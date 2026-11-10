@@ -115,6 +115,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Blocked by / questions: the browser pane is not signed in to GitHub, so the pull requests are not opened yet.
 - Architecture: updated (section 2 registry row `scenarios/D21/`, section 11 change log)
 
+### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - gallery of figures
+- Did: on the sponsor's request, added `docs/GALLERY.md`: fourteen commented figures (`docs/gallery/*.svg`) of T0, T9.1, the demo T1.4 and the D21 scenarios, and the tool `tools/make_gallery.py` that redraws them from the stored results. To have all the results in one place, the branch `gallery` first merges `D21-scenarios` (pull request #13) into the top of the MVP stack (`MVP-demo`), with the four documentation conflicts resolved by keeping both sides.
+- Result: `python tools/make_gallery.py` regenerates the fourteen figures. No new run was added to `results/`, and no new claim is made: each figure is labelled with its law and its kind; the demo figures are labelled exploratory and L1a a hypothesis. `pytest`: 170 passed, 1 deselected.
+- Next: review. If #13 and the stack are merged separately, this branch's merge commit shows how their documents reconcile.
+- Blocked by / questions: none. Two figures are recomputed, not read from files (the positions of T0.2 and the field line of T0.5); the gallery says so.
+- Architecture: updated (sections 2, 4, 11)
+
 ### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - MVP-10 (demo T1.4, release notes)
 - Did: wrote down the expectations for the demo before running it (`team/notes/T1.4.md`, commit `d618739`); wrote `scenarios/T1.4/run.py` and `figures.py` (SVG with the standard library); added "Try it" to `README.md`, wrote `CHANGELOG.md` for 0.1.0 and set the package version to 0.1.0; ran the demo on the committed code (engine commit `30f2172`) and committed its stamped, exploratory outputs with two figures.
 - Result: one command, `python scenarios/T1.4/run.py`, shows a proton and an electron on a circle under L0 and on an eccentric closed orbit under the hypothesis L1a (farthest separation 3.3808 r0, back after 4.03 L0 periods, both as expected beforehand). **Exploratory, not a result**; L1a at lambda = 1 is excluded by T9.1. `pytest`: 170 passed, 1 deselected.

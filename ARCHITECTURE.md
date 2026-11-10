@@ -88,6 +88,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | validate | `tools/validate_results.py` | P4 | implemented | validates the results folders against `engine/schemas/`, one readable line per problem; used by `engine/tests/test_schemas.py` on every committed result. Outside the package, so the web universe does not load `jsonschema` |
 | scaffold | `tools/new_scenario.py` | P5 | implemented | creates `scenarios/<ID>/` (`settings.json`: a valid 10-step L0 start; `run.py`: calls the runner, `--dry-run` writes nothing), the notebook from `team/notes/_TEMPLATE.md` and a registry row; never overwrites |
 | webui | `simulator/web/` | UI1 | in-progress | interactive universe in the browser: the unchanged engine runs in Pyodide in a web worker (`worker.js`, `bridge.py`); page `index.html`, `app.js`; `engine-files.json` lists the engine files it loads (D22, proposed) |
+| gallery | `tools/make_gallery.py` | - | implemented | draws the figures of `docs/GALLERY.md` (SVG, standard library) from the stored results |
 <!-- registry:end -->
 
 ### Scenario scripts
@@ -143,6 +144,7 @@ flowchart TB
         archcheck["tools/check_architecture.py"]
         validate["tools/validate_results.py"]
         schemas["engine/schemas<br/>(stamp, summary)"]
+        gallery["tools/make_gallery.py"]
         cli["python -m cosmicmass<br/>__main__.py"]
         scen["scenarios/ID/run.py"]
         gate["gates/t0.py"]
@@ -194,6 +196,9 @@ flowchart TB
 
     scen --> runner
     cli --> runner
+    gallery --> gate
+    gallery --> runner
+    gallery --> fields
     scen --> settings
     gatetests --> gate
     gatetests --> limits
@@ -716,6 +721,7 @@ Newest first. One line per pull request that changed the architecture.
 | 2026-11-10 | E4.5, T9.4 and the question scenarios Q1-Q3 (`E4.5-T9.4`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/base.py` gains `third_law_residual`; `gates/t9.py` gains `t9_4`; scenario rows `scenarios/T9.4/` and `scenarios/Q/`; section 10: signature of `third_law_residual` added; no diagram changed |
 | 2026-11-11 | UI1, first version (`UI1-web-universe`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `simulator/web/` in progress: web worker running the unchanged engine in Pyodide, bridge, page; nodes `UI` and `webui` no longer planned; test `engine/tests/test_web_universe.py`. No engine module or contract changed |
 | 2026-11-10 | D21 scenarios (`D21-scenarios`, stacked on `T0-gate`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | scenario row `scenarios/D21/` (D21.1-D21.4); no engine module, diagram or contract changed |
+| 2026-11-10 | Gallery (`gallery`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | **new tool** `tools/make_gallery.py` (node `gallery` in section 4, uses `gate`, `runner`, `fields`); no engine module or contract changed |
 | 2026-11-10 | MVP-10: demo and release notes (`MVP-demo`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | scenario row `scenarios/T1.4/` (in progress: the demo only); package version 0.1.0; no module, diagram or contract changed |
 | 2026-11-10 | MVP-9: L1a and the measured limits (`T9-limits`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/l1.py` in progress (L1a with sign, strength, terms; node `l1` stays dashed); **new module** `gates/t9.py` (node `limits`); scenario rows `scenarios/T9.1/`, `scenarios/T9.3/`; section 4: `gatetests` and `scen` use `limits`. `write_gate_result` takes the kind and the law of the result (keyword arguments with the old behaviour as default) |
 | 2026-11-10 | MVP-8: the consistency gate (`T0-gate`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | **new module** `gates/t0.py` (node `gate`), `engine/gates/` implemented (the fast gate is collected by pytest; section 9 is left as it is until the `tests` job of P2 is merged), five scenario rows `scenarios/T0.1/` to `scenarios/T0.5/`; section 4: `gatetests` and `scen` use `gate`, which uses `runner`, `settings` and `stamp`; section 8: `run.py` exists. The summary of a run gains `wall_impulse` and `momentum_with_walls_drift` (no signature changed) |
