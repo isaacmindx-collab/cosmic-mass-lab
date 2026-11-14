@@ -20,7 +20,7 @@ from .constants import SI, scaled
 from .diagnostics import Diagnostics, drifts
 from .environment import Environment, kinetic_temperature
 from .fields import DirectSum, smallest_separation
-from .integrators import StepContext, VelocityVerlet
+from .integrators import Boris, StepContext, VelocityVerlet
 from .settings import Settings, SettingsError, load_settings, make_heat_bath, make_inflow
 from .stamp import build_stamp, engine_commit, make_run_id, write_results
 from .state import State
@@ -91,7 +91,7 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         speed_reference=num["speed_reference"],
         dt_max=np.inf if num["dt_max"] is None else num["dt_max"],
     )
-    integrator = VelocityVerlet()
+    integrator = Boris() if num["integrator"] == "boris" else VelocityVerlet()
     diagnostics = Diagnostics(settings.frame, constants, softening, background)
 
     every = num.get("record_every") or (max(1, num["steps"] // 1000) if num["steps"] else 100)

@@ -83,7 +83,7 @@ def broken(path, value="__delete__", **extra):
         (broken(["bodies", 2, "q"]), "bodies[2]"),
         (broken(["bodies", 0, "m"], 1.0), "bodies[0]"),
         (broken(["bodies", 0, "spin"], 1), "bodies[0]"),
-        (broken(["numerics", "integrator"], "boris"), "numerics.integrator"),
+        (broken(["numerics", "integrator"], "leapfrog"), "numerics.integrator"),  # "boris" exists since E3.2
         (broken(["numerics", "stepz"], 1), "stepz"),
         (broken(["kind"], "guess"), "kind"),
         (
