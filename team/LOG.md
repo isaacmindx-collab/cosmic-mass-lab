@@ -20,6 +20,20 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: no code changed
 - Questions: answered (# 1, 2, 3, 7, 8, 9, 10)
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.2
+- Did: after delivering T9.4, claimed T9.2; pre-registered it in `team/notes/T9.2.md` (commit `8e2e812`, before any code); wrote `t9_2` in `gates/t9.py` (pull at four separations, one integrated orbit with convergence, the book's scaling), `scenarios/T9.2/run.py` and a fast check; ran it on the clean engine commit `b19237e`.
+- Result: **T9.2 passes, as predicted**: under the charge share alone the pull of hydrogen is 0.647892 of L0's at every separation; an orbit keeps the period of that pull (3.3e-7, converged to 6e-8); by the book's scaling the binding energy is 5.708 eV (book 5.71) against the measured 13.598 eV, so this reading at lambda = 1 is excluded. Measurement check under a hypothesis. `pytest`: 176 passed, 1 deselected, coverage 99.45%.
+- Next: pull requests for T9.4 and T9.2 (stacked); reproductions by a human or another model (D14). With them, the T9 gate of D4 is complete and Milestone 2 can start.
+- Blocked by / questions: GitHub sign-in of this session (pending at the time of writing).
+- Architecture: updated (section 2 rows `limits`, `gatetests`, `scenarios/T9.2/`; section 4 edge `limits --> runner`; section 11)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.4
+- Did: fresh clone and pinned environment on Windows (Python 3.12.10); ran the six verification scripts (all pass); pre-registered T9.4 in `team/notes/T9.4.md` (commit `d7003ae`, before any code); wrote `t9_4` in `gates/t9.py`, `scenarios/T9.4/run.py` and a fast check; ran it on the clean engine commit `206c8af`.
+- Result: **T9.4 passes, as predicted**: near the neutral Earth a proton and an antiproton (`m_p - e G`) get Composer forces of 1.51237e-8 N in opposite directions (sum exactly 0), with identical Real forces; only `s q g` acts. Measurement check under the hypothesis L1a, no measurement to compare with. `pytest`: 175 passed, 1 deselected, coverage 99.67%.
+- Next: pull request; reproduction by a human or another model (D14); then T9.2 (hydrogen under the charge share).
+- Blocked by / questions: this session is not signed in to GitHub, so the branch is pushed only after the sponsor signs in. Sponsor handle inferred (see `team/notes/T9.4.md`).
+- Architecture: updated (section 2 rows `limits`, `gatetests`, `scenarios/T9.4/`; section 11)
+
 ### 2026-11-11 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - Q4 (the step rule and the frame)
 - Did: merged `main` (UI1, pull request #19) into my two open branches, renumbering my proposed decisions to D23 and D24 because `main` took D22; my first merge commit left conflict markers in the change log of `ARCHITECTURE.md`, which I removed in a following commit on both branches. Then took up the remark of `team/notes/UI1.md` as a scenario: pre-registered Q4 (`team/notes/Q4.md`, commit `7cd44e0`), added the option `speed_reference` to the step rule (default unchanged), wrote `scenarios/Q4/run.py`, ran it on the clean commit `7d98c8d`.
 - Result: the current step rule depends on the frame (29 times more steps for a system moving at the Earth's orbital speed, without loss of accuracy); a rule relative to the nearest neighbour does not, and is as accurate on four setups (Sun, Earth and moon over a month: 6,449 steps instead of 186,692, within 2.8e-8 of a fine reference). Seven of my eight prediction flags hold; the one that fails, and one prediction that was wrong in its value, are described in the notebook. `pytest`: 179 passed, 1 deselected.

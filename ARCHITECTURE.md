@@ -68,12 +68,13 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | plots | `engine/cosmicmass/analysis/plots.py` | E8.3 | planned | standard figures: Real and Composer planes, drifts, sweeps |
 | tests | `engine/tests/` | P1 | implemented | unit tests for every module (pytest), run in CI with coverage (P2); so far `test_pins.py` (pins of `pyproject.toml` equal `requirements.txt`), `test_import.py`, `test_constants_frame.py` (E1.1), `test_gn.py` (E1.2), `test_gnarray.py` (E1.3), `test_readings_matter.py` (E1.4, E1.5), `test_compendium.py` (E1.6), `test_state_laws.py` (E5.1, E4.1, E4.2), `test_settings.py` (E5.3), `test_fields.py` (E2.1, E2.3, E2.4), `test_integrators.py` (E3.1, E3.3, E6a; one test marked `slow`), `test_runner.py` (E7.1 to E7.3, E8.1, E9), `test_l1a.py` (E4.3, L1a) |
 | gate | `engine/cosmicmass/gates/t0.py` | T0, G1 | implemented | the consistency gate T0.1 to T0.5 as functions (`t0_1` ... `t0_5`, `run_gate`), and `write_gate_result` |
-| limits | `engine/cosmicmass/gates/t9.py` | T9.1, T9.3 | implemented | the measured limits T9.1 and T9.3 under L1a as functions (`t9_1`, `t9_3`, `t9_4`) |
-| gatetests | `engine/gates/` | G1 | implemented | fast T0 gate and fast T9.1, T9.3 checks, run by pytest (in CI with the `tests` job of P2) |
+| limits | `engine/cosmicmass/gates/t9.py` | T9.1-T9.4 | implemented | the measured limits T9.1 to T9.4 under L1a as functions (`t9_1`, `t9_2`, `t9_3`, `t9_4`); `t9_2` also integrates one orbit with the runner |
+| gatetests | `engine/gates/` | G1 | implemented | fast T0 gate and fast T9.1 to T9.4 checks, run by pytest (in CI with the `tests` job of P2) |
 | - | `scenarios/T1.4/` | T1.4 (demo) | in-progress | demo of version 0.1.0: hydrogen-like pair under L0 and L1a, exploratory; `run.py` and `figures.py` (SVG, standard library) |
 | - | `scenarios/T9.1/` | T9.1 | implemented | neutron effective charge 9.0e-19 e under L1a |
+| - | `scenarios/T9.2/` | T9.2 | implemented | hydrogen under the charge share (L5c): the pull falls to 0.648 of Coulomb's; binding energy 5.71 eV by the book's scaling, against 13.598 eV |
 | - | `scenarios/T9.3/` | T9.3 | implemented | equivalent field 1.14e11 V/m for a charge in gravity (L5a) |
-| - | `scenarios/T9.4/` | T9.4 | implemented | proton and antiproton near a neutral Earth under L1a: opposite pushes |
+| - | `scenarios/T9.4/` | T9.4 | implemented | a proton and an antiproton (`m_p - e G`) near the neutral Earth under L1a: opposite Composer pushes |
 | - | `scenarios/Q/` | Q1-Q3 | implemented | open questions run against their alternatives: third law under L1a, energy candidates of L1a, value of `K` |
 | - | `scenarios/Q4/` | Q4 | implemented | the adaptive step and the frame of description: the current rule against a rule relative to the nearest neighbour |
 | - | `scenarios/T0.1/` | T0.1 | implemented | Earth-moon, hydrogen-like orbit, two protons under L0 |
@@ -196,6 +197,7 @@ flowchart TB
     limits --> settings
     limits --> fields
     limits --> gate
+    limits --> runner
     scen --> gate
     gate --> runner
     gate --> settings
@@ -683,6 +685,8 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | T9.2 (`T9.2-hydrogen-share`, stacked on `T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_2`, which uses `runner` (new edge `limits --> runner` in section 4) and the helpers `_pair`, `_relative_track` of `gates/t0.py` (edge `limits --> gate` already there); scenario row `scenarios/T9.2/`; no contract changed |
+| 2026-11-14 | T9.4 (`T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_4` (no existing signature changed); scenario row `scenarios/T9.4/`; no new module, edge or contract |
 | 2026-11-11 | Q4: the step rule and the frame (`Q4-step-frame`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `integrators.py`: `nearest_neighbours` and the option `StepContext.speed_reference` (default unchanged); scenario row `scenarios/Q4/`; section 10: the option written out. No diagram changed |
 | 2026-11-11 | E6a: absorbing walls (`E6a-absorbing-walls`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `environment.py`: boundary `absorbing` and the collector `Environment.collected`; section 10: the collector and the three boundary names written out; the run summary gains `absorbed`. No diagram changed |
 | 2026-11-10 | E4.5, T9.4 and the question scenarios Q1-Q3 (`E4.5-T9.4`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/base.py` gains `third_law_residual`; `gates/t9.py` gains `t9_4`; scenario rows `scenarios/T9.4/` and `scenarios/Q/`; section 10: signature of `third_law_residual` added; no diagram changed |

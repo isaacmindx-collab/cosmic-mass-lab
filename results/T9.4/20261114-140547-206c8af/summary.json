@@ -1,0 +1,91 @@
+{
+  "cases": {
+    "antiproton": {
+      "composer_force": [
+        1.5123686890912403e-08,
+        0.0
+      ],
+      "composer_over_real": 1.1115537055741676e+18,
+      "composer_size": 1.5123686890912403e-08,
+      "composer_terms": {
+        "-2 cos q E": [
+          0.0,
+          0.0
+        ],
+        "-m E/s": [
+          -0.0,
+          -0.0
+        ],
+        "s q g": [
+          1.5123686890912403e-08,
+          0.0
+        ]
+      },
+      "composer_towards_earth": false,
+      "expected_s_q_g": 1.51236868909124e-08,
+      "g": [
+        -8.1344733877551,
+        -0.0
+      ],
+      "pass": true,
+      "real_force": [
+        -1.3605898496015842e-26,
+        -0.0
+      ],
+      "relative_error_vs_s_q_g": 2.220446049250313e-16
+    },
+    "pair": {
+      "checks": {
+        "opposite_to_1e-15": true,
+        "other_terms_zero": true,
+        "proton_pulled_antiproton_pushed": true,
+        "real_forces_equal": true,
+        "size_s_e_g_to_1e-12": true
+      },
+      "measurement": "none: the fall of a charged antiparticle has not been measured (book, Chapter 9)",
+      "pass": true,
+      "relative_sum_of_composer_forces": 0.0,
+      "tolerance": {
+        "opposite": 1e-15,
+        "relative": 1e-12
+      }
+    },
+    "proton": {
+      "composer_force": [
+        -1.5123686890912403e-08,
+        -0.0
+      ],
+      "composer_over_real": 1.1115537055741676e+18,
+      "composer_size": 1.5123686890912403e-08,
+      "composer_terms": {
+        "-2 cos q E": [
+          -0.0,
+          -0.0
+        ],
+        "-m E/s": [
+          -0.0,
+          -0.0
+        ],
+        "s q g": [
+          -1.5123686890912403e-08,
+          -0.0
+        ]
+      },
+      "composer_towards_earth": true,
+      "expected_s_q_g": 1.51236868909124e-08,
+      "g": [
+        -8.1344733877551,
+        -0.0
+      ],
+      "pass": true,
+      "real_force": [
+        -1.3605898496015842e-26,
+        0.0
+      ],
+      "relative_error_vs_s_q_g": 2.220446049250313e-16
+    }
+  },
+  "explanation": "T9.4 under the hypothesis L1a: every case meets its criterion.",
+  "scenario": "T9.4",
+  "verdict": "pass"
+}
