@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) - review: T9.2, Q5, D21.1 to D21.4 reproduced by a different model
+- Did: for the S3 exit gate of M1 ("each reproduced independently"), re-ran T9.2 (`b19237e`), Q5 (`746e044`) and D21.1 to D21.4 (`f263697`) from their stamped engine commits on Linux (Python 3.12.3; the producers used 3.12.10 on Windows), with the producers' scripts unchanged, and compared every value. For T9.2 also an arithmetic check that does not use the engine.
+- Result: all six reproduced. Every text, flag, verdict and step count is identical. Numbers agree to rounding: the largest difference on a judged quantity is 1.1e-11 relative (a three-body separation in Q5). T9.2 and Q5 move from the same-model exceptions D38 and D39 to "confirmed (agent, same sponsor; D27)"; D21.1 to D21.4 from `done` to the same. Outputs not committed.
+- Next: the M1 review draft.
+- Blocked by / questions: none.
+- Architecture: no change (no code)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the rest of M1: split, D40, registry
 - Did: mapped what M1's exit gates still need (S2: every E row implemented; S3: T0 and T9 confirmed, done; the M1 review). The maintainer chose to split the open engine parts (Claude Code: E9, E2.2, the registry; OpenCode: D37, D36, E5.2, E7) and to move E2.5 to S5 (D40). Recorded D40, the work plan's S2 gate, the registry (`modifiers` deprecated, `fieldsfast` moved to S5), the E2 claim, and the split in the team chat.
 - Result: records only. E9 is in #70; OpenCode's D37 is in #69.
