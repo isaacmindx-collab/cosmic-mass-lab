@@ -12,6 +12,30 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
+- Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.
+- Result: `summary.json` identical bit for bit (67 numbers, 29 flags; the failed prediction about the sign of the deflection is reproduced too). The gates of M1 (T0, T9.1-T9.4) are all confirmed.
+- Next: the OpenCode agent builds D37 and D36; D21.1-D21.4 are still `done`.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - T9.2 reproduced and confirmed (D38)
+- Did: re-ran `scenarios/T9.2/run.py` from its stamped engine commit `b19237e` in a clean worktree and compared the new `summary.json` with the stored one. On the maintainer's decision (D38, "approve it even the same agent"; "don't leave it open anymore"), recorded T9.2 as confirmed by the same model, with that label; added the reproduction run to `results/T9.2/`; updated `team/FINDINGS.md` and journal entry 2026-003 (with a dated note).
+- Result: identical bit for bit (33 numbers, 11 flags; binding energy 5.7080 eV). All four T9 tests are now confirmed.
+- Next: a reproduction by a person or another model can still upgrade the label. Q5 stays `done` (not covered by D38).
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - open issues: decisions D23, D36, D37
+- Did: put the three open decision issues to the maintainer, with recommendations. His answers: question 12 (#58) "A: nearest image" → **D36**; question 24 (#57) "A: all four columns" → **D37** (it also answers question 13); D23 (#17) "Approve, with scope" → **D23 approved** (all terms, radial, inertia `Re`, no `B_cal`). Recorded them in `team/DECISIONS.md`, moved questions 1, 12, 13 and 24 to "Answered" in `team/QUESTIONS.md`, answered the issues, and told the OpenCode agent in the chat.
+- Result: E4 (L1e, torque), E6 (wrap-around) and the Composer part of E9 are unblocked.
+- Next: the OpenCode agent builds D37 (L1e, torque) and D36 (wrap-around, with its comparison scenario).
+- Blocked by / questions: still for the physics lead, the definitions of the law options (`team/notes/E4.md`) and question 11; T9.2 and Q5 still need a reproduction by another model or a person.
+- Architecture: no code changed
+- Questions: answered (1, 12, 13, 24, by the maintainer)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E5.4: seeded populations
 - Did: claimed E5; wrote `populations.py` (box, shell, ring; bulk flow, thermal spread, Keplerian speeds; super-particles) and the settings key `populations`, seeded from `numerics.seed`; the stamp keeps them. Opened issues #57 (E4, question 24) and #58 (E6, question 12) for the maintainer.
 - Result: the same seed gives identical arrays; 10^4 protons at 1e4 K have their kinetic temperature within 1% (the done-when of E5.4). Software checks; no finding.
