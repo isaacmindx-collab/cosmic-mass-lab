@@ -18,6 +18,7 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Next: review (stacked on P4, #25); P7.
 - Blocked by / questions: the scaffold writes a generic valid L0 start, not the setup of `docs/05` (labelled choice in `team/notes/P5.md`).
 - Architecture: updated (section 2 row `scaffold`; section 4 node and edges; section 10 additions; section 11)
+- Questions: none new
 
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P4
 - Did: wrote `engine/schemas/stamp.schema.json` and `summary.schema.json` (two forms each: one run, or a test with cases), `tools/validate_results.py` (readable messages, command line) and `engine/tests/test_schemas.py` (every committed result folder included); pinned `jsonschema==4.26.0` as a dev dependency, as proposed in D24. After #27 was merged, merged `main` into the branch (no history rewritten) and dropped the four D21 exceptions (issue #24 is fixed).
