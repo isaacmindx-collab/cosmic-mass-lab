@@ -12,6 +12,7 @@ Start here, in this order:
 - [team/DECISIONS.md](team/DECISIONS.md): binding decisions D1-D20
 - [team/LOG.md](team/LOG.md): project journal, newest first (read the last 10 entries)
 - [team/FINDINGS.md](team/FINDINGS.md): results and their status
+- [team/QUESTIONS.md](team/QUESTIONS.md): questions waiting for the maintainer
 
 ## Plan and architecture
 

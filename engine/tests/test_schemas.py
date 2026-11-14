@@ -15,10 +15,6 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 import validate_results as vr  # noqa: E402
 
-# Committed summaries that do not follow section 4: their verdict is a sentence, not
-# pass / fail / finding. Reported in issue #24; results are never edited by hand, so they
-# stay until their producer re-runs them. Nothing else may be wrong with them.
-KNOWN_NONCONFORMING = {"D21.1", "D21.2", "D21.3", "D21.4"}
 
 
 def _settings():
@@ -31,12 +27,7 @@ def _settings():
 
 @pytest.mark.parametrize("folder", vr.run_folders(ROOT / "results"), ids=lambda f: f.relative_to(ROOT).as_posix())
 def test_committed_results_follow_the_schemas(folder):
-    problems = vr.validate_folder(folder)
-    scenario = folder.relative_to(ROOT / "results").parts[0]
-    if scenario in KNOWN_NONCONFORMING:
-        assert len(problems) == 1 and "summary.json: verdict:" in problems[0]
-    else:
-        assert problems == []
+    assert vr.validate_folder(folder) == []
 
 
 def test_a_fresh_run_validates(tmp_path):

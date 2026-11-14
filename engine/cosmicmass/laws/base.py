@@ -16,7 +16,7 @@ from ..fields.sample import FieldSample
 from ..frame import Frame
 from ..state import State
 
-__all__ = ["LawSpec", "ForcePair", "Law", "register", "make_law", "available_laws"]
+__all__ = ["LawSpec", "ForcePair", "Law", "register", "make_law", "available_laws", "third_law_residual"]
 
 # field of LawSpec -> (key in stamp.json, allowed values; None means "a number")
 _OPTIONS = {
@@ -131,3 +131,25 @@ def make_law(spec: LawSpec | str) -> Law:
     if spec.reading not in _REGISTRY:
         raise NotImplementedError(f"law {spec.reading} is not implemented; available: {available_laws()}")
     return _REGISTRY[spec.reading](spec)
+
+
+def third_law_residual(law: Law, state: State, solver, frame: Frame) -> dict:
+    """Newton's third law check (task E4.5, used by T1.6). For every pair of alive bodies, the
+    force on a from b alone and the force on b from a alone are computed with `solver` (which must
+    have no background field) and `law`, and added. Returns the pair with the largest
+    `|F_ab + F_ba| / max(|F_ab|, |F_ba|)`: `{"pair", "residual", "force", "relative"}`; the relative
+    residual is 0 when the law obeys the third law, and `None` when no pair exerts any force."""
+    worst = {"pair": None, "residual": 0.0, "force": 0.0, "relative": None}
+    alive = np.flatnonzero(state.alive)
+    for position, i in enumerate(alive):
+        for j in alive[position + 1:]:
+            pick = [i, j]
+            pair = State(state.m[pick], state.q[pick], state.x[pick], state.v[pick], [False, False], [True, True], state.t)
+            force = law.forces(pair, solver.at_bodies(pair), frame).total()
+            size = float(max(np.linalg.norm(force[0]), np.linalg.norm(force[1])))
+            if size == 0.0:
+                continue
+            residual = float(np.linalg.norm(force[0] + force[1]))
+            if worst["relative"] is None or residual / size > worst["relative"]:
+                worst = {"pair": (int(i), int(j)), "residual": residual, "force": size, "relative": residual / size}
+    return worst

@@ -236,3 +236,69 @@ def test_bad_boxes_are_refused():
     for box in (None, {"lower": [0, 0]}, {"lower": [0], "upper": [1]}, {"lower": [1, 1], "upper": [0, 0]}, {"size": 2}):
         with pytest.raises(SettingsError, match="box"):
             load_settings({**base, "universe": {"boundary": "reflecting", "box": box}})
+
+
+def test_absorbing_walls_collect_mass_charge_and_momentum():
+    # E6a: an absorbing wall switches the body off and adds its m, q and momentum to the collector
+    f = Frame.scaled()
+    state = State(m=[1.0, 2.0, 3.0, 4.0], q=[0.5, -0.25, 1.0, 2.0], x=[[1.5, 0.0], [0.0, -1.2], [0.0, 0.0], [3.0, 0.0]],
+                  v=[[2.0, 1.0], [0.0, 3.0], [1.0, 1.0], [0.0, 0.0]], fixed=[False, False, False, True], alive=[True] * 4)
+    total = state.total_mu(f)
+    box = Environment("absorbing", [-1.0, -1.0], [1.0, 1.0])
+    events = box.apply(state, 0.1)
+    assert list(state.alive) == [False, False, True, True]  # the fixed body outside the box is left alone
+    assert events == [
+        {"wall": (0, "upper"), "bodies": 1, "impulse": 2.0, "absorbed": {"indices": [0], "m": 1.0, "q": 0.5, "momentum": [2.0, 1.0]}},
+        {"wall": (1, "lower"), "bodies": 1, "impulse": 6.0, "absorbed": {"indices": [1], "m": 2.0, "q": -0.25, "momentum": [0.0, 6.0]}}]
+    # body 1 was moving back inwards: an absorbing wall takes it all the same
+    assert (box.collected["bodies"], box.collected["m"], box.collected["q"]) == (2, 3.0, 0.25)
+    assert np.array_equal(box.collected["momentum"], [2.0, 7.0])
+    # the rows keep their m and q: total mass and charge are exactly conserved, counting the collector
+    assert np.all(state.total_mu(f) == total)
+    alive = state.total_mu(f, alive_only=True)
+    assert alive.re + box.collected["m"] == total.re and alive.com + box.collected["q"] == total.com
+    assert box.apply(state, 0.1) == [] and box.collected["bodies"] == 2  # a body is taken once
+    assert not np.any(context().acceleration(state)[:2])  # absorbed bodies neither move nor act
+
+
+def test_a_gas_between_absorbing_walls_through_the_runner():
+    from cosmicmass.runner import run
+
+    rng = np.random.default_rng(5)
+    bodies = [{"m": 1e-3, "q": float(rng.normal(0, 1e-3)), "x": [float(c) for c in rng.uniform(-0.9, 0.9, 2)],
+               "v": [float(c) for c in rng.normal(0, 1.0, 2)]} for _ in range(12)]
+    data = {"scenario": "absorb", "universe": {"units": "scaled", "boundary": "absorbing",
+                                              "box": {"lower": [-1.0, -1.0], "upper": [1.0, 1.0]}},
+            "bodies": bodies, "numerics": {"t_end": 3.0, "dt_max": 2e-3}}
+    result = run(data, out_root=None)
+    absorbed, drift = result.summary["absorbed"], result.summary["conservation"]
+    assert absorbed["bodies"] >= 8 and absorbed["bodies"] + absorbed["alive_at_the_end"] == 12
+    assert drift["mass"] == 0.0 and drift["charge"] in (0.0, None)  # exactly, counting the collector
+    assert absorbed["m"] == pytest.approx(1e-3 * absorbed["bodies"])
+    assert result.summary["momentum_with_walls_drift"] < 1e-9  # the walls hold the momentum the bodies lost
+    assert drift["momentum"] > 1e-2 and result.summary["wall_hits"] == absorbed["bodies"]
+    assert drift["energy_re"] > 1e-2  # the energy of the absorbed bodies leaves the bodies: not conserved
+    assert run({**data, "universe": {**data["universe"], "boundary": "open"}}, out_root=None).summary["absorbed"]["bodies"] == 0
+
+
+def test_step_rule_relative_to_the_nearest_neighbour():
+    # the option tested by scenario Q4: the same step whatever uniform velocity is added to all bodies
+    from cosmicmass.integrators import nearest_neighbours
+
+    state, period = kepler(m1=1.0, m2=1.0)
+    absolute, relative = context(), context(speed_reference="neighbour")
+    dt_abs, dt_rel = VV.next_dt(state, absolute), VV.next_dt(state, relative)
+    assert dt_rel == pytest.approx(dt_abs, rel=1e-12)  # a two-body circular orbit: eta r / v_rel in both
+    boosted = state.copy()
+    boosted.v += [300.0, -40.0]
+    assert VV.next_dt(boosted, context(speed_reference="neighbour")) == pytest.approx(dt_rel, rel=1e-9)
+    assert VV.next_dt(boosted, context()) < dt_abs / 100  # the absolute rule shrinks with the boost
+    assert list(nearest_neighbours(state)[1]) == [1, 0] and nearest_neighbours(state)[0][0] == pytest.approx(1.0)
+    # a body alone has no neighbour and does not limit the step; a fixed neighbour counts as at rest
+    alone = State.from_bodies([preset("neutron")], [[0.0, 0.0]], v=[[5.0, 0.0]])
+    assert list(nearest_neighbours(alone)[1]) == [0] and VV.next_dt(alone, context(speed_reference="neighbour", dt_max=2.0)) == 2.0
+    pinned = State(m=[1.0, 1e-3], q=[0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0]], v=[[9.0, 9.0], [0.0, 1.0]],
+                   fixed=[True, False], alive=[True, True])
+    assert VV.next_dt(pinned, context(speed_reference="neighbour")) == pytest.approx(VV.next_dt(pinned, context()), rel=1e-12)
+    with pytest.raises(ValueError, match="speed_reference"):
+        VV.next_dt(state, context(speed_reference="rotating"))

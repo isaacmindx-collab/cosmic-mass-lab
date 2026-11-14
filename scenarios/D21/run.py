@@ -72,7 +72,11 @@ def _write(outcome, verdict, explanation):
     folder = write_gate_result(outcome, producer=PRODUCER)
     path = folder / "summary.json"
     summary = json.loads(path.read_text(encoding="utf-8"))
-    summary.update(verdict=verdict, explanation=explanation, prediction=outcome["prediction"])
+    # RESULTS-STANDARD section 4: the verdict is pass, fail or finding. D21 compares conventions
+    # rather than testing a pass criterion, so it is a finding; the sentence goes to the explanation
+    # (issue #24).
+    summary.update(verdict="finding", explanation=f"{verdict[0].upper() + verdict[1:]}. {explanation}",
+                   prediction=outcome["prediction"])
     path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return folder
 

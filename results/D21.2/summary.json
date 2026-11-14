@@ -36,8 +36,8 @@
       "value": 0.9999985000018751
     }
   },
-  "explanation": "Prediction partly wrong: T0.1c passes with D10's softening, with a smaller error at eta = 1e-3 (1.23e-07 against 3.82e-07). Halving the step shows why: without softening the error falls as the step squared (+3.82e-07 -> +9.55e-08), towards the closed form; with softening it grows (-1.23e-07 -> -4.09e-07), towards a different answer, because softening changes the force law. The smaller error was a cancellation. The orbits' period error is ten times larger with softening (3.3e-6 against 3.3e-7). So gates compared with closed forms run with softening 0; D10's softening stays for many-body runs.",
+  "explanation": "Supports D21 (2). Prediction partly wrong: T0.1c passes with D10's softening, with a smaller error at eta = 1e-3 (1.23e-07 against 3.82e-07). Halving the step shows why: without softening the error falls as the step squared (+3.82e-07 -> +9.55e-08), towards the closed form; with softening it grows (-1.23e-07 -> -4.09e-07), towards a different answer, because softening changes the force law. The smaller error was a cancellation. The orbits' period error is ten times larger with softening (3.3e-6 against 3.3e-7). So gates compared with closed forms run with softening 0; D10's softening stays for many-body runs.",
   "prediction": "orbits pass either way; T0.1c likely fails with D10 softening (prediction failed: it passes)",
   "scenario": "D21.2",
-  "verdict": "supports D21 (2)"
+  "verdict": "finding"
 }
