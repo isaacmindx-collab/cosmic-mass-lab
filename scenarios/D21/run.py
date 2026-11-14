@@ -11,7 +11,6 @@ statement is mathematics: a check of the engine's numerics, not a finding about 
 import json
 import math
 import sys
-from pathlib import Path
 
 import numpy as np
 
