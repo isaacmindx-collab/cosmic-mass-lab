@@ -44,6 +44,13 @@ Every run writes a stamp with at least:
 
 `kind` is one of `mathematics`, `measurement-check` or `finding`. `preregistered` is false for exploratory runs.
 
+Written by the engine since E7 (`team/notes/E7.md`; questions 26 and 27 of `team/QUESTIONS.md`):
+
+- `t0_status` is `pass`, `fail` or `not run`: the verdict of the stored T0.1 to T0.5 runs made on the same engine code as this run.
+- `resumed_at_steps` (only when it applies): the steps at which the run was taken up again from a checkpoint. A resumed run gives the same `summary.json` as a run never interrupted.
+- `numerics` may hold `checkpoint_every` (it does not change the result) and `drift_tolerance` (step control; it does, and belongs in the pre-registration of a scenario that uses it).
+- The stamp and the summary are checked against `engine/schemas/` before they are written.
+
 ## 3. Determinism
 
 - Every random draw comes from a seeded generator, with the seed in the stamp.
