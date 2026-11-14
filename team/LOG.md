@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3 part 1: the pair guard of D29
+- Did: claimed E3 (chat message `20261114-162843`); put the pair guard of D29 into `integrators.py` (`pair_approach_time`; `next_dt` always applies `eta min r_ij / |v_ij|`); default `speed_reference` now `"neighbour"` (labelled reading of D29, in `team/notes/E3.md`); 2 new tests; three calls of an older unit test now ask for `"absolute"` explicitly.
+- Result: full T0 gate with convergence passes on `8545bfa` (T0.1c: 3,961 steps, separation error 1.3e-7, as Q4 measured); 249 tests passed, coverage 99.31%.
+- Next: E3.2 (Boris push), then E3.4 with E4.4 (inertia readings L7).
+- Blocked by / questions: the reading of D29 (default rule C), posted in the chat.
+- Architecture: updated (section 2 row `integrators`; section 10, contract of `StepContext` changed by D29; section 11)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the team chat adopted (D30)
 - Did: recorded the maintainer's decision "Merge and adopt" (question 23): decision D30; reading the inbox is now step 1 of the session protocol (`AGENTS.md`), and is in `TEAM.md`, `BRING-YOUR-AI.md`, `llms.txt` and `team/chat/README.md`.
 - Result: documentation only.
