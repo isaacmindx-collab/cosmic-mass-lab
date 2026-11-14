@@ -145,7 +145,7 @@ Then read [`TEAM.md`](TEAM.md) and the [work plan](docs/WORK-PLAN.md), pick a ta
 |---|---|
 | Verified foundation (sources, compendium, CI) | ✅ done |
 | **MVP 0.1.0**: the first working universe ([release](https://github.com/MostafaDerraz/cosmic-mass-lab/releases/tag/v0.1.0)) | ✅ **released** |
-| S1: infrastructure (P1–P7) | 🟡 P1, P2, P3 done; P4–P7 open |
+| S1: infrastructure (P1–P7) | ✅ **done** (2026-11-14): package, CI tests, architecture check, result schemas, scenario scaffold, branch protection, lint |
 | M1: engine and gates (E1–E9, T0, T9, G1) | 🟡 T0 and T9.1, T9.3 **confirmed**; T9.2, T9.4 open |
 | M2: what can the coupling be? (T1, T2) | ⏳ next, after M1 |
 | M3, M4: angle, many bodies, motion, populations | ⏳ planned |

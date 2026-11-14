@@ -20,6 +20,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: updated (section 2 row `scenarios/Q5/`; section 11)
 - Questions: answered (14)
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - P6, stage S1 complete
+- Did: on the maintainer's request ("focus now to finish S1"): created the 8 project labels (`claim`, `result`, `decision`, `urgent`, `agent`, `engine`, `scenario`, `architecture`; `question` and `good first issue` already existed); set 9 repository topics; switched on branch protection for `main` with the rule the maintainer chose: pull request required, the CI checks `verify`, `tests`, `architecture`, `lint` required, no approval required yet, admin bypass (decision D26).
+- Result: GitHub reports `main` protected, with the four required checks, enforced for non-admins. **Stage S1 (P1-P7) is complete.**
+- Next: the maintainer's decisions D23 (energy of L1a, unblocks T2 and M2) and D25 (one format pass); then milestone M2.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the gallery (#15), D21 results layout
 - Did: took the gallery commit of #15 onto `main` with cherry-pick (its branch also carried a stale copy of the D21 work and records); kept `main`'s registry rows and added only the `gallery` row. Ran `tools/make_gallery.py` on today's results: all 14 figures regenerate byte for byte. Updated four stale lines of `docs/GALLERY.md` (T9.1 now confirmed; T9.2 and T9.4 mentioned; Q2 and D23 for the energy of L1a; the web universe is live).
 - Found and fixed my own slip from #27: the four re-run D21 results sat in `results/D21.x/` itself instead of `results/D21.x/<run-id>/` (a `cp -r` into a just-deleted folder), so the links in `team/FINDINGS.md` pointed nowhere; moved them into their run-id folders. Added `engine/tests/test_results_layout.py` (run folders named after their stamp's `run_id`, no loose files); it fails on the old layout and passes now.
