@@ -21,6 +21,13 @@ Scope and labelled assumptions:
   2. no body moves more than `eta` of the distance to its nearest neighbour in one
      step. This only ever shortens the step. Without it the step of two bodies flying
      apart grows without limit.
+- decision D29 (amending D21, convention 4; scenarios Q4 and Q5): by default the conditions
+  above are taken **relative to each body's nearest neighbour** (`speed_reference =
+  "neighbour"`), so the step does not depend on the frame; and the **pair guard**
+  `dt <= eta min_(i<j) r_ij / |v_i - v_j|` over every pair of alive bodies is always applied,
+  so that a fast passage that no body's nearest neighbour sees still gets short steps. The
+  guard only ever shortens a step. `speed_reference = "absolute"` keeps the rule of D10 and
+  D21 (each body's own motion), plus the guard.
 """
 
 from dataclasses import dataclass, field
@@ -32,7 +39,15 @@ from .frame import Frame
 from .laws.base import Law
 from .state import State
 
-__all__ = ["StepContext", "Integrator", "VelocityVerlet", "nearest_distances", "nearest_neighbours", "REST_FRACTION"]
+__all__ = [
+    "StepContext",
+    "Integrator",
+    "VelocityVerlet",
+    "nearest_distances",
+    "nearest_neighbours",
+    "pair_approach_time",
+    "REST_FRACTION",
+]
 
 REST_FRACTION = 0.1  # floor of the speed in the adaptive step, as a fraction of sqrt(|a| l)
 
@@ -61,6 +76,28 @@ def nearest_neighbours(state: State) -> tuple:
     return out, partner
 
 
+def pair_approach_time(state: State) -> float:
+    """`min_(i<j) r_ij / |v_i - v_j|` over the pairs of alive bodies that move relative to each
+    other (infinite if none does). Fixed bodies count as at rest. The pair guard of D29 is
+    `eta` times this time."""
+    idx = np.flatnonzero(state.alive)
+    if len(idx) < 2:
+        return np.inf
+    x = state.x[idx]
+    v = np.where(state.fixed[idx, None], 0.0, state.v[idx])
+    best = np.inf
+    step = max(1, 2_000_000 // len(idx))
+    for start in range(0, len(idx), step):
+        dx = x[start : start + step, None, :] - x[None, :, :]
+        dv = v[start : start + step, None, :] - v[None, :, :]
+        r = np.sqrt(np.einsum("pnd,pnd->pn", dx, dx))
+        w = np.sqrt(np.einsum("pnd,pnd->pn", dv, dv))
+        moving = w > 0  # a body with itself, and pairs at rest relative to each other, are left out
+        if np.any(moving):
+            best = min(best, float(np.min(r[moving] / w[moving])))
+    return best
+
+
 @dataclass
 class StepContext:
     """What a step needs besides the state: the law, the field solver, the frame and
@@ -73,9 +110,9 @@ class StepContext:
     eta: float = 1e-3  # D10: largest velocity change per step, as a fraction of the speed
     dt_min: float = 0.0
     dt_max: float = np.inf
-    # whose motion the step rule looks at: "absolute" (each body's own velocity and acceleration:
-    # D10 and D21) or "neighbour" (relative to its nearest neighbour; tested in scenario Q4, not a default)
-    speed_reference: str = "absolute"
+    # whose motion the step rule looks at: "neighbour" (relative to its nearest neighbour: the
+    # default since D29) or "absolute" (each body's own velocity and acceleration: D10 and D21)
+    speed_reference: str = "neighbour"
     _cache: tuple | None = field(default=None, repr=False)
 
     def acceleration(self, state: State) -> np.ndarray:
@@ -129,6 +166,8 @@ class VelocityVerlet:
         crossing = moving & (speed > 0) & near
         if np.any(crossing):
             dt = min(dt, float(np.min(ctx.eta * reach[crossing] / speed[crossing])))
+        # D29: the pair guard, for passages that no body's nearest neighbour sees
+        dt = min(dt, ctx.eta * pair_approach_time(state))
         dt = min(max(dt, ctx.dt_min), ctx.dt_max)
         if not np.isfinite(dt) or dt <= 0:
             raise ValueError("no time step can be derived from the motion; give numerics.dt_max")

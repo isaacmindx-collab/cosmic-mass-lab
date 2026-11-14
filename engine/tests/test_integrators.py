@@ -358,13 +358,13 @@ def test_step_rule_relative_to_the_nearest_neighbour():
     from cosmicmass.integrators import nearest_neighbours
 
     state, period = kepler(m1=1.0, m2=1.0)
-    absolute, relative = context(), context(speed_reference="neighbour")
+    absolute, relative = context(speed_reference="absolute"), context(speed_reference="neighbour")
     dt_abs, dt_rel = VV.next_dt(state, absolute), VV.next_dt(state, relative)
     assert dt_rel == pytest.approx(dt_abs, rel=1e-12)  # a two-body circular orbit: eta r / v_rel in both
     boosted = state.copy()
     boosted.v += [300.0, -40.0]
     assert VV.next_dt(boosted, context(speed_reference="neighbour")) == pytest.approx(dt_rel, rel=1e-9)
-    assert VV.next_dt(boosted, context()) < dt_abs / 100  # the absolute rule shrinks with the boost
+    assert VV.next_dt(boosted, absolute) < dt_abs / 100  # the absolute rule shrinks with the boost
     assert list(nearest_neighbours(state)[1]) == [1, 0] and nearest_neighbours(state)[0][0] == pytest.approx(1.0)
     # a body alone has no neighbour and does not limit the step; a fixed neighbour counts as at rest
     alone = State.from_bodies([preset("neutron")], [[0.0, 0.0]], v=[[5.0, 0.0]])
@@ -381,7 +381,50 @@ def test_step_rule_relative_to_the_nearest_neighbour():
         alive=[True, True],
     )
     assert VV.next_dt(pinned, context(speed_reference="neighbour")) == pytest.approx(
-        VV.next_dt(pinned, context()), rel=1e-12
+        VV.next_dt(pinned, context(speed_reference="absolute")), rel=1e-12
     )
     with pytest.raises(ValueError, match="speed_reference"):
         VV.next_dt(state, context(speed_reference="rotating"))
+
+
+def test_d29_default_and_pair_approach_time():
+    from cosmicmass.integrators import pair_approach_time
+
+    assert StepContext(make_law("L0"), DirectSum(constants=SCALED), Frame.scaled()).speed_reference == "neighbour"
+    settings = load_settings({"scenario": "x", "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]})
+    assert settings.numerics["speed_reference"] == "neighbour"
+    state = State(
+        m=[1.0, 1.0, 1.0, 1.0],
+        q=[0.0] * 4,
+        x=[[0.0, 0.0], [3.0, 0.0], [0.0, 1.0], [9.0, 9.0]],
+        v=[[0.0, 0.0], [0.0, 0.0], [2.0, 0.0], [5.0, 5.0]],
+        fixed=[False, False, False, True],  # a fixed body counts as at rest, whatever its stored velocity
+        alive=[True, True, True, True],
+    )
+    # moving pairs: (0,2) 1/2, (1,2) sqrt(10)/2, (0,3)..(2,3) far; (0,1) is at rest relative to itself
+    assert pair_approach_time(state) == pytest.approx(0.5)
+    state.alive[2] = False
+    assert pair_approach_time(state) == math.inf
+    assert pair_approach_time(State.from_bodies([preset("proton")], [[0.0, 0.0]])) == math.inf
+
+
+def test_d29_pair_guard_binds_on_a_passage_that_no_nearest_neighbour_sees(monkeypatch):
+    # the trap of scenario Q5, at its closest approach: H's nearest neighbour is its companion,
+    # each member of the light pair has its partner as nearest neighbour
+    state = State(
+        m=[1.0, 1e-3, 1e-12, 1e-12],
+        q=[0.0] * 4,
+        x=[[0.0, 0.0], [1.0, 0.0], [0.0, 1.5], [0.0, 1.51]],
+        v=[[0.0, 0.0], [0.0, 1.0], [300.0, 0.0], [300.0, 0.0]],
+        fixed=[False] * 4,
+        alive=[True] * 4,
+    )
+    dt = VV.next_dt(state, context())
+    assert dt == pytest.approx(1e-3 * 1.5 / 300.0, rel=1e-12)  # eta r / |v|: the guard, H to the near member
+    from cosmicmass import integrators
+
+    reach, partner = integrators.nearest_neighbours(state)
+    assert list(partner) == [1, 0, 3, 2] and reach[2] == pytest.approx(0.01)
+    # without the guard, the conditions of the nearest neighbours alone allow a step over 20 times longer
+    monkeypatch.setattr(integrators, "pair_approach_time", lambda s: math.inf)
+    assert VV.next_dt(state, context()) > 20 * dt
