@@ -19,6 +19,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Blocked by / questions: the entries link to pull requests #73 and #74 by URL, because their files are not on `main` yet.
 - Architecture: no change (no code)
 - Questions: four open questions are in entry 2026-015; none new on the board
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
+- Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
+- Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.
+- Next: the physics lead approves or corrects; then the implementation in `fields/direct.py`, behind an option.
+- Blocked by / questions: the approval (question 11).
+- Architecture: no code changed
+- Questions: proposed answer to 11
 
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the rest of M1: split, D40, registry
 - Did: mapped what M1's exit gates still need (S2: every E row implemented; S3: T0 and T9 confirmed, done; the M1 review). The maintainer chose to split the open engine parts (Claude Code: E9, E2.2, the registry; OpenCode: D37, D36, E5.2, E7) and to move E2.5 to S5 (D40). Recorded D40, the work plan's S2 gate, the registry (`modifiers` deprecated, `fieldsfast` moved to S5), the E2 claim, and the split in the team chat.
@@ -35,6 +42,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Blocked by / questions: none.
 - Architecture: updated (row `energy` implemented; section 10; change log)
 - Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4: L1e and the torque (D37)
+- Did: released the rest of E5 (handoff in `team/notes/E5.md`) and claimed E4 again after D37 (issue #57). `State` gains the optional columns `xc`, `vc`, `spin`, `radius` and `extend`; a law gains the hooks `velocity_coupling`, `composer_acceleration`, `torque`; both integrators advance the new columns; the reading **L1e** and the direction **"torque"** in `laws/l1.py`; settings and time series.
+- Result: L1e by hand; `Re(mu a) / Re(mu)` is L0's acceleration (to 1e-13); the reduce-to-L0 test for L1e, bit for bit; a body in uniform fields moves in two coordinates exactly, and `x - s^2 (q/m) xc` follows L0; the torque spins a body up without pushing it. Software checks against the formulas; L1e and the torque are hypotheses. No finding.
+- Next: E9 (the energy of L1a, D23), then the wrap-around wall (D36), then E2.2 (question 11).
+- Blocked by / questions: question 25 (under L1e, is the place `x` or a reading of `X`?), for the physics lead.
+- Architecture: updated (section 2 rows `state`, `lawbase`, `l1`, `integrators`; section 5 `State`; section 10, the contract addition of D37; section 11)
+- Questions: asked (25)
 
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
 - Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.

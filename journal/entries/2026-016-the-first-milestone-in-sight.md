@@ -41,17 +41,17 @@ M1 is done when three things hold: every part of the engine in the plan is built
 
 **Done and on `main`.**
 
-- The algebra of General Numbers, the fields of bodies at rest, two integrators with an adaptive step, the reference law and the readings L1a to L1d with their options, walls, an inflow, a heat bath, seeded populations, the runner with its stamped results, the conservation diagnostics and the energy of both coordinates. 313 tests, with 99% of the engine's lines covered.
+- The algebra of General Numbers, the fields of bodies at rest, two integrators with an adaptive step, the reference law and the readings L1a to L1e with their options, walls, an inflow, a heat bath, seeded populations, the runner with its stamped results, the conservation diagnostics and the energy of both coordinates. More than 300 tests, with 99% of the engine's lines covered.
 - **The gate T0** (five tests under L0) and **the measured limits T9.1 to T9.4** all pass and are confirmed (entries [2026-012](../2026-012/) and [2026-003](../2026-003/)).
 - Five question scenarios, Q1 to Q5, and the four scenarios behind the numerical conventions of D21.
 - The first public version, 0.1.0, and a universe that runs in a browser.
 
 **Open, or waiting for review.**
 
-- The reading L1e and the torque direction (pull request 69).
 - Checkpoints, so that a long run can be interrupted and resumed, with the gate's status written into every stamp (pull request 73; entry [2026-014](../2026-014/)).
 - A reproduction of T9.2, Q5 and the D21 scenarios by a different model, replacing two same-model exceptions (pull request 74; entry [2026-013](../2026-013/)).
-- Walls that wrap around, the `Universe` object that gathers the settings of a universe, and the field of moving bodies. The last one waits for a derivation that the physics lead must approve: the compendium gives the field equations, not the field of a moving point body.
+- The field of moving bodies (pull request 75). Its derivation was written for the physics lead, because the compendium gives the field equations, not the field of a moving point body.
+- Walls that wrap around, and the `Universe` object that gathers the settings of a universe.
 
 **Only the maintainer can do.**
 

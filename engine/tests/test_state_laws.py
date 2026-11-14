@@ -111,8 +111,14 @@ def test_registry_of_laws():
     law = make_law("L0")
     assert isinstance(law, L0) and isinstance(law, Law) and law.id == "L0" and law.spec == LawSpec()
     assert L0.hypothesis is False and Law.hypothesis is True  # only L0 is not a hypothesis (D1)
-    with pytest.raises(NotImplementedError):
-        make_law(LawSpec(reading="L1e"))
+    from cosmicmass.laws import base
+
+    saved = base._REGISTRY.pop("L1e")  # every reading is implemented now; a missing one is still refused
+    try:
+        with pytest.raises(NotImplementedError):
+            make_law(LawSpec(reading="L1e"))
+    finally:
+        base._REGISTRY["L1e"] = saved
     with pytest.raises(ValueError):
         make_law(LawSpec(reading="L0", sign="-"))  # the reference law takes no option
     with pytest.raises(ValueError):
