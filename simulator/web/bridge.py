@@ -37,9 +37,17 @@ def run_scene(settings_json: str) -> str:
     energy = np.array([r["energy_re"] for r in rows])
     excursion = float(np.max(np.abs(energy / energy[0] - 1))) if energy[0] != 0 else None
     summary = result.summary
-    return json.dumps({
-        "t": t, "paths": paths,
-        "steps": summary["steps"], "t_end": summary["t_end"],
-        "drift": summary["conservation"], "energy_excursion": excursion,
-        "law": summary["law"], "stamp": result.stamp, "version": cosmicmass.__version__,
-    }, default=float)
+    return json.dumps(
+        {
+            "t": t,
+            "paths": paths,
+            "steps": summary["steps"],
+            "t_end": summary["t_end"],
+            "drift": summary["conservation"],
+            "energy_excursion": excursion,
+            "law": summary["law"],
+            "stamp": result.stamp,
+            "version": cosmicmass.__version__,
+        },
+        default=float,
+    )

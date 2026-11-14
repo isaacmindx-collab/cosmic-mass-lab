@@ -52,9 +52,10 @@ select = ["E4", "E7", "E9", "F", "W", "B"]
 ignore = ["B905"]
 
 [tool.ruff.format]
-# Configured, not yet enforced in CI: a first `ruff format .` would rewrite about 36 files and
-# conflict with every open pull request. See team/notes/P7.md.
+# Decision D25: one pass of `ruff format .` (2026-11-14), then `ruff format --check .` in CI.
+# Markdown is not formatted: the code blocks of ARCHITECTURE.md and the notes are written by hand.
 quote-style = "double"
+exclude = ["*.md"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"

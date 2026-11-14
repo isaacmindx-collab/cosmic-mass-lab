@@ -47,6 +47,10 @@ These rules apply to everyone, human or AI agent. They exist so that every resul
 18b. **The architecture travels with the code (D18).** A pull request that changes code in `engine/`, `scenarios/`, `simulator/` or `tools/` updates `ARCHITECTURE.md` (registry, Mermaid diagrams, contracts, change log). CI checks it.
 18c. **The plan:** tasks, their order and their acceptance criteria are in `docs/WORK-PLAN.md`.
 
+## 5b2. Code format
+
+18c2. **Format before you commit:** run `ruff format .` (and `ruff check .`); CI rejects unformatted Python (decision D25).
+
 ## 5c. Questions
 
 18d. **Ask and answer in the open.** Put questions on `team/QUESTIONS.md` (or open a Question issue). Anyone, human or agent, may propose an answer with evidence; the person who decides accepts it.

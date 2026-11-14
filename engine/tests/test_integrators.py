@@ -78,8 +78,10 @@ def test_kepler_orbit_for_1000_periods():
     # E3.1 as written: 1000 periods, energy drift below 1e-6, period within 0.1%
     state, period = kepler()
     final, drift, excursion, measured, steps = orbit(state, period, 1000, context())
-    print(f"\n1000 periods: steps={steps}, energy change at the end={drift:.3e}, "
-          f"largest excursion={excursion:.3e}, period error={measured / period - 1:.3e}")
+    print(
+        f"\n1000 periods: steps={steps}, energy change at the end={drift:.3e}, "
+        f"largest excursion={excursion:.3e}, period error={measured / period - 1:.3e}"
+    )
     assert excursion < 1e-6 and measured == pytest.approx(period, rel=1e-3)
 
 
@@ -91,7 +93,9 @@ def test_the_adaptive_step_follows_D10():
     speed = np.linalg.norm(state.v, axis=1)
     assert dt == pytest.approx(1e-3 * np.min(speed / a))  # velocity change per step: 1e-3 of the speed
     assert dt == pytest.approx(0.9995e-3, rel=1e-4)
-    assert VV.next_dt(state, context(dt_max=dt / 10)) == dt / 10 and VV.next_dt(state, context(dt_min=dt * 10)) == dt * 10
+    assert (
+        VV.next_dt(state, context(dt_max=dt / 10)) == dt / 10 and VV.next_dt(state, context(dt_min=dt * 10)) == dt * 10
+    )
     assert VV.next_dt(state, context(eta=1e-4)) == pytest.approx(dt / 10)
 
 
@@ -134,8 +138,14 @@ def test_bodies_starting_at_rest_get_a_free_fall_step():
 
 def test_fixed_step_verlet_is_time_reversible_and_keeps_momentum():
     rng = np.random.default_rng(3)
-    state = State(m=rng.uniform(1, 2, 5), q=rng.normal(0, 0.3, 5), x=rng.uniform(-1, 1, (5, 3)) * 3,
-                  v=rng.normal(0, 0.2, (5, 3)), fixed=np.zeros(5, bool), alive=np.ones(5, bool))
+    state = State(
+        m=rng.uniform(1, 2, 5),
+        q=rng.normal(0, 0.3, 5),
+        x=rng.uniform(-1, 1, (5, 3)) * 3,
+        v=rng.normal(0, 0.2, (5, 3)),
+        fixed=np.zeros(5, bool),
+        alive=np.ones(5, bool),
+    )
     start, ctx = state.copy(), context()
     p0 = np.sum(state.m[:, None] * state.v, axis=0)
     for _ in range(300):
@@ -150,8 +160,14 @@ def test_fixed_step_verlet_is_time_reversible_and_keeps_momentum():
 
 
 def test_fixed_and_absorbed_bodies_do_not_move():
-    state = State(m=[1.0, 1.0, 1.0], q=[0.0, 0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0], [0.0, 2.0]],
-                  v=[[0.0, 0.0], [0.0, 1.0], [5.0, 5.0]], fixed=[True, False, False], alive=[True, True, False])
+    state = State(
+        m=[1.0, 1.0, 1.0],
+        q=[0.0, 0.0, 0.0],
+        x=[[0.0, 0.0], [1.0, 0.0], [0.0, 2.0]],
+        v=[[0.0, 0.0], [0.0, 1.0], [5.0, 5.0]],
+        fixed=[True, False, False],
+        alive=[True, True, False],
+    )
     ctx = context()
     assert np.array_equal(ctx.acceleration(state)[[0, 2]], np.zeros((2, 2)))
     assert ctx.acceleration(state)[1] == pytest.approx([-1.0, 0.0])  # pulled by the fixed body only
@@ -167,7 +183,9 @@ def test_no_derivable_step_and_zero_inertia_are_refused():
         VV.next_dt(alone, context())
     assert VV.next_dt(alone, context(dt_max=2.0)) == 2.0
     # at rest in a uniform background: no neighbour and no speed, so the step is dt_max
-    falling = StepContext(make_law("L0"), DirectSum(constants=SCALED, background={"g": [0.0, -1.0]}), Frame.scaled(), dt_max=0.5)
+    falling = StepContext(
+        make_law("L0"), DirectSum(constants=SCALED, background={"g": [0.0, -1.0]}), Frame.scaled(), dt_max=0.5
+    )
     assert VV.next_dt(alone, falling) == 0.5
     # thrown upwards, it must pass its turning point: D10's rule alone would shrink the step to
     # nothing there, so a body with no neighbour does not limit the step
@@ -194,13 +212,22 @@ def test_no_derivable_step_and_zero_inertia_are_refused():
 
 
 def test_reflecting_walls_turn_bodies_back_without_changing_their_energy():
-    state = State(m=[1.0, 2.0, 3.0, 4.0], q=[0.0] * 4, x=[[1.5, 0.0], [-1.2, 0.5], [0.0, 0.0], [1.5, 0.0]],
-                  v=[[2.0, 1.0], [-1.0, 0.0], [3.0, 3.0], [-2.0, 0.0]], fixed=[False] * 4, alive=[True] * 4)
+    state = State(
+        m=[1.0, 2.0, 3.0, 4.0],
+        q=[0.0] * 4,
+        x=[[1.5, 0.0], [-1.2, 0.5], [0.0, 0.0], [1.5, 0.0]],
+        v=[[2.0, 1.0], [-1.0, 0.0], [3.0, 3.0], [-2.0, 0.0]],
+        fixed=[False] * 4,
+        alive=[True] * 4,
+    )
     before, speeds = state.copy(), np.linalg.norm(state.v, axis=1)
     events = Environment("reflecting", [-1.0, -1.0], [1.0, 1.0]).apply(state, 0.1)
     assert np.array_equal(state.v, [[-2.0, 1.0], [1.0, 0.0], [3.0, 3.0], [-2.0, 0.0]])  # body 3 was already returning
     assert np.array_equal(state.x, before.x) and np.array_equal(np.linalg.norm(state.v, axis=1), speeds)
-    assert events == [{"wall": (0, "lower"), "bodies": 1, "impulse": -4.0}, {"wall": (0, "upper"), "bodies": 1, "impulse": 4.0}]
+    assert events == [
+        {"wall": (0, "lower"), "bodies": 1, "impulse": -4.0},
+        {"wall": (0, "upper"), "bodies": 1, "impulse": 4.0},
+    ]
     assert Environment().apply(state, 0.1) == []
     state.fixed[0], state.v[0, 0] = True, 2.0
     assert Environment("reflecting", [-1.0, -1.0], [1.0, 1.0]).apply(state, 0.1) == []  # fixed bodies are left alone
@@ -208,8 +235,14 @@ def test_reflecting_walls_turn_bodies_back_without_changing_their_energy():
 
 def test_a_cloud_in_a_reflecting_box_keeps_its_energy():
     rng = np.random.default_rng(8)
-    state = State(m=np.full(6, 1e-2), q=rng.normal(0, 2e-2, 6), x=rng.uniform(-0.8, 0.8, (6, 2)),
-                  v=rng.normal(0, 0.7, (6, 2)), fixed=np.zeros(6, bool), alive=np.ones(6, bool))
+    state = State(
+        m=np.full(6, 1e-2),
+        q=rng.normal(0, 2e-2, 6),
+        x=rng.uniform(-0.8, 0.8, (6, 2)),
+        v=rng.normal(0, 0.7, (6, 2)),
+        fixed=np.zeros(6, bool),
+        alive=np.ones(6, bool),
+    )
     ctx, box = context(), Environment("reflecting", [-1.0, -1.0], [1.0, 1.0])
     e0, hits = energy(state), 0
     for _ in range(6000):
@@ -223,15 +256,24 @@ def test_a_cloud_in_a_reflecting_box_keeps_its_energy():
 
 
 def test_bad_boxes_are_refused():
-    for bad in (dict(boundary="absorbing"), dict(boundary="reflecting"), dict(boundary="reflecting", lower=[0.0], upper=[0.0]),
-                dict(boundary="reflecting", lower=[0.0, 0.0], upper=[1.0])):
+    for bad in (
+        dict(boundary="absorbing"),
+        dict(boundary="reflecting"),
+        dict(boundary="reflecting", lower=[0.0], upper=[0.0]),
+        dict(boundary="reflecting", lower=[0.0, 0.0], upper=[1.0]),
+    ):
         with pytest.raises(ValueError):
             Environment(**bad)
     with pytest.raises(ValueError):
         Environment("reflecting", [0.0] * 3, [1.0] * 3).apply(kepler()[0], 0.1)
     base = {"scenario": "x", "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]}
-    s = load_settings({**base, "universe": {"boundary": "reflecting", "box": {"lower": [-1, -1], "upper": [1, 1]}},
-                       "numerics": {"eta": 1e-4, "dt_max": 1.0}})
+    s = load_settings(
+        {
+            **base,
+            "universe": {"boundary": "reflecting", "box": {"lower": [-1, -1], "upper": [1, 1]}},
+            "numerics": {"eta": 1e-4, "dt_max": 1.0},
+        }
+    )
     assert s.universe["box"] == {"lower": [-1, -1], "upper": [1, 1]} and s.numerics["eta"] == 1e-4
     for box in (None, {"lower": [0, 0]}, {"lower": [0], "upper": [1]}, {"lower": [1, 1], "upper": [0, 0]}, {"size": 2}):
         with pytest.raises(SettingsError, match="box"):
@@ -241,15 +283,32 @@ def test_bad_boxes_are_refused():
 def test_absorbing_walls_collect_mass_charge_and_momentum():
     # E6a: an absorbing wall switches the body off and adds its m, q and momentum to the collector
     f = Frame.scaled()
-    state = State(m=[1.0, 2.0, 3.0, 4.0], q=[0.5, -0.25, 1.0, 2.0], x=[[1.5, 0.0], [0.0, -1.2], [0.0, 0.0], [3.0, 0.0]],
-                  v=[[2.0, 1.0], [0.0, 3.0], [1.0, 1.0], [0.0, 0.0]], fixed=[False, False, False, True], alive=[True] * 4)
+    state = State(
+        m=[1.0, 2.0, 3.0, 4.0],
+        q=[0.5, -0.25, 1.0, 2.0],
+        x=[[1.5, 0.0], [0.0, -1.2], [0.0, 0.0], [3.0, 0.0]],
+        v=[[2.0, 1.0], [0.0, 3.0], [1.0, 1.0], [0.0, 0.0]],
+        fixed=[False, False, False, True],
+        alive=[True] * 4,
+    )
     total = state.total_mu(f)
     box = Environment("absorbing", [-1.0, -1.0], [1.0, 1.0])
     events = box.apply(state, 0.1)
     assert list(state.alive) == [False, False, True, True]  # the fixed body outside the box is left alone
     assert events == [
-        {"wall": (0, "upper"), "bodies": 1, "impulse": 2.0, "absorbed": {"indices": [0], "m": 1.0, "q": 0.5, "momentum": [2.0, 1.0]}},
-        {"wall": (1, "lower"), "bodies": 1, "impulse": 6.0, "absorbed": {"indices": [1], "m": 2.0, "q": -0.25, "momentum": [0.0, 6.0]}}]
+        {
+            "wall": (0, "upper"),
+            "bodies": 1,
+            "impulse": 2.0,
+            "absorbed": {"indices": [0], "m": 1.0, "q": 0.5, "momentum": [2.0, 1.0]},
+        },
+        {
+            "wall": (1, "lower"),
+            "bodies": 1,
+            "impulse": 6.0,
+            "absorbed": {"indices": [1], "m": 2.0, "q": -0.25, "momentum": [0.0, 6.0]},
+        },
+    ]
     # body 1 was moving back inwards: an absorbing wall takes it all the same
     assert (box.collected["bodies"], box.collected["m"], box.collected["q"]) == (2, 3.0, 0.25)
     assert np.array_equal(box.collected["momentum"], [2.0, 7.0])
@@ -265,11 +324,21 @@ def test_a_gas_between_absorbing_walls_through_the_runner():
     from cosmicmass.runner import run
 
     rng = np.random.default_rng(5)
-    bodies = [{"m": 1e-3, "q": float(rng.normal(0, 1e-3)), "x": [float(c) for c in rng.uniform(-0.9, 0.9, 2)],
-               "v": [float(c) for c in rng.normal(0, 1.0, 2)]} for _ in range(12)]
-    data = {"scenario": "absorb", "universe": {"units": "scaled", "boundary": "absorbing",
-                                              "box": {"lower": [-1.0, -1.0], "upper": [1.0, 1.0]}},
-            "bodies": bodies, "numerics": {"t_end": 3.0, "dt_max": 2e-3}}
+    bodies = [
+        {
+            "m": 1e-3,
+            "q": float(rng.normal(0, 1e-3)),
+            "x": [float(c) for c in rng.uniform(-0.9, 0.9, 2)],
+            "v": [float(c) for c in rng.normal(0, 1.0, 2)],
+        }
+        for _ in range(12)
+    ]
+    data = {
+        "scenario": "absorb",
+        "universe": {"units": "scaled", "boundary": "absorbing", "box": {"lower": [-1.0, -1.0], "upper": [1.0, 1.0]}},
+        "bodies": bodies,
+        "numerics": {"t_end": 3.0, "dt_max": 2e-3},
+    }
     result = run(data, out_root=None)
     absorbed, drift = result.summary["absorbed"], result.summary["conservation"]
     assert absorbed["bodies"] >= 8 and absorbed["bodies"] + absorbed["alive_at_the_end"] == 12
@@ -278,7 +347,10 @@ def test_a_gas_between_absorbing_walls_through_the_runner():
     assert result.summary["momentum_with_walls_drift"] < 1e-9  # the walls hold the momentum the bodies lost
     assert drift["momentum"] > 1e-2 and result.summary["wall_hits"] == absorbed["bodies"]
     assert drift["energy_re"] > 1e-2  # the energy of the absorbed bodies leaves the bodies: not conserved
-    assert run({**data, "universe": {**data["universe"], "boundary": "open"}}, out_root=None).summary["absorbed"]["bodies"] == 0
+    assert (
+        run({**data, "universe": {**data["universe"], "boundary": "open"}}, out_root=None).summary["absorbed"]["bodies"]
+        == 0
+    )
 
 
 def test_step_rule_relative_to_the_nearest_neighbour():
@@ -296,9 +368,20 @@ def test_step_rule_relative_to_the_nearest_neighbour():
     assert list(nearest_neighbours(state)[1]) == [1, 0] and nearest_neighbours(state)[0][0] == pytest.approx(1.0)
     # a body alone has no neighbour and does not limit the step; a fixed neighbour counts as at rest
     alone = State.from_bodies([preset("neutron")], [[0.0, 0.0]], v=[[5.0, 0.0]])
-    assert list(nearest_neighbours(alone)[1]) == [0] and VV.next_dt(alone, context(speed_reference="neighbour", dt_max=2.0)) == 2.0
-    pinned = State(m=[1.0, 1e-3], q=[0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0]], v=[[9.0, 9.0], [0.0, 1.0]],
-                   fixed=[True, False], alive=[True, True])
-    assert VV.next_dt(pinned, context(speed_reference="neighbour")) == pytest.approx(VV.next_dt(pinned, context()), rel=1e-12)
+    assert (
+        list(nearest_neighbours(alone)[1]) == [0]
+        and VV.next_dt(alone, context(speed_reference="neighbour", dt_max=2.0)) == 2.0
+    )
+    pinned = State(
+        m=[1.0, 1e-3],
+        q=[0.0, 0.0],
+        x=[[0.0, 0.0], [1.0, 0.0]],
+        v=[[9.0, 9.0], [0.0, 1.0]],
+        fixed=[True, False],
+        alive=[True, True],
+    )
+    assert VV.next_dt(pinned, context(speed_reference="neighbour")) == pytest.approx(
+        VV.next_dt(pinned, context()), rel=1e-12
+    )
     with pytest.raises(ValueError, match="speed_reference"):
         VV.next_dt(state, context(speed_reference="rotating"))

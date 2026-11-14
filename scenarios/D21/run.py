@@ -75,8 +75,11 @@ def _write(outcome, verdict, explanation):
     # RESULTS-STANDARD section 4: the verdict is pass, fail or finding. D21 compares conventions
     # rather than testing a pass criterion, so it is a finding; the sentence goes to the explanation
     # (issue #24).
-    summary.update(verdict="finding", explanation=f"{verdict[0].upper() + verdict[1:]}. {explanation}",
-                   prediction=outcome["prediction"])
+    summary.update(
+        verdict="finding",
+        explanation=f"{verdict[0].upper() + verdict[1:]}. {explanation}",
+        prediction=outcome["prediction"],
+    )
     path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return folder
 
@@ -85,45 +88,77 @@ def d21_1():
     """2D planar against a tilted 3D run of the same orbits."""
     rot = _rotation()
     cases, runs = {}, {}
-    for name, a, b, r0 in (("a", preset("Earth"), preset("moon"), 3.844e8),
-                           ("b", preset("proton"), preset("electron"), 5.29177e-11)):
+    for name, a, b, r0 in (
+        ("a", preset("Earth"), preset("moon"), 3.844e8),
+        ("b", preset("proton"), preset("electron"), 5.29177e-11),
+    ):
         speed, period = _orbit(a, b, r0)
         base = _pair(f"D21.1{name}", a, b, r0, speed, PHI, {"t_end": period, "eta": 1e-3, "record_every": 1})
         flat, tilted = run(base, out_root=None), run(_to_3d(base, rot), out_root=None)
         p2, p3 = _period(flat), _period(tilted, rot)
         d2, d3 = flat.summary["conservation"]["energy_re"], tilted.summary["conservation"]["energy_re"]
         _, rel3 = _rel(tilted, rot)
-        cases[name] = {"period_2d": p2, "period_3d": p3, "period_analytic": period,
-                       "period_relative_difference": abs(p3 / p2 - 1),
-                       "energy_drift_2d": d2, "energy_drift_3d": d3,
-                       "steps_2d": flat.summary["steps"], "steps_3d": tilted.summary["steps"],
-                       "largest_out_of_plane_offset_relative": float(np.max(np.abs(rel3[:, 2])) / r0)}
+        cases[name] = {
+            "period_2d": p2,
+            "period_3d": p3,
+            "period_analytic": period,
+            "period_relative_difference": abs(p3 / p2 - 1),
+            "energy_drift_2d": d2,
+            "energy_drift_3d": d3,
+            "steps_2d": flat.summary["steps"],
+            "steps_3d": tilted.summary["steps"],
+            "largest_out_of_plane_offset_relative": float(np.max(np.abs(rel3[:, 2])) / r0),
+        }
         cases[name]["pass"] = bool(cases[name]["period_relative_difference"] < 1e-9)
         runs[f"{name}-2d"], runs[f"{name}-3d"] = flat, tilted
     ok = all(c["pass"] for c in cases.values())
-    outcome = {"id": "D21.1", "pass": ok, "cases": cases, "runs": runs,
-               "prediction": "periods and drifts agree to rounding (relative difference below 1e-9)"}
-    explanation = ("Planar motion in 2D gives the same orbits as the full 3D run to rounding, so D21's "
-                   "convention (1) loses nothing. A field falling as 1/r would need a 2D constant of "
-                   "gravitation that the compendium does not contain (mathematics, not run).") if ok else \
-        "2D and 3D differ beyond rounding: convention (1) needs review."
+    outcome = {
+        "id": "D21.1",
+        "pass": ok,
+        "cases": cases,
+        "runs": runs,
+        "prediction": "periods and drifts agree to rounding (relative difference below 1e-9)",
+    }
+    explanation = (
+        (
+            "Planar motion in 2D gives the same orbits as the full 3D run to rounding, so D21's "
+            "convention (1) loses nothing. A field falling as 1/r would need a 2D constant of "
+            "gravitation that the compendium does not contain (mathematics, not run)."
+        )
+        if ok
+        else "2D and 3D differ beyond rounding: convention (1) needs review."
+    )
     return outcome, ("supports D21 (1)" if ok else "contradicts D21 (1)"), explanation
 
 
 def d21_2():
     """Softening 0 against D10's softening on the three two-body cases of T0.1."""
     cases, runs = {}, {}
-    for name, a, b, r0 in (("a", preset("Earth"), preset("moon"), 3.844e8),
-                           ("b", preset("proton"), preset("electron"), 5.29177e-11)):
+    for name, a, b, r0 in (
+        ("a", preset("Earth"), preset("moon"), 3.844e8),
+        ("b", preset("proton"), preset("electron"), 5.29177e-11),
+    ):
         speed, period = _orbit(a, b, r0)
         for label, soft in (("softening 0", 0.0), ("softening D10", None)):
-            res = run(_pair(f"D21.2{name}", a, b, r0, speed, PHI,
-                            {"t_end": period, "eta": 1e-3, "record_every": 1, "softening": soft}), out_root=None)
+            res = run(
+                _pair(
+                    f"D21.2{name}",
+                    a,
+                    b,
+                    r0,
+                    speed,
+                    PHI,
+                    {"t_end": period, "eta": 1e-3, "record_every": 1, "softening": soft},
+                ),
+                out_root=None,
+            )
             p = _period(res)
             key = f"{name}, {label}"
-            cases[key] = {"period_error_vs_analytic": abs(p / period - 1),
-                          "energy_drift": res.summary["conservation"]["energy_re"],
-                          "passes_T0.1_criterion_0.1pct": bool(abs(p / (27.3 * 86400 if name == "a" else 1.5198e-16) - 1) < 1e-3)}
+            cases[key] = {
+                "period_error_vs_analytic": abs(p / period - 1),
+                "energy_drift": res.summary["conservation"]["energy_re"],
+                "passes_T0.1_criterion_0.1pct": bool(abs(p / (27.3 * 86400 if name == "a" else 1.5198e-16) - 1) < 1e-3),
+            }
             runs[key] = res
     p = preset("proton")
     r0, k, mu = 1e-10, _strength(p, p), p.m / 2
@@ -132,18 +167,30 @@ def d21_2():
     for label, soft in (("softening 0", 0.0), ("softening D10", None)):
         signed = {}
         for eta in (1e-3, 5e-4):  # halving the step shows whether the error converges to zero
-            res = run(_pair("D21.2c", p, p, r0, 0.0, PHI, {"t_end": t_end, "eta": eta, "record_every": 50,
-                                                           "softening": soft}), out_root=None)
+            res = run(
+                _pair(
+                    "D21.2c", p, p, r0, 0.0, PHI, {"t_end": t_end, "eta": eta, "record_every": 50, "softening": soft}
+                ),
+                out_root=None,
+            )
             signed[eta] = float(np.linalg.norm(_rel(res)[1][-1])) / exact - 1
             if eta == 1e-3:
                 runs[f"c, {label}"] = res
-        cases[f"c, {label}"] = {"separation_error": abs(signed[1e-3]), "signed_error_eta": signed[1e-3],
-                                "signed_error_eta_half": signed[5e-4],
-                                "passes_T0.1c_criterion_1e-6": bool(abs(signed[1e-3]) < 1e-6)}
+        cases[f"c, {label}"] = {
+            "separation_error": abs(signed[1e-3]),
+            "signed_error_eta": signed[1e-3],
+            "signed_error_eta_half": signed[5e-4],
+            "passes_T0.1c_criterion_1e-6": bool(abs(signed[1e-3]) < 1e-6),
+        }
     cases["initial force factor with D10 softening"] = {"value": (1 + 1e-6) ** -1.5}
     s0, s1 = cases["c, softening 0"], cases["c, softening D10"]
-    outcome = {"id": "D21.2", "pass": True, "cases": cases, "runs": runs,
-               "prediction": "orbits pass either way; T0.1c likely fails with D10 softening (prediction failed: it passes)"}
+    outcome = {
+        "id": "D21.2",
+        "pass": True,
+        "cases": cases,
+        "runs": runs,
+        "prediction": "orbits pass either way; T0.1c likely fails with D10 softening (prediction failed: it passes)",
+    }
     explanation = (
         "Prediction partly wrong: T0.1c passes with D10's softening, with a smaller error at eta = 1e-3 "
         f"({s1['separation_error']:.2e} against {s0['separation_error']:.2e}). Halving the step shows why: "
@@ -152,7 +199,8 @@ def d21_2():
         f"({s1['signed_error_eta']:+.2e} -> {s1['signed_error_eta_half']:+.2e}), towards a different answer, "
         "because softening changes the force law. The smaller error was a cancellation. The orbits' period "
         "error is ten times larger with softening (3.3e-6 against 3.3e-7). So gates compared with closed forms "
-        "run with softening 0; D10's softening stays for many-body runs.")
+        "run with softening 0; D10's softening stays for many-body runs."
+    )
     return outcome, "supports D21 (2)", explanation
 
 
@@ -163,21 +211,34 @@ def d21_3():
     for e in (0.0, 0.9):
         speed, period = _orbit(a, b, r0, e)
         for eta in (1e-3, 3e-4, 1e-4):
-            res = run(_pair("D21.3", a, b, r0, speed, PHI, {"t_end": period, "eta": eta, "record_every": 1}),
-                      out_root=None)
+            res = run(
+                _pair("D21.3", a, b, r0, speed, PHI, {"t_end": period, "eta": eta, "record_every": 1}), out_root=None
+            )
             key = f"e={e}, eta={eta:g}"
-            cases[key] = {"end_drift": res.summary["conservation"]["energy_re"], "largest_excursion": _excursion(res),
-                          "steps": res.summary["steps"]}
+            cases[key] = {
+                "end_drift": res.summary["conservation"]["energy_re"],
+                "largest_excursion": _excursion(res),
+                "steps": res.summary["steps"],
+            }
             cases[key]["end_drift_below_1e-6"] = bool(cases[key]["end_drift"] < 1e-6)
             cases[key]["excursion_below_1e-6"] = bool(cases[key]["largest_excursion"] < 1e-6)
             runs[key] = res
     split = [k for k, c in cases.items() if c["end_drift_below_1e-6"] != c["excursion_below_1e-6"]]
-    outcome = {"id": "D21.3", "pass": True, "cases": cases, "runs": runs,
-               "prediction": "end drift < 1e-6 everywhere; excursion ~4e-6 at e=0.9, eta=1e-3, falling as eta^2"}
-    explanation = ("The two definitions give different verdicts for: " + ", ".join(split) + ". " if split else
-                   "Both definitions give the same verdict in every case. ") + \
-        ("The end drift hides the excursion at pericentre, so every result reports both, and a scenario "
-         "states which one its criterion uses (D21 (3) refined).")
+    outcome = {
+        "id": "D21.3",
+        "pass": True,
+        "cases": cases,
+        "runs": runs,
+        "prediction": "end drift < 1e-6 everywhere; excursion ~4e-6 at e=0.9, eta=1e-3, falling as eta^2",
+    }
+    explanation = (
+        "The two definitions give different verdicts for: " + ", ".join(split) + ". "
+        if split
+        else "Both definitions give the same verdict in every case. "
+    ) + (
+        "The end drift hides the excursion at pericentre, so every result reports both, and a scenario "
+        "states which one its criterion uses (D21 (3) refined)."
+    )
     return outcome, "refines D21 (3): report both", explanation
 
 
@@ -207,8 +268,17 @@ def d21_4():
         for frac in (0.0, 0.01, 0.1, 1.0):
             integrators.REST_FRACTION = frac
             for name, setup, exact in (
-                    ("c (protons apart)", _pair("D21.4c", p, p, r0c, 0.0, PHI, {"t_end": tc, "eta": 1e-3, "record_every": 50}), exact_c),
-                    ("f (Earth-moon fall)", _pair("D21.4f", a, b, r0f, 0.0, PHI, {"t_end": tf, "eta": 1e-3, "record_every": 50}), exact_f)):
+                (
+                    "c (protons apart)",
+                    _pair("D21.4c", p, p, r0c, 0.0, PHI, {"t_end": tc, "eta": 1e-3, "record_every": 50}),
+                    exact_c,
+                ),
+                (
+                    "f (Earth-moon fall)",
+                    _pair("D21.4f", a, b, r0f, 0.0, PHI, {"t_end": tf, "eta": 1e-3, "record_every": 50}),
+                    exact_f,
+                ),
+            ):
                 key = f"{name}, floor {frac:g}"
                 try:
                     res = run(setup, out_root=None)
@@ -216,16 +286,25 @@ def d21_4():
                     cases[key] = {"outcome": "impossible", "reason": str(exc)}
                     continue
                 sep = float(np.linalg.norm(_rel(res)[1][-1]))
-                cases[key] = {"separation_error": abs(sep / exact - 1), "steps": res.summary["steps"],
-                              "end_drift": res.summary["conservation"]["energy_re"]}
+                cases[key] = {
+                    "separation_error": abs(sep / exact - 1),
+                    "steps": res.summary["steps"],
+                    "end_drift": res.summary["conservation"]["energy_re"],
+                }
                 runs[key] = res
     finally:
         integrators.REST_FRACTION = original
-    outcome = {"id": "D21.4", "pass": True, "cases": cases, "runs": runs,
-               "prediction": "floor 0 impossible; 0.01 and 0.1 below 1e-6; 1.0 coarser"}
+    outcome = {
+        "id": "D21.4",
+        "pass": True,
+        "cases": cases,
+        "runs": runs,
+        "prediction": "floor 0 impossible; 0.01 and 0.1 below 1e-6; 1.0 coarser",
+    }
     zero = [k for k, c in cases.items() if c.get("outcome") == "impossible"]
-    explanation = (("D10 as written cannot start from rest (" + "; ".join(zero) + "). ") if zero else "") + \
-        "With a floor, the error and the step count are listed per floor; the floor only acts in the first steps."
+    explanation = (
+        ("D10 as written cannot start from rest (" + "; ".join(zero) + "). ") if zero else ""
+    ) + "With a floor, the error and the step count are listed per floor; the floor only acts in the first steps."
     return outcome, "supports a floor (D21 (4)); see numbers for its value", explanation
 
 

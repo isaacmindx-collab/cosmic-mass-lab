@@ -68,10 +68,16 @@ def test_readings_of_scalars_arrays_and_exact_numbers_agree():
 def test_every_preset_matches_the_table():
     # docs/05-scenarios-and-tests.md, section 0, "Matter presets" (kg, C)
     table = {
-        "electron": (9.1093837e-31, -1.602176634e-19), "proton": (1.67262192e-27, 1.602176634e-19),
-        "neutron": (1.67492750e-27, 0.0), "alpha": (6.6446573e-27, 3.204353268e-19),
-        "dust grain +": (1e-15, 1e-16), "dust grain -": (1e-15, -1e-16), "moon": (7.342e22, 0.0),
-        "Earth": (5.972e24, 0.0), "Sun": (1.989e30, 0.0), "Saturn": (5.683e26, 0.0),
+        "electron": (9.1093837e-31, -1.602176634e-19),
+        "proton": (1.67262192e-27, 1.602176634e-19),
+        "neutron": (1.67492750e-27, 0.0),
+        "alpha": (6.6446573e-27, 3.204353268e-19),
+        "dust grain +": (1e-15, 1e-16),
+        "dust grain -": (1e-15, -1e-16),
+        "moon": (7.342e22, 0.0),
+        "Earth": (5.972e24, 0.0),
+        "Sun": (1.989e30, 0.0),
+        "Saturn": (5.683e26, 0.0),
     }
     assert {name: (b.m, b.q) for name, b in PRESETS.items()} == table
     assert all(preset(name).name == name for name in table)

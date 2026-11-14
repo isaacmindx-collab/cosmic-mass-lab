@@ -17,7 +17,7 @@ from cosmicmass.state import State
 
 
 def field_of_a_source_at_rest(source, x_source, points, frame) -> FieldSample:
-    """"Cosmic Field Law and law of motion": the field of a source at rest is
+    """ "Cosmic Field Law and law of motion": the field of a source at rest is
     E_cal = -G mu_s e_r / r^2, so g = -G m_s e_r / r^2 and e = -G q_s e_r / r^2."""
     r = points - x_source
     dist = np.linalg.norm(r, axis=1, keepdims=True)
@@ -54,13 +54,16 @@ def test_absorbed_bodies_are_switched_off_never_deleted_and_totals_survive_a_cop
     assert s.alive.all() and s.x[0, 0] == 0.0  # the original is untouched
 
 
-@pytest.mark.parametrize("bad", [
-    dict(m=[1.0], q=[0.0, 0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
-    dict(m=[1.0], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0, 0.0]], fixed=[False], alive=[True]),
-    dict(m=[1.0], q=[0.0], x=[[0.0]], v=[[0.0]], fixed=[False], alive=[True]),
-    dict(m=[float("nan")], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
-    dict(m=[[1.0]], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        dict(m=[1.0], q=[0.0, 0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
+        dict(m=[1.0], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0, 0.0]], fixed=[False], alive=[True]),
+        dict(m=[1.0], q=[0.0], x=[[0.0]], v=[[0.0]], fixed=[False], alive=[True]),
+        dict(m=[float("nan")], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
+        dict(m=[[1.0]], q=[0.0], x=[[0.0, 0.0]], v=[[0.0, 0.0]], fixed=[False], alive=[True]),
+    ],
+)
 def test_state_refuses_inconsistent_arrays(bad):
     with pytest.raises(ValueError):
         State(**bad)
@@ -68,8 +71,16 @@ def test_state_refuses_inconsistent_arrays(bad):
 
 # ------------------------------------------------------- law interface (E4.1)
 def test_lawspec_round_trips_through_json():
-    spec = LawSpec(reading="L1a", sign="-", strength=1e-12, direction="perpendicular",
-                   terms="s q g", moving="on", inertia="Sh", range="screened")
+    spec = LawSpec(
+        reading="L1a",
+        sign="-",
+        strength=1e-12,
+        direction="perpendicular",
+        terms="s q g",
+        moving="on",
+        inertia="Sh",
+        range="screened",
+    )
     assert LawSpec.from_dict(json.loads(json.dumps(spec.to_dict()))) == spec
     assert LawSpec.from_dict(json.loads(json.dumps(LawSpec().to_dict()))) == LawSpec()
     # the stamp keys of team/RESULTS-STANDARD.md, section 2
@@ -77,8 +88,19 @@ def test_lawspec_round_trips_through_json():
     assert LawSpec.from_dict({"id": "L1a", "lambda": "cos_phi_bar"}).strength == "cos_phi_bar"
 
 
-@pytest.mark.parametrize("bad", [{"id": "L9"}, {"sign": "x"}, {"lambda": "big"}, {"lambda": float("inf")},
-                                 {"lambda": True}, {"direction": "up"}, {"colour": "red"}, {"inertia": "Com"}])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"id": "L9"},
+        {"sign": "x"},
+        {"lambda": "big"},
+        {"lambda": float("inf")},
+        {"lambda": True},
+        {"direction": "up"},
+        {"colour": "red"},
+        {"inertia": "Com"},
+    ],
+)
 def test_unknown_law_options_are_refused(bad):
     with pytest.raises(ValueError):
         LawSpec.from_dict(bad)
@@ -122,9 +144,16 @@ def test_two_bodies_feel_newton_plus_coulomb(d, deg):
             state = State.from_bodies([a, b], x)
             on_a = field_of_a_source_at_rest(b, x[1], x[:1], f)
             on_b = field_of_a_source_at_rest(a, x[0], x[1:], f)
-            pair = law.forces(state, FieldSample(np.vstack([on_a.g, on_b.g]), np.vstack([on_a.e, on_b.e]),
-                                                 np.concatenate([on_a.B_g, on_b.B_g]),
-                                                 np.concatenate([on_a.b, on_b.b])), f)
+            pair = law.forces(
+                state,
+                FieldSample(
+                    np.vstack([on_a.g, on_b.g]),
+                    np.vstack([on_a.e, on_b.e]),
+                    np.concatenate([on_a.B_g, on_b.B_g]),
+                    np.concatenate([on_a.b, on_b.b]),
+                ),
+                f,
+            )
             assert isinstance(pair, ForcePair) and not pair.composer.any()
             expected = (SI.G_N * a.m * b.m - SI.K * a.q * b.q) / r**2
             force = pair.total()
@@ -151,10 +180,17 @@ def test_l0_is_newton_and_lorentz_with_the_second_field():
     n, s = 40, f.s
     for d in (2, 3):
         second = (n, 3) if d == 3 else (n,)
-        fields = FieldSample(rng.normal(size=(n, d)), rng.normal(size=(n, d)) / s,
-                             rng.normal(size=second), rng.normal(size=second) / s)
-        state = State(m=rng.uniform(1, 2, n), q=rng.normal(size=n) / s, x=rng.normal(size=(n, d)),
-                      v=rng.normal(size=(n, d)), fixed=np.zeros(n, bool), alive=np.ones(n, bool))
+        fields = FieldSample(
+            rng.normal(size=(n, d)), rng.normal(size=(n, d)) / s, rng.normal(size=second), rng.normal(size=second) / s
+        )
+        state = State(
+            m=rng.uniform(1, 2, n),
+            q=rng.normal(size=n) / s,
+            x=rng.normal(size=(n, d)),
+            v=rng.normal(size=(n, d)),
+            fixed=np.zeros(n, bool),
+            alive=np.ones(n, bool),
+        )
         E, B = -s * s * fields.e, -s * s * fields.b
         m, q = state.m[:, None], state.q[:, None]
         expected = m * (fields.g + cross(state.v, fields.B_g)) + q * (E + cross(state.v, B))
@@ -170,8 +206,10 @@ def test_field_sample_shapes_and_superposition():
     assert a.E_cal(f).shape == (4, 3) and a.B_cal(f).shape == (4, 3) and FieldSample.zeros(4, 2).b.shape == (4,)
     ones = FieldSample(np.ones((4, 3)), np.ones((4, 3)), np.ones((4, 3)), np.ones((4, 3)))
     assert np.array_equal((ones + ones).g, 2 * np.ones((4, 3))) and np.array_equal((ones + ones).b, 2 * np.ones((4, 3)))
-    for bad in (lambda: FieldSample(np.ones((4, 3)), np.ones((4, 2)), np.ones((4, 3)), np.ones((4, 3))),
-                lambda: FieldSample(np.ones((4, 2)), np.ones((4, 2)), np.ones((4, 3)), np.ones((4,))),
-                lambda: FieldSample(np.ones(4), np.ones(4), np.ones(4), np.ones(4))):
+    for bad in (
+        lambda: FieldSample(np.ones((4, 3)), np.ones((4, 2)), np.ones((4, 3)), np.ones((4, 3))),
+        lambda: FieldSample(np.ones((4, 2)), np.ones((4, 2)), np.ones((4, 3)), np.ones((4,))),
+        lambda: FieldSample(np.ones(4), np.ones(4), np.ones(4), np.ones(4)),
+    ):
         with pytest.raises(ValueError):
             bad()

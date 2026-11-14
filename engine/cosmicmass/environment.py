@@ -58,8 +58,19 @@ class Inflow:
     at `rate` bodies per unit time, all with `velocity` (which must point into the box), counted
     from the time `t0` (the start of the run)."""
 
-    def __init__(self, m: float, q: float, rate: float, velocity, axis: int, side: str, lower, upper, name: str = "",
-                 t0: float = 0.0):
+    def __init__(
+        self,
+        m: float,
+        q: float,
+        rate: float,
+        velocity,
+        axis: int,
+        side: str,
+        lower,
+        upper,
+        name: str = "",
+        t0: float = 0.0,
+    ):
         self.m, self.q, self.name = float(m), float(q), name
         self.rate = float(rate)
         self.velocity = np.asarray(velocity, dtype=float)
@@ -124,8 +135,14 @@ class Environment:
 
     BOUNDARIES = ("open", "reflecting", "absorbing")
 
-    def __init__(self, boundary: str = "open", lower=None, upper=None, inflow: Inflow | None = None,
-                 heat_bath: HeatBath | None = None):
+    def __init__(
+        self,
+        boundary: str = "open",
+        lower=None,
+        upper=None,
+        inflow: Inflow | None = None,
+        heat_bath: HeatBath | None = None,
+    ):
         self.inflow, self.heat_bath = inflow, heat_bath
         if boundary not in self.BOUNDARIES:
             raise ValueError(f"boundary must be one of {list(self.BOUNDARIES)}, not {boundary!r}")
@@ -168,16 +185,26 @@ class Environment:
                     out = state.alive & ~state.fixed & (sign * (state.x[:, axis] - bound) > 0)  # not yet taken
                     if np.any(out):
                         momentum = np.sum(state.m[out, None] * state.v[out], axis=0)
-                        taken = {"indices": [int(i) for i in np.flatnonzero(out)], "m": float(state.m[out].sum()),
-                                 "q": float(state.q[out].sum()), "momentum": [float(p) for p in momentum]}
+                        taken = {
+                            "indices": [int(i) for i in np.flatnonzero(out)],
+                            "m": float(state.m[out].sum()),
+                            "q": float(state.q[out].sum()),
+                            "momentum": [float(p) for p in momentum],
+                        }
                         state.alive[out] = False
                         self.collected["bodies"] += int(out.sum())
                         self.collected["m"] += taken["m"]
                         self.collected["q"] += taken["q"]
                         previous = self.collected["momentum"]
                         self.collected["momentum"] = momentum if previous is None else previous + momentum
-                        events.append({"wall": (axis, side), "bodies": int(out.sum()), "impulse": float(momentum[axis]),
-                                       "absorbed": taken})
+                        events.append(
+                            {
+                                "wall": (axis, side),
+                                "bodies": int(out.sum()),
+                                "impulse": float(momentum[axis]),
+                                "absorbed": taken,
+                            }
+                        )
                     continue
                 out = moving & (sign * (state.x[:, axis] - bound) > 0) & (sign * state.v[:, axis] > 0)
                 if np.any(out):

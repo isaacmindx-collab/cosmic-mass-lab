@@ -52,17 +52,23 @@ def background_energy(state: State, frame: Frame, background: dict | None) -> fl
         return 0.0
     moving = state.alive & ~state.fixed
     d = state.dimension
-    field = GNArray(np.asarray(background.get("g", np.zeros(d)), dtype=float),
-                    np.asarray(background.get("e", np.zeros(d)), dtype=float), frame)
+    field = GNArray(
+        np.asarray(background.get("g", np.zeros(d)), dtype=float),
+        np.asarray(background.get("e", np.zeros(d)), dtype=float),
+        frame,
+    )
     force = (GNArray(state.m[moving], state.q[moving], frame)[:, None] * field).re  # Re[mu E_cal]
     return float(-np.sum(force * state.x[moving]))
 
 
-def energy_l0(state: State, frame: Frame, constants: Constants, softening: float = 0.0,
-              background: dict | None = None) -> dict:
+def energy_l0(
+    state: State, frame: Frame, constants: Constants, softening: float = 0.0, background: dict | None = None
+) -> dict:
     """The parts of the L0 energy and their total."""
-    parts = {"kinetic": kinetic_energy(state),
-             "interaction": interaction_energy(state, frame, constants, softening),
-             "background": background_energy(state, frame, background)}
+    parts = {
+        "kinetic": kinetic_energy(state),
+        "interaction": interaction_energy(state, frame, constants, softening),
+        "background": background_energy(state, frame, background),
+    }
     parts["total"] = parts["kinetic"] + parts["interaction"] + parts["background"]
     return parts

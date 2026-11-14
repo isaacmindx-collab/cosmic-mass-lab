@@ -37,7 +37,7 @@ def smallest_separation(state: State) -> float:
         return float("inf")
     best = np.inf
     for start in range(0, len(x), max(1, _BLOCK // len(x))):
-        chunk = x[start:start + max(1, _BLOCK // len(x))]
+        chunk = x[start : start + max(1, _BLOCK // len(x))]
         dist = np.linalg.norm(chunk[:, None, :] - x[None, :, :], axis=2)
         dist[np.arange(len(chunk)), start + np.arange(len(chunk))] = np.inf  # not a body with itself
         best = min(best, float(dist.min()))
@@ -88,7 +88,7 @@ class DirectSum:
         step = max(1, _BLOCK // max(1, len(src)))
         eps2 = self.softening**2
         for start in range(0, len(points) if len(src) else 0, step):
-            r = points[start:start + step, None, :] - xs[None, :, :]  # (p, n, d)
+            r = points[start : start + step, None, :] - xs[None, :, :]  # (p, n, d)
             dist2 = np.einsum("pnd,pnd->pn", r, r) + eps2
             if skip_self:  # body i does not act on itself
                 rows = start + np.arange(r.shape[0])
@@ -96,8 +96,8 @@ class DirectSum:
                 dist2[own] = np.inf
             with np.errstate(divide="ignore"):
                 weight = dist2**-1.5  # 1 / (r^2 + eps^2)^(3/2)
-            g[start:start + step] = np.einsum("pn,pnd->pd", weight * ms, r)
-            e[start:start + step] = np.einsum("pn,pnd->pd", weight * qs, r)
+            g[start : start + step] = np.einsum("pn,pnd->pd", weight * ms, r)
+            e[start : start + step] = np.einsum("pn,pnd->pd", weight * qs, r)
         G = self.constants.G_N
         zero = FieldSample.zeros(len(points), d)
         field = FieldSample(-G * g, -G * e, zero.B_g, zero.b)

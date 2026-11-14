@@ -48,9 +48,15 @@ def _pair(scenario, a, b, separation, speed, phi_bar_deg, numerics, kind="mathem
         {"name": a.name, "m": a.m, "q": a.q, "x": [-b.m / total * separation, 0.0], "v": [0.0, -b.m / total * speed]},
         {"name": b.name, "m": b.m, "q": b.q, "x": [a.m / total * separation, 0.0], "v": [0.0, a.m / total * speed]},
     ]
-    return {"scenario": scenario, "universe": {"phi_bar_deg": phi_bar_deg, "dimension": 2, "units": "SI"},
-            "law": {"id": "L0"}, "bodies": bodies, "numerics": {"softening": 0.0, **numerics},
-            "kind": kind, "preregistered": True}
+    return {
+        "scenario": scenario,
+        "universe": {"phi_bar_deg": phi_bar_deg, "dimension": 2, "units": "SI"},
+        "law": {"id": "L0"},
+        "bodies": bodies,
+        "numerics": {"softening": 0.0, **numerics},
+        "kind": kind,
+        "preregistered": True,
+    }
 
 
 def _relative_track(result):
@@ -77,17 +83,25 @@ def _orbit_case(name, a, b, separation, reference_period, phi_bar_deg, periods, 
     result, period, radius_error = measure(eta)
     drift = result.summary["conservation"]["energy_re"]
     case = {
-        "period": period, "period_analytic": analytic, "period_reference": reference_period,
+        "period": period,
+        "period_analytic": analytic,
+        "period_reference": reference_period,
         "period_error_vs_reference": abs(period / reference_period - 1),
         "period_error_vs_analytic": abs(period / analytic - 1),
-        "radius_largest_relative_change": radius_error, "energy_drift": drift,
-        "steps": result.summary["steps"], "tolerance": {"period": 1e-3, "energy_drift": 1e-6},
+        "radius_largest_relative_change": radius_error,
+        "energy_drift": drift,
+        "steps": result.summary["steps"],
+        "tolerance": {"period": 1e-3, "energy_drift": 1e-6},
     }
     case["pass"] = bool(case["period_error_vs_reference"] < 1e-3 and drift < 1e-6)
     if convergence:  # the same quantity at eta/2 and eta/4 (TEAM.md, section 5, step 5)
         half, quarter = measure(eta / 2)[1], measure(eta / 4)[1]
-        case["convergence"] = {"period_eta": period, "period_eta_half": half, "period_eta_quarter": quarter,
-                               "change_half_to_quarter": abs(half / quarter - 1)}
+        case["convergence"] = {
+            "period_eta": period,
+            "period_eta_half": half,
+            "period_eta_quarter": quarter,
+            "change_half_to_quarter": abs(half / quarter - 1),
+        }
     return case, result
 
 
@@ -96,8 +110,12 @@ def _escape_radius(t, r0, strength, reduced) -> float:
     force (`k = -strength > 0`): from `(1/2) mu r'^2 = k (1/r0 - 1/r)`,
     `t = sqrt(mu r0 / 2k) [sqrt(r (r - r0)) + r0 ln((sqrt(r) + sqrt(r - r0)) / sqrt(r0))]`."""
     k = -strength
-    time_of = lambda r: math.sqrt(reduced * r0 / (2 * k)) * (  # noqa: E731
-        math.sqrt(r * (r - r0)) + r0 * math.log((math.sqrt(r) + math.sqrt(r - r0)) / math.sqrt(r0)))
+
+    def time_of(r):
+        return math.sqrt(reduced * r0 / (2 * k)) * (
+            math.sqrt(r * (r - r0)) + r0 * math.log((math.sqrt(r) + math.sqrt(r - r0)) / math.sqrt(r0))
+        )
+
     low, high = r0, 2 * r0
     while time_of(high) < t:
         high *= 2
@@ -119,26 +137,43 @@ def _escape_case(phi_bar_deg, eta, convergence) -> tuple:
 
     result, separation = measure(eta)
     analytic = _escape_radius(t_end, r0, strength, reduced)
-    case = {"t_end": t_end, "separation": separation, "separation_analytic": analytic,
-            "separation_error": abs(separation / analytic - 1),
-            "energy_drift": result.summary["conservation"]["energy_re"], "steps": result.summary["steps"],
-            "eta": eta, "tolerance": {"separation": 1e-6}}
+    case = {
+        "t_end": t_end,
+        "separation": separation,
+        "separation_analytic": analytic,
+        "separation_error": abs(separation / analytic - 1),
+        "energy_drift": result.summary["conservation"]["energy_re"],
+        "steps": result.summary["steps"],
+        "eta": eta,
+        "tolerance": {"separation": 1e-6},
+    }
     case["pass"] = bool(case["separation_error"] < 1e-6)
     if convergence:
         half, quarter = measure(eta / 2)[1], measure(eta / 4)[1]
-        case["convergence"] = {"separation_eta": separation, "separation_eta_half": half,
-                               "separation_eta_quarter": quarter, "change_half_to_quarter": abs(half / quarter - 1)}
+        case["convergence"] = {
+            "separation_eta": separation,
+            "separation_eta_half": half,
+            "separation_eta_quarter": quarter,
+            "change_half_to_quarter": abs(half / quarter - 1),
+        }
     return case, result
 
 
-def t0_1(phi_bar_deg: float = 79.86, periods: float = 1.0, eta: float = 1e-3, escape_eta: float = 1e-3,
-         convergence: bool = False) -> dict:
+def t0_1(
+    phi_bar_deg: float = 79.86,
+    periods: float = 1.0,
+    eta: float = 1e-3,
+    escape_eta: float = 1e-3,
+    convergence: bool = False,
+) -> dict:
     """T0.1: (a) Earth and moon, (b) electron and proton at the Bohr radius, (c) two protons at rest."""
     cases, runs = {}, {}
-    cases["a"], runs["a"] = _orbit_case("T0.1a", preset("Earth"), preset("moon"), 3.844e8, 27.3 * DAY,
-                                        phi_bar_deg, periods, eta, convergence)
-    cases["b"], runs["b"] = _orbit_case("T0.1b", preset("proton"), preset("electron"), 5.29177e-11, 1.5198e-16,
-                                        phi_bar_deg, periods, eta, convergence)
+    cases["a"], runs["a"] = _orbit_case(
+        "T0.1a", preset("Earth"), preset("moon"), 3.844e8, 27.3 * DAY, phi_bar_deg, periods, eta, convergence
+    )
+    cases["b"], runs["b"] = _orbit_case(
+        "T0.1b", preset("proton"), preset("electron"), 5.29177e-11, 1.5198e-16, phi_bar_deg, periods, eta, convergence
+    )
     cases["c"], runs["c"] = _escape_case(phi_bar_deg, escape_eta, convergence)
     return {"id": "T0.1", "pass": all(c["pass"] for c in cases.values()), "cases": cases, "runs": runs}
 
@@ -149,34 +184,66 @@ def cloud_settings(n: int = 200, steps: int = 10_000, seed: int = 12345, eta: fl
     kinds = rng.choice(["electron", "proton", "neutron"], size=n)
     spread = {"electron": 1e6, "proton": 2e4, "neutron": 2e4}  # velocity spread of each kind, m/s
     half = side / 2
-    bodies = [{"preset": str(kind), "x": [float(c) for c in rng.uniform(-0.98 * half, 0.98 * half, 2)],
-               "v": [float(c) for c in rng.normal(0.0, spread[str(kind)], 2)]} for kind in kinds]
-    return {"scenario": "T0.2", "universe": {"dimension": 2, "units": "SI", "boundary": "reflecting",
-                                            "box": {"lower": [-half, -half], "upper": [half, half]}},
-            "law": {"id": "L0"}, "bodies": bodies,
-            "numerics": {"steps": steps, "eta": eta, "seed": seed, "record_every": max(1, steps // 500)},
-            "kind": "mathematics", "preregistered": True}
+    bodies = [
+        {
+            "preset": str(kind),
+            "x": [float(c) for c in rng.uniform(-0.98 * half, 0.98 * half, 2)],
+            "v": [float(c) for c in rng.normal(0.0, spread[str(kind)], 2)],
+        }
+        for kind in kinds
+    ]
+    return {
+        "scenario": "T0.2",
+        "universe": {
+            "dimension": 2,
+            "units": "SI",
+            "boundary": "reflecting",
+            "box": {"lower": [-half, -half], "upper": [half, half]},
+        },
+        "law": {"id": "L0"},
+        "bodies": bodies,
+        "numerics": {"steps": steps, "eta": eta, "seed": seed, "record_every": max(1, steps // 500)},
+        "kind": "mathematics",
+        "preregistered": True,
+    }
 
 
 def t0_2(n: int = 200, steps: int = 10_000, seed: int = 12345, eta: float = 1e-3, convergence: bool = False) -> dict:
     """T0.2: mass and charge exactly constant; energy and momentum drift below 1e-6. The walls take
     momentum, so the momentum checked is that of the bodies plus what they gave to the walls."""
+
     def measure(n_value, eta_value):
         result = run(cloud_settings(n_value, steps, seed, eta_value), out_root=None)
         c = result.summary["conservation"]
-        return result, {"mass_drift": c["mass"], "charge_drift": c["charge"], "energy_drift": c["energy_re"],
-                        "momentum_drift_with_walls": result.summary["momentum_with_walls_drift"],
-                        "momentum_drift_bodies_only": c["momentum"], "wall_hits": result.summary["wall_hits"],
-                        "t_end": result.summary["t_end"], "steps": result.summary["steps"]}
+        return result, {
+            "mass_drift": c["mass"],
+            "charge_drift": c["charge"],
+            "energy_drift": c["energy_re"],
+            "momentum_drift_with_walls": result.summary["momentum_with_walls_drift"],
+            "momentum_drift_bodies_only": c["momentum"],
+            "wall_hits": result.summary["wall_hits"],
+            "t_end": result.summary["t_end"],
+            "steps": result.summary["steps"],
+        }
 
     result, case = measure(n, eta)
     case["tolerance"] = {"mass": 0.0, "charge": 0.0, "energy_drift": 1e-6, "momentum_drift": 1e-6}
-    case["pass"] = bool(case["mass_drift"] == 0.0 and case["charge_drift"] in (0.0, None)
-                        and case["energy_drift"] < 1e-6 and case["momentum_drift_with_walls"] < 1e-6)
+    case["pass"] = bool(
+        case["mass_drift"] == 0.0
+        and case["charge_drift"] in (0.0, None)
+        and case["energy_drift"] < 1e-6
+        and case["momentum_drift_with_walls"] < 1e-6
+    )
     if convergence:  # the drifts at eta/2 and eta/4, and with half and twice the bodies
-        case["convergence"] = {label: {k: m[k] for k in ("energy_drift", "momentum_drift_with_walls")}
-                               for label, m in (("eta_half", measure(n, eta / 2)[1]), ("eta_quarter", measure(n, eta / 4)[1]),
-                                                ("n_half", measure(n // 2, eta)[1]), ("n_double", measure(2 * n, eta)[1]))}
+        case["convergence"] = {
+            label: {k: m[k] for k in ("energy_drift", "momentum_drift_with_walls")}
+            for label, m in (
+                ("eta_half", measure(n, eta / 2)[1]),
+                ("eta_quarter", measure(n, eta / 4)[1]),
+                ("n_half", measure(n // 2, eta)[1]),
+                ("n_double", measure(2 * n, eta)[1]),
+            )
+        }
     return {"id": "T0.2", "pass": case["pass"], "cases": {"cloud": case}, "runs": {"cloud": result}}
 
 
@@ -186,13 +253,17 @@ def t0_3(periods: float = 1.0, eta: float = 1e-3, angles=ANGLES) -> dict:
     reference, cases, runs = None, {}, {}
     for angle in angles:
         outcome = t0_1(angle, periods, eta)
-        finals = {k: (r.state.x.tobytes(), r.state.v.tobytes(), r.summary["steps"], r.summary["final"]["energy_re"])
-                  for k, r in outcome["runs"].items()}
+        finals = {
+            k: (r.state.x.tobytes(), r.state.v.tobytes(), r.summary["steps"], r.summary["final"]["energy_re"])
+            for k, r in outcome["runs"].items()
+        }
         reference = finals if reference is None else reference
-        cases[f"{angle:g} deg"] = {"identical_to_first_angle": finals == reference,
-                                   "periods": {k: outcome["cases"][k].get("period") for k in ("a", "b")},
-                                   "separation_c": outcome["cases"]["c"]["separation"],
-                                   "pass": bool(finals == reference and outcome["pass"])}
+        cases[f"{angle:g} deg"] = {
+            "identical_to_first_angle": finals == reference,
+            "periods": {k: outcome["cases"][k].get("period") for k in ("a", "b")},
+            "separation_c": outcome["cases"]["c"]["separation"],
+            "pass": bool(finals == reference and outcome["pass"]),
+        }
         runs[f"{angle:g} deg"] = outcome["runs"]["a"]
     return {"id": "T0.3", "pass": all(c["pass"] for c in cases.values()), "cases": cases, "runs": runs}
 
@@ -208,16 +279,28 @@ def t0_4(phi_bar_deg: float = 79.86) -> dict:
         state = State.from_bodies([earth, body], [[0.0, 0.0], [r, 0.0]], fixed=[True, False])
         ctx = StepContext(make_law("L0"), DirectSum(constants=SI), frame)
         a = ctx.acceleration(state)[1]
-        cases[name] = {"acceleration": [float(c) for c in a], "expected": expected,
-                       "relative_error": abs(-a[0] / expected - 1), "tolerance": 1e-12}
+        cases[name] = {
+            "acceleration": [float(c) for c in a],
+            "expected": expected,
+            "relative_error": abs(-a[0] / expected - 1),
+            "tolerance": 1e-12,
+        }
         cases[name]["pass"] = bool(cases[name]["relative_error"] < 1e-12 and a[1] == 0.0)
-        runs[name] = {"scenario": "T0.4", "universe": {"phi_bar_deg": phi_bar_deg, "dimension": 2, "units": "SI"},
-                      "law": {"id": "L0"}, "numerics": {"softening": 0.0, "steps": 0},
-                      "bodies": [{"preset": "Earth", "x": [0.0, 0.0], "fixed": True}, {"preset": name, "x": [r, 0.0]}],
-                      "kind": "mathematics", "preregistered": True}
+        runs[name] = {
+            "scenario": "T0.4",
+            "universe": {"phi_bar_deg": phi_bar_deg, "dimension": 2, "units": "SI"},
+            "law": {"id": "L0"},
+            "numerics": {"softening": 0.0, "steps": 0},
+            "bodies": [{"preset": "Earth", "x": [0.0, 0.0], "fixed": True}, {"preset": name, "x": [r, 0.0]}],
+            "kind": "mathematics",
+            "preregistered": True,
+        }
     spread = max(c["acceleration"][0] for c in cases.values()) - min(c["acceleration"][0] for c in cases.values())
-    cases["all bodies"] = {"largest_relative_difference": abs(spread) / expected, "tolerance": 1e-12,
-                           "pass": bool(abs(spread) / expected < 1e-12)}
+    cases["all bodies"] = {
+        "largest_relative_difference": abs(spread) / expected,
+        "tolerance": 1e-12,
+        "pass": bool(abs(spread) / expected < 1e-12),
+    }
     return {"id": "T0.4", "pass": all(c["pass"] for c in cases.values()), "cases": cases, "runs": runs}
 
 
@@ -234,11 +317,22 @@ def t0_5(points_per_side: int = 21) -> dict:
     newton = -SI.G_N * proton.m * grid / r**3
     error_e = float(np.max(np.linalg.norm(-s * s * field.e - coulomb, axis=1) / np.linalg.norm(coulomb, axis=1)))
     error_g = float(np.max(np.linalg.norm(field.g - newton, axis=1) / np.linalg.norm(newton, axis=1)))
-    case = {"grid_points": len(grid), "largest_relative_error_E": error_e, "largest_relative_error_g": error_g,
-            "tolerance": 1e-6, "pass": bool(error_e < 1e-6 and error_g < 1e-6)}
-    settings = {"scenario": "T0.5", "universe": {"dimension": 2, "units": "SI"}, "law": {"id": "L0"},
-                "bodies": [{"preset": "proton", "x": [0.0, 0.0]}], "numerics": {"softening": 0.0, "steps": 0},
-                "kind": "mathematics", "preregistered": True}
+    case = {
+        "grid_points": len(grid),
+        "largest_relative_error_E": error_e,
+        "largest_relative_error_g": error_g,
+        "tolerance": 1e-6,
+        "pass": bool(error_e < 1e-6 and error_g < 1e-6),
+    }
+    settings = {
+        "scenario": "T0.5",
+        "universe": {"dimension": 2, "units": "SI"},
+        "law": {"id": "L0"},
+        "bodies": [{"preset": "proton", "x": [0.0, 0.0]}],
+        "numerics": {"softening": 0.0, "steps": 0},
+        "kind": "mathematics",
+        "preregistered": True,
+    }
     return {"id": "T0.5", "pass": case["pass"], "cases": {"proton": case}, "runs": {"proton": settings}}
 
 
@@ -251,8 +345,14 @@ def run_gate(fast: bool = True) -> dict:
     return {"pass": all(p["pass"] for p in parts), "parts": {p["id"]: p for p in parts}}
 
 
-def write_gate_result(outcome: dict, out_root="results", producer: str = "", now=None,
-                      kind: str = "mathematics", law: str = "the reference law L0") -> Path:
+def write_gate_result(
+    outcome: dict,
+    out_root="results",
+    producer: str = "",
+    now=None,
+    kind: str = "mathematics",
+    law: str = "the reference law L0",
+) -> Path:
     """Write one gate test to `results/<ID>/<run-id>/`: `summary.json` (cases and verdict),
     `stamp.json` (the stamp of every case) and, for the cases that ran, `timeseries-<case>.csv`."""
     import csv
@@ -278,12 +378,23 @@ def write_gate_result(outcome: dict, out_root="results", producer: str = "", now
                 writer.writerows(rows if rows[-1] is item.timeseries[-1] else rows + [item.timeseries[-1]])
     for stamp in stamps.values():
         stamp["producer"] = producer
-    stamp = {"scenario": outcome["id"], "run_id": run_id, "engine_commit": commit, "kind": kind,
-             "preregistered": True, "producer": producer, "cases": stamps}
+    stamp = {
+        "scenario": outcome["id"],
+        "run_id": run_id,
+        "engine_commit": commit,
+        "kind": kind,
+        "preregistered": True,
+        "producer": producer,
+        "cases": stamps,
+    }
     verdict = "pass" if outcome["pass"] else "fail"
-    summary = {"scenario": outcome["id"], "verdict": verdict, "cases": outcome["cases"],
-               "explanation": f"{outcome['id']} under {law}: "
-                              + ("every case meets its criterion." if outcome["pass"] else "at least one case fails.")}
+    summary = {
+        "scenario": outcome["id"],
+        "verdict": verdict,
+        "cases": outcome["cases"],
+        "explanation": f"{outcome['id']} under {law}: "
+        + ("every case meets its criterion." if outcome["pass"] else "at least one case fails."),
+    }
     for name, data in (("stamp.json", stamp), ("summary.json", summary)):
         (folder / name).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return folder

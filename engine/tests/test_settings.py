@@ -44,8 +44,9 @@ def test_loads_a_dictionary_and_a_file_to_the_same_objects(tmp_path):
 
 
 def test_defaults():
-    s = load_settings({"scenario": "x", "bodies": [{"m": 1.0, "q": 0.5, "x": [0.0, 0.0]}],
-                       "universe": {"units": "scaled"}})
+    s = load_settings(
+        {"scenario": "x", "bodies": [{"m": 1.0, "q": 0.5, "x": [0.0, 0.0]}], "universe": {"units": "scaled"}}
+    )
     assert s.frame == Frame.scaled(90.0) and s.law_spec.reading == "L0" and s.meta["kind"] == "finding"
     assert load_settings({"scenario": "x", "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]}).frame == Frame.si()
 
@@ -62,30 +63,35 @@ def broken(path, value="__delete__", **extra):
     return data
 
 
-@pytest.mark.parametrize("data, named", [
-    (broken(["scenario"]), "scenario"),
-    (broken(["bodies"]), "bodies"),
-    (broken(["bodies"], []), "bodies"),
-    (broken(["colour"], "red"), "colour"),
-    (broken(["universe", "units"], "cgs"), "universe.units"),
-    (broken(["universe", "dimension"], 4), "universe.dimension"),
-    (broken(["universe", "phi_bar_deg"], 180.0), "universe.phi_bar_deg"),
-    (broken(["universe", "walls"], "yes"), "walls"),
-    (broken(["universe"], 3), "universe"),
-    (broken(["law", "id"], "L9"), "law"),
-    (broken(["law", "speed"], 1), "law"),
-    (broken(["bodies", 0, "preset"], "quark"), "bodies[0].preset"),
-    (broken(["bodies", 1, "x"], [0.0]), "bodies[1].x"),
-    (broken(["bodies", 1, "v"], "fast"), "bodies[1].v"),
-    (broken(["bodies", 2, "q"]), "bodies[2]"),
-    (broken(["bodies", 0, "m"], 1.0), "bodies[0]"),
-    (broken(["bodies", 0, "spin"], 1), "bodies[0]"),
-    (broken(["numerics", "integrator"], "boris"), "numerics.integrator"),
-    (broken(["numerics", "stepz"], 1), "stepz"),
-    (broken(["kind"], "guess"), "kind"),
-    ({"scenario": "x", "universe": {"units": "scaled"}, "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]},
-     "bodies[0].preset"),
-])
+@pytest.mark.parametrize(
+    "data, named",
+    [
+        (broken(["scenario"]), "scenario"),
+        (broken(["bodies"]), "bodies"),
+        (broken(["bodies"], []), "bodies"),
+        (broken(["colour"], "red"), "colour"),
+        (broken(["universe", "units"], "cgs"), "universe.units"),
+        (broken(["universe", "dimension"], 4), "universe.dimension"),
+        (broken(["universe", "phi_bar_deg"], 180.0), "universe.phi_bar_deg"),
+        (broken(["universe", "walls"], "yes"), "walls"),
+        (broken(["universe"], 3), "universe"),
+        (broken(["law", "id"], "L9"), "law"),
+        (broken(["law", "speed"], 1), "law"),
+        (broken(["bodies", 0, "preset"], "quark"), "bodies[0].preset"),
+        (broken(["bodies", 1, "x"], [0.0]), "bodies[1].x"),
+        (broken(["bodies", 1, "v"], "fast"), "bodies[1].v"),
+        (broken(["bodies", 2, "q"]), "bodies[2]"),
+        (broken(["bodies", 0, "m"], 1.0), "bodies[0]"),
+        (broken(["bodies", 0, "spin"], 1), "bodies[0]"),
+        (broken(["numerics", "integrator"], "boris"), "numerics.integrator"),
+        (broken(["numerics", "stepz"], 1), "stepz"),
+        (broken(["kind"], "guess"), "kind"),
+        (
+            {"scenario": "x", "universe": {"units": "scaled"}, "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]},
+            "bodies[0].preset",
+        ),
+    ],
+)
 def test_errors_name_the_bad_field(data, named):
     with pytest.raises(SettingsError, match=named.replace("[", r"\[").replace("]", r"\]").replace(".", r"\.")):
         load_settings(data)

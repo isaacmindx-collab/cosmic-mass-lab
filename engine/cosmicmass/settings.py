@@ -19,12 +19,31 @@ from .state import State
 __all__ = ["Settings", "SettingsError", "load_settings", "make_inflow", "make_heat_bath"]
 
 # decision D10: velocity Verlet, adaptive step, softening 1e-3 of the smallest separation
-_NUMERICS = {"integrator": "verlet", "adaptive": True, "dt_initial": None, "softening": None,
-             "softening_fraction": 1e-3, "eta": 1e-3, "dt_min": 0.0, "dt_max": None,
-             "speed_reference": "absolute",
-             "steps": None, "t_end": None, "record_every": None, "seed": 0}
-_UNIVERSE = {"phi_bar_deg": None, "dimension": 2, "units": "SI", "boundary": "open", "background": "none",
-             "box": None, "inflow": None, "heat_bath": None}
+_NUMERICS = {
+    "integrator": "verlet",
+    "adaptive": True,
+    "dt_initial": None,
+    "softening": None,
+    "softening_fraction": 1e-3,
+    "eta": 1e-3,
+    "dt_min": 0.0,
+    "dt_max": None,
+    "speed_reference": "absolute",
+    "steps": None,
+    "t_end": None,
+    "record_every": None,
+    "seed": 0,
+}
+_UNIVERSE = {
+    "phi_bar_deg": None,
+    "dimension": 2,
+    "units": "SI",
+    "boundary": "open",
+    "background": "none",
+    "box": None,
+    "inflow": None,
+    "heat_bath": None,
+}
 _INFLOW = {"preset", "name", "m", "q", "rate", "velocity", "face"}
 _TOP = {"scenario", "universe", "law", "bodies", "numerics", "kind", "preregistered", "producer"}
 _BODY = {"preset", "name", "m", "q", "x", "v", "fixed"}
@@ -106,8 +125,14 @@ def _inflow(universe: dict) -> dict:
         raise SettingsError(f"'{where}': give a 'preset', or both 'm' and 'q'")
     face = entry.get("face")
     _known(face if isinstance(face, dict) else 0, ("axis", "side"), f"{where}.face")
-    out = {"name": name, "m": m, "q": q, "rate": entry.get("rate"), "velocity": entry.get("velocity"),
-           "face": {"axis": face.get("axis"), "side": face.get("side")}}
+    out = {
+        "name": name,
+        "m": m,
+        "q": q,
+        "rate": entry.get("rate"),
+        "velocity": entry.get("velocity"),
+        "face": {"axis": face.get("axis"), "side": face.get("side")},
+    }
     try:
         make_inflow(out, universe["box"])
     except (ValueError, TypeError) as exc:
@@ -121,15 +146,26 @@ def _heat_bath(entry, units: str) -> dict:
     try:
         HeatBath(entry.get("temperature"), entry.get("collision_rate"), K_B[units])
     except (ValueError, TypeError):
-        raise SettingsError("'universe.heat_bath' needs a positive 'temperature' and a positive "
-                            "'collision_rate'") from None
+        raise SettingsError(
+            "'universe.heat_bath' needs a positive 'temperature' and a positive 'collision_rate'"
+        ) from None
     return {"temperature": float(entry["temperature"]), "collision_rate": float(entry["collision_rate"])}
 
 
 def make_inflow(spec: dict, box: dict, t0: float = 0.0) -> Inflow:
     """The `Inflow` of a normalised inflow block and the box, counting from `t0`."""
-    return Inflow(spec["m"], spec["q"], spec["rate"], spec["velocity"], spec["face"]["axis"], spec["face"]["side"],
-                  box["lower"], box["upper"], spec.get("name", ""), t0=t0)
+    return Inflow(
+        spec["m"],
+        spec["q"],
+        spec["rate"],
+        spec["velocity"],
+        spec["face"]["axis"],
+        spec["face"]["side"],
+        box["lower"],
+        box["upper"],
+        spec.get("name", ""),
+        t0=t0,
+    )
 
 
 def make_heat_bath(spec: dict, units: str) -> HeatBath:
@@ -163,8 +199,11 @@ def load_settings(source) -> Settings:
         _known(background, ("g", "e", "B_g", "b"), "universe.background")
         for key, value in background.items():
             second_2d = key in ("B_g", "b") and universe["dimension"] == 2
-            ok = isinstance(value, (int, float)) if second_2d else (
-                isinstance(value, list) and len(value) == universe["dimension"])
+            ok = (
+                isinstance(value, (int, float))
+                if second_2d
+                else (isinstance(value, list) and len(value) == universe["dimension"])
+            )
             if not ok:
                 shape = "a number" if second_2d else f"a list of {universe['dimension']} numbers"
                 raise SettingsError(f"'universe.background.{key}' must be {shape}")
@@ -177,8 +216,9 @@ def load_settings(source) -> Settings:
             Environment(universe["boundary"], box.get("lower"), box.get("upper"))
             assert len(box["lower"]) == universe["dimension"]
         except (ValueError, TypeError, AssertionError):
-            raise SettingsError(f"'universe.box' needs 'lower' and 'upper', lists of {universe['dimension']} "
-                                "numbers with lower < upper") from None
+            raise SettingsError(
+                f"'universe.box' needs 'lower' and 'upper', lists of {universe['dimension']} numbers with lower < upper"
+            ) from None
     if universe["inflow"] is not None:
         universe["inflow"] = _inflow(universe)
     if universe["heat_bath"] is not None:
@@ -199,8 +239,11 @@ def load_settings(source) -> Settings:
     numerics = {**_NUMERICS, **data.get("numerics", {})}
     if numerics["integrator"] != "verlet":
         raise SettingsError("'numerics.integrator': only 'verlet' exists in the MVP")
-    meta = {"kind": data.get("kind", "finding"), "preregistered": bool(data.get("preregistered", False)),
-            "producer": data.get("producer", "")}
+    meta = {
+        "kind": data.get("kind", "finding"),
+        "preregistered": bool(data.get("preregistered", False)),
+        "producer": data.get("producer", ""),
+    }
     if meta["kind"] not in ("mathematics", "measurement-check", "finding"):
         raise SettingsError("'kind' must be 'mathematics', 'measurement-check' or 'finding'")
     return Settings(str(data["scenario"]), frame, universe, law_spec, state, bodies, numerics, meta)

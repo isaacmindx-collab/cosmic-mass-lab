@@ -92,6 +92,9 @@ jobs:
       - name: Ruff lint
         run: ruff check . --output-format=github
 
+      - name: Ruff format check (decision D25)
+        run: ruff format --check .
+
   tests:
     runs-on: ubuntu-latest
     steps:

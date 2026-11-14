@@ -41,8 +41,13 @@ def simulate(settings: dict, rule: str, eta: float, track=None) -> dict:
     s = load_settings(settings)
     constants = SI if s.universe["units"] == "SI" else scaled()
     state = s.state.copy()
-    ctx = StepContext(s.make_law(), DirectSum(constants=constants, softening=0.0), s.frame, eta=eta,
-                      speed_reference="absolute" if rule == "A" else "neighbour")
+    ctx = StepContext(
+        s.make_law(),
+        DirectSum(constants=constants, softening=0.0),
+        s.frame,
+        eta=eta,
+        speed_reference="absolute" if rule == "A" else "neighbour",
+    )
     integrator, t_end, steps = VelocityVerlet(), s.numerics["t_end"], 0
     e0 = energy_l0(state, s.frame, constants)["total"]
     excursion = 0.0
@@ -64,12 +69,21 @@ def simulate(settings: dict, rule: str, eta: float, track=None) -> dict:
 
 def trap_settings() -> dict:
     """Setup 1: a light, loose pair passes fast by a heavy body whose nearest neighbour is its companion."""
-    bodies = [{"name": "H", "m": 1.0, "q": 0.0, "x": [0.0, 0.0]},
-              {"name": "companion", "m": 1e-3, "q": 0.0, "x": [1.0, 0.0], "v": [0.0, 1.0]},
-              {"name": "pair a", "m": 1e-12, "q": 0.0, "x": [-60.0, 1.5], "v": [300.0, 0.0]},
-              {"name": "pair b", "m": 1e-12, "q": 0.0, "x": [-60.0, 1.51], "v": [300.0, 0.0]}]
-    return {"scenario": "Q5", "universe": {"units": "scaled", "dimension": 2}, "law": {"id": "L0"}, "bodies": bodies,
-            "numerics": {"softening": 0.0, "t_end": 0.4}, "kind": "mathematics", "preregistered": True}
+    bodies = [
+        {"name": "H", "m": 1.0, "q": 0.0, "x": [0.0, 0.0]},
+        {"name": "companion", "m": 1e-3, "q": 0.0, "x": [1.0, 0.0], "v": [0.0, 1.0]},
+        {"name": "pair a", "m": 1e-12, "q": 0.0, "x": [-60.0, 1.5], "v": [300.0, 0.0]},
+        {"name": "pair b", "m": 1e-12, "q": 0.0, "x": [-60.0, 1.51], "v": [300.0, 0.0]},
+    ]
+    return {
+        "scenario": "Q5",
+        "universe": {"units": "scaled", "dimension": 2},
+        "law": {"id": "L0"},
+        "bodies": bodies,
+        "numerics": {"softening": 0.0, "t_end": 0.4},
+        "kind": "mathematics",
+        "preregistered": True,
+    }
 
 
 def trap(rule: str, eta: float) -> dict:
@@ -96,12 +110,20 @@ def earth_moon(rule: str, boost: float) -> dict:
 
 
 def sun_earth_moon(rule: str, eta: float) -> dict:
-    bodies = [{"preset": "Sun", "x": [0.0, 0.0]},
-              {"preset": "Earth", "x": [1.496e11, 0.0], "v": [0.0, 29780.0]},
-              {"preset": "moon", "x": [1.496e11 + 3.844e8, 0.0], "v": [0.0, 29780.0 + 1022.0]}]
-    settings = {"scenario": "Q5", "universe": {"phi_bar_deg": PHI, "dimension": 2, "units": "SI"}, "law": {"id": "L0"},
-                "bodies": bodies, "numerics": {"softening": 0.0, "t_end": 27.3 * DAY}, "kind": "mathematics",
-                "preregistered": True}
+    bodies = [
+        {"preset": "Sun", "x": [0.0, 0.0]},
+        {"preset": "Earth", "x": [1.496e11, 0.0], "v": [0.0, 29780.0]},
+        {"preset": "moon", "x": [1.496e11 + 3.844e8, 0.0], "v": [0.0, 29780.0 + 1022.0]},
+    ]
+    settings = {
+        "scenario": "Q5",
+        "universe": {"phi_bar_deg": PHI, "dimension": 2, "units": "SI"},
+        "law": {"id": "L0"},
+        "bodies": bodies,
+        "numerics": {"softening": 0.0, "t_end": 27.3 * DAY},
+        "kind": "mathematics",
+        "preregistered": True,
+    }
     out = simulate(settings, rule, eta)
     state = out.pop("state")
     out["earth_moon_separation"] = float(np.linalg.norm(state.x[2] - state.x[1]))
@@ -111,8 +133,13 @@ def sun_earth_moon(rule: str, eta: float) -> dict:
 def q5() -> dict:
     cases = {}
     # 1: the trap; reference C at eta/8, with eta/2 and eta/4 for convergence
-    for name, rule, eta in (("1: trap; B", "B", ETA), ("1: trap; C", "C", ETA), ("1: trap; C, eta/2", "C", ETA / 2),
-                            ("1: trap; C, eta/4", "C", ETA / 4), ("1: trap; C, eta/8 (reference)", "C", ETA / 8)):
+    for name, rule, eta in (
+        ("1: trap; B", "B", ETA),
+        ("1: trap; C", "C", ETA),
+        ("1: trap; C, eta/2", "C", ETA / 2),
+        ("1: trap; C, eta/4", "C", ETA / 4),
+        ("1: trap; C, eta/8 (reference)", "C", ETA / 8),
+    ):
         cases[name] = trap(rule, eta)
     ref = cases["1: trap; C, eta/8 (reference)"]
     for case in cases.values():
@@ -120,15 +147,20 @@ def q5() -> dict:
         case["pair_separation_error_vs_reference"] = abs(case["pair_separation"] / ref["pair_separation"] - 1)
     b, L = 1.5, 60.0
     impulse = 2.0 / (b * 300.0) * L / math.sqrt(L * L + b * b)
-    cases["1: trap; A (not run)"] = {"steps_from_the_rule": int(round(0.4 / (ETA * 0.01 / 300.0))),
-                                     "why_not_run": "dt <= eta l / |v| = 3.3e-8 for each pair member"}
+    cases["1: trap; A (not run)"] = {
+        "steps_from_the_rule": int(round(0.4 / (ETA * 0.01 / 300.0))),
+        "why_not_run": "dt <= eta l / |v| = 3.3e-8 for each pair member",
+    }
     # 2: Earth and moon, own frame and boosted
     for frame, boost in (("own frame", 0.0), ("plus 29780 m per s", 29780.0)):
         for rule in ("B", "C"):
             cases[f"2: Earth-moon, {frame}; {rule}"] = earth_moon(rule, boost)
     # 3: Sun, Earth and moon; reference B with eta = 1.25e-4, as in Q4
-    for name, rule, eta in (("3: Sun-Earth-moon; B", "B", ETA), ("3: Sun-Earth-moon; C", "C", ETA),
-                            ("3: Sun-Earth-moon; B, eta = 1.25e-4 (reference)", "B", 1.25e-4)):
+    for name, rule, eta in (
+        ("3: Sun-Earth-moon; B", "B", ETA),
+        ("3: Sun-Earth-moon; C", "C", ETA),
+        ("3: Sun-Earth-moon; B, eta = 1.25e-4 (reference)", "B", 1.25e-4),
+    ):
         cases[name] = sun_earth_moon(rule, eta)
     ref3 = cases["3: Sun-Earth-moon; B, eta = 1.25e-4 (reference)"]["earth_moon_separation"]
     for name in ("3: Sun-Earth-moon; B", "3: Sun-Earth-moon; C"):
@@ -145,11 +177,17 @@ def q5() -> dict:
         "1: C takes 4,000 to 20,000 steps": bool(4_000 <= tc["steps"] <= 20_000),
         "1: the reference agrees with the impulse within 1%": bool(abs(ref["deflection"] / impulse - 1) < 0.01),
         "1: the reference has converged (eta/4 to eta/8 below 1e-6)": bool(
-            get("1: trap; C, eta/4")["deflection_error_vs_reference"] < 1e-6),
-        "2: C's steps within 10% of B's, own frame": bool(abs(em["own frame; C"]["steps"] / em["own frame; B"]["steps"] - 1) < 0.1),
-        "2: C takes the same steps in both frames": bool(em["own frame; C"]["steps"] == em["plus 29780 m per s; C"]["steps"]),
+            get("1: trap; C, eta/4")["deflection_error_vs_reference"] < 1e-6
+        ),
+        "2: C's steps within 10% of B's, own frame": bool(
+            abs(em["own frame; C"]["steps"] / em["own frame; B"]["steps"] - 1) < 0.1
+        ),
+        "2: C takes the same steps in both frames": bool(
+            em["own frame; C"]["steps"] == em["plus 29780 m per s; C"]["steps"]
+        ),
         "2: C's period error within a factor 2 of B's": bool(
-            em["own frame; C"]["period_error"] <= 2 * em["own frame; B"]["period_error"]),
+            em["own frame; C"]["period_error"] <= 2 * em["own frame; B"]["period_error"]
+        ),
         "3: C's steps within 10% of B's": bool(abs(sc["steps"] / sb["steps"] - 1) < 0.1),
         "3: C within 1e-5 of the reference": bool(sc["separation_error_vs_reference"] < 1e-5),
     }
@@ -162,8 +200,12 @@ def q5() -> dict:
 
 if __name__ == "__main__":
     outcome = q5()
-    folder = write_gate_result(outcome, producer=sys.argv[1] if len(sys.argv) > 1 else PRODUCER,
-                               kind="mathematics", law="the reference law L0 (a test of the step rule)")
+    folder = write_gate_result(
+        outcome,
+        producer=sys.argv[1] if len(sys.argv) > 1 else PRODUCER,
+        kind="mathematics",
+        law="the reference law L0 (a test of the step rule)",
+    )
     for flag, ok in outcome["cases"]["predictions"]["flags"].items():
         print(f"{'holds' if ok else 'FAILS'}  {flag}")
     for name, case in outcome["cases"].items():

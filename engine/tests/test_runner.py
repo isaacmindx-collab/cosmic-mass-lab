@@ -56,8 +56,14 @@ def test_l0_energy_is_newton_plus_coulomb():
 
 def test_background_energy_and_fixed_bodies():
     f = Frame.scaled()
-    state = State(m=[2.0, 5.0], q=[0.5, 0.0], x=[[1.0, 3.0], [9.0, 9.0]], v=[[0.0, 0.0], [7.0, 7.0]],
-                  fixed=[False, True], alive=[True, True])
+    state = State(
+        m=[2.0, 5.0],
+        q=[0.5, 0.0],
+        x=[[1.0, 3.0], [9.0, 9.0]],
+        v=[[0.0, 0.0], [7.0, 7.0]],
+        fixed=[False, True],
+        alive=[True, True],
+    )
     # -Re[mu (g + e G)] . x = -(m g + q E) . x with E = -s^2 e and s = 1
     energy = background_energy(state, f, {"g": [0.0, -10.0], "e": [4.0, 0.0], "b": 3.0})
     assert energy == pytest.approx(-(2.0 * -10.0 * 3.0 + 0.5 * (-4.0) * 1.0))
@@ -67,8 +73,11 @@ def test_background_energy_and_fixed_bodies():
 
 # ------------------------------------------------------------- diagnostics (E8.1)
 def test_diagnostics_and_drifts():
-    state = State.from_bodies([preset("proton"), preset("electron"), preset("neutron")],
-                              [[0.0, 0.0], [1e-10, 0.0], [0.0, 1e-10]], v=[[1.0, 0.0], [0.0, 2.0], [3.0, 0.0]])
+    state = State.from_bodies(
+        [preset("proton"), preset("electron"), preset("neutron")],
+        [[0.0, 0.0], [1e-10, 0.0], [0.0, 1e-10]],
+        v=[[1.0, 0.0], [0.0, 2.0], [3.0, 0.0]],
+    )
     d = Diagnostics(Frame.si(), SI)
     first = d.measure(state)
     assert first["mass"] == pytest.approx(sum(preset(k).m for k in ("proton", "electron", "neutron")))
@@ -80,7 +89,9 @@ def test_diagnostics_and_drifts():
     assert drifts(first, first) == {"mass": 0.0, "charge": 0.0, "energy_re": 0.0, "energy_com": None, "momentum": 0.0}
     changed = dict(first, energy_re=first["energy_re"] * 1.5, momentum=[2 * p for p in first["momentum"]], charge=1e-19)
     out = drifts(first, changed)
-    assert out["energy_re"] == pytest.approx(0.5) and out["momentum"] > 0 and out["charge"] is None  # no scale: 0 -> 1e-19
+    assert (
+        out["energy_re"] == pytest.approx(0.5) and out["momentum"] > 0 and out["charge"] is None
+    )  # no scale: 0 -> 1e-19
 
 
 # ------------------------------------------------------- runner and stamp (E7.1, E7.2)
@@ -92,11 +103,31 @@ def test_a_run_writes_stamped_results(tmp_path):
     stamp = json.loads((result.folder / "stamp.json").read_text())
     summary = json.loads((result.folder / "summary.json").read_text())
     # the fields of team/RESULTS-STANDARD.md, section 2
-    assert set(stamp) == {"scenario", "run_id", "engine_commit", "t0_status", "law", "universe", "matter",
-                          "numerics", "environment", "kind", "preregistered", "producer"}
+    assert set(stamp) == {
+        "scenario",
+        "run_id",
+        "engine_commit",
+        "t0_status",
+        "law",
+        "universe",
+        "matter",
+        "numerics",
+        "environment",
+        "kind",
+        "preregistered",
+        "producer",
+    }
     assert stamp["law"]["id"] == "L0" and stamp["universe"] == {
-        "phi_bar_deg": 90.0, "dimension": 2, "units": "scaled", "boundary": "open", "background": "none"}
-    assert stamp["matter"] == [{"name": "heavy", "m": 1.0, "q": 0.0, "n": 1}, {"name": "light", "m": 1e-3, "q": 0.0, "n": 1}]
+        "phi_bar_deg": 90.0,
+        "dimension": 2,
+        "units": "scaled",
+        "boundary": "open",
+        "background": "none",
+    }
+    assert stamp["matter"] == [
+        {"name": "heavy", "m": 1.0, "q": 0.0, "n": 1},
+        {"name": "light", "m": 1e-3, "q": 0.0, "n": 1},
+    ]
     assert stamp["numerics"]["softening"] == 0.0 and stamp["numerics"]["integrator"] == "verlet"
     assert set(stamp["environment"]) == {"python", "sympy", "mpmath", "numpy"} and stamp["kind"] == "mathematics"
     assert stamp["engine_commit"] == commit and stamp["t0_status"] == "not run"
@@ -110,7 +141,9 @@ def test_a_run_writes_stamped_results(tmp_path):
         rows = list(csv.DictReader(handle))
     assert rows[0]["step"] == "0" and float(rows[-1]["t"]) == 2.0 and int(rows[-1]["step"]) == summary["steps"]
     assert {"energy_re", "kinetic", "mass", "charge", "p0", "p1", "x0_0", "v1_1", "dt"} <= set(rows[0])
-    angle = math.atan2(float(rows[-1]["x1_1"]) - float(rows[-1]["x0_1"]), float(rows[-1]["x1_0"]) - float(rows[-1]["x0_0"]))
+    angle = math.atan2(
+        float(rows[-1]["x1_1"]) - float(rows[-1]["x0_1"]), float(rows[-1]["x1_0"]) - float(rows[-1]["x0_0"])
+    )
     assert angle == pytest.approx(2.0 * SPEED, rel=1e-5)  # the pair has turned by omega t
     with pytest.raises(FileExistsError):
         run(ORBIT, out_root=tmp_path, now=now)  # a results folder is never overwritten
@@ -118,7 +151,9 @@ def test_a_run_writes_stamped_results(tmp_path):
 
 def test_the_same_stamp_gives_the_same_summary():
     first, second = run(ORBIT, out_root=None), run(ORBIT, out_root=None)
-    assert first.folder is None and json.dumps(first.summary, sort_keys=True) == json.dumps(second.summary, sort_keys=True)
+    assert first.folder is None and json.dumps(first.summary, sort_keys=True) == json.dumps(
+        second.summary, sort_keys=True
+    )
     assert first.stamp["numerics"] == second.stamp["numerics"]
 
 
@@ -136,10 +171,17 @@ def test_steps_fixed_step_and_default_softening():
 
 def test_free_fall_in_a_background_and_a_reflecting_floor():
     # one body dropped in a uniform g above a reflecting floor: it bounces and keeps its energy
-    data = {"scenario": "bounce", "universe": {"units": "scaled", "background": {"g": [0.0, -1.0]},
-                                              "boundary": "reflecting", "box": {"lower": [-5.0, 0.0], "upper": [5.0, 50.0]}},
-            "bodies": [{"m": 2.0, "q": 0.0, "x": [0.0, 1.0]}],
-            "numerics": {"t_end": 4.5, "dt_max": 1e-3}}
+    data = {
+        "scenario": "bounce",
+        "universe": {
+            "units": "scaled",
+            "background": {"g": [0.0, -1.0]},
+            "boundary": "reflecting",
+            "box": {"lower": [-5.0, 0.0], "upper": [5.0, 50.0]},
+        },
+        "bodies": [{"m": 2.0, "q": 0.0, "x": [0.0, 1.0]}],
+        "numerics": {"t_end": 4.5, "dt_max": 1e-3},
+    }
     result = run(data, out_root=None)
     assert result.summary["wall_hits"] == 2 and result.summary["conservation"]["energy_re"] < 1e-6
     # two bounces of a body of mass 2 arriving at speed sqrt(2): the floor received 2 * 2 m v downwards
@@ -150,9 +192,14 @@ def test_free_fall_in_a_background_and_a_reflecting_floor():
 
 
 def test_a_fixed_source_in_SI_keeps_the_energy():
-    data = {"scenario": "pinned", "bodies": [{"preset": "proton", "x": [0.0, 0.0], "fixed": True},
-                                             {"preset": "electron", "x": [5.29177e-11, 0.0], "v": [0.0, 2.18769e6]}],
-            "numerics": {"steps": 3000, "softening": 0.0}}
+    data = {
+        "scenario": "pinned",
+        "bodies": [
+            {"preset": "proton", "x": [0.0, 0.0], "fixed": True},
+            {"preset": "electron", "x": [5.29177e-11, 0.0], "v": [0.0, 2.18769e6]},
+        ],
+        "numerics": {"steps": 3000, "softening": 0.0},
+    }
     result = run(data, out_root=None)
     assert result.summary["conservation"]["energy_re"] < 1e-6
     assert np.array_equal(result.state.x[0], [0.0, 0.0])
@@ -201,7 +248,10 @@ def test_command_line(tmp_path, capsys):
 def test_python_dash_m_cosmicmass(tmp_path):
     path = tmp_path / "settings.json"
     path.write_text(json.dumps({**ORBIT, "numerics": {"steps": 5, "softening": 0.0}}), encoding="utf-8")
-    done = subprocess.run([sys.executable, "-m", "cosmicmass", "run", str(path), "--out", str(tmp_path / "out")],
-                          capture_output=True, text=True)
+    done = subprocess.run(
+        [sys.executable, "-m", "cosmicmass", "run", str(path), "--out", str(tmp_path / "out")],
+        capture_output=True,
+        text=True,
+    )
     assert done.returncode == 0 and "5 steps" in done.stdout
     assert (next((tmp_path / "out" / "unit-orbit").iterdir()) / "summary.json").exists()

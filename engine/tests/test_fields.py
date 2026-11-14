@@ -115,7 +115,9 @@ def test_uniform_backgrounds_appear_unchanged_at_every_point(d):
     plain, withbg = DirectSum().sample(state, grid(d)), DirectSum(background=background).sample(state, grid(d))
     for key in ("g", "e", "B_g", "b"):
         assert np.allclose(getattr(withbg, key) - getattr(plain, key), background[key], rtol=1e-9, atol=1e-30)
-    alone = DirectSum(background={"g": background["g"]}).at_bodies(State.from_bodies([preset("neutron")], np.zeros((1, d))))
+    alone = DirectSum(background={"g": background["g"]}).at_bodies(
+        State.from_bodies([preset("neutron")], np.zeros((1, d)))
+    )
     assert np.array_equal(alone.g[0], background["g"]) and not alone.e.any()
     with pytest.raises(ValueError):
         DirectSum(background={"wind": [1.0, 0.0]})
@@ -146,12 +148,24 @@ def test_blocks_and_speed_for_a_thousand_bodies_in_2D(monkeypatch):
 
 def test_settings_accept_backgrounds_and_boundaries():
     base = {"scenario": "x", "bodies": [{"preset": "proton", "x": [0.0, 0.0]}]}
-    s = load_settings({**base, "universe": {"background": {"g": [0.0, -9.81], "b": 1e-20}, "boundary": "reflecting",
-                                           "box": {"lower": [-1, -1], "upper": [1, 1]}}})
+    s = load_settings(
+        {
+            **base,
+            "universe": {
+                "background": {"g": [0.0, -9.81], "b": 1e-20},
+                "boundary": "reflecting",
+                "box": {"lower": [-1, -1], "upper": [1, 1]},
+            },
+        }
+    )
     assert s.universe["background"] == {"g": [0.0, -9.81], "b": 1e-20} and s.universe["boundary"] == "reflecting"
-    for bad, named in [({"background": {"g": [1.0]}}, "background.g"), ({"background": {"b": [1.0, 0.0]}}, "background.b"),
-                       ({"background": {"wind": 1}}, "wind"), ({"background": "strong"}, "background"),
-                       ({"boundary": "periodic"}, "boundary"),
-                       ({"boundary": "absorbing"}, "box")]:
+    for bad, named in [
+        ({"background": {"g": [1.0]}}, "background.g"),
+        ({"background": {"b": [1.0, 0.0]}}, "background.b"),
+        ({"background": {"wind": 1}}, "wind"),
+        ({"background": "strong"}, "background"),
+        ({"boundary": "periodic"}, "boundary"),
+        ({"boundary": "absorbing"}, "box"),
+    ]:
         with pytest.raises(SettingsError, match=named):
             load_settings({**base, "universe": bad})

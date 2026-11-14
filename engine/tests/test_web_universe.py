@@ -29,12 +29,16 @@ def test_bridge_runs_a_scene_with_the_engine():
     v = math.sqrt(6.67430e-11 * total / r)
     period = 2 * math.pi * math.sqrt(r**3 / (6.67430e-11 * total))
     settings = {
-        "scenario": "web-test", "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"},
+        "scenario": "web-test",
+        "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"},
         "law": {"id": "L0"},
-        "bodies": [{"preset": "Earth", "x": [-moon / total * r, 0], "v": [0, -moon / total * v]},
-                   {"preset": "moon", "x": [earth / total * r, 0], "v": [0, earth / total * v]}],
+        "bodies": [
+            {"preset": "Earth", "x": [-moon / total * r, 0], "v": [0, -moon / total * v]},
+            {"preset": "moon", "x": [earth / total * r, 0], "v": [0, earth / total * v]},
+        ],
         "numerics": {"t_end": 0.1 * period, "eta": 1e-3, "softening": 0.0, "record_every": 1},
-        "kind": "mathematics", "preregistered": False,
+        "kind": "mathematics",
+        "preregistered": False,
     }
     out = json.loads(bridge.run_scene(json.dumps(settings)))
     assert out["law"] == "L0" and out["steps"] > 100
