@@ -27,6 +27,10 @@ dev = [
     "pytest-cov==7.1.0",
     "jsonschema==4.26.0",  # P4: tools/validate_results.py and its tests (decision D24)
     "ruff==0.17.5",
+    # D34: tools/build_journal.py (the Co-exist Journal) and its test
+    "markdown==3.8.2",
+    "pymdown-extensions==10.16.1",
+    "pyyaml==6.0.2",
 ]
 
 [project.urls]
