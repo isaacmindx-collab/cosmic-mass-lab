@@ -40,24 +40,24 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | ID | Scenario | Needs | Difficulty | Status |
 |---|---|---|---|---|
 | E1 | Algebra core: General Numbers, Rule of the Square, readings Re, Com, Sh, Ht, abs, with unit tests against the compendium | none | easy | done |
-| E2 | Field solver: F1-F4 in both coordinates (direct sum for N up to 1e3, grid optional) | E1 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E2.1, E2.3, E2.4 delivered; E2.2, E2.5 to do |
-| E3 | Integrator: Verlet and Boris, adaptive step, settings stamp | E1 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E3.1 and E3.3 delivered; E3.2, E3.4 to do |
-| E4 | Law plug-in interface: L0-L8 as switchable readings | E1-E3 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E4.1, E4.2, L1a of E4.3 and E4.5 delivered; L1b-L1e and E4.4 to do |
-| E5 | State, universe U1-U8, settings loader, seeded populations | E1 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E5.1 and a minimal E5.3 delivered |
-| E6a | Walls: reflecting, absorbing with collection, wrap-around | E5 | easy | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz): reflecting and absorbing walls delivered; wrap-around waits for question 12 of `team/QUESTIONS.md` |
-| E6b | Inflow, heat bath, fixed sources | E6a | medium | open |
-| E7 | Runner, stamp, command line | E3-E5 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): the time loop, the stamp and the command line delivered; checkpoints and schema validation to do |
-| E8 | Diagnostics, convergence helper, standard plots | E7 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E8.1 conservation diagnostics delivered; pressure, temperature, E8.2, E8.3 to do |
-| E9 | Energy in both coordinates (may need an approved derivation) | E2 | hard | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): the L0 energy delivered; the Composer energy needs an approved derivation |
+| E2 | Field solver: F1-F4 in both coordinates (direct sum for N up to 1e3, grid optional) | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E2.1, E2.3, E2.4 delivered; E2.2, E2.5 to do |
+| E3 | Integrator: Verlet and Boris, adaptive step, settings stamp | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E3.1 and E3.3 delivered; E3.2, E3.4 to do |
+| E4 | Law plug-in interface: L0-L8 as switchable readings | E1-E3 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E4.1, E4.2, L1a of E4.3 and E4.5 delivered; L1b-L1e and E4.4 to do |
+| E5 | State, universe U1-U8, settings loader, seeded populations | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E5.1 and a minimal E5.3 delivered |
+| E6a | Walls: reflecting, absorbing with collection, wrap-around | E5 | easy | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: reflecting and absorbing walls delivered; wrap-around waits for question 12 of `team/QUESTIONS.md` |
+| E6b | Inflow, heat bath, fixed sources | E6a | medium | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
+| E7 | Runner, stamp, command line | E3-E5 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: the time loop, the stamp and the command line delivered; checkpoints and schema validation to do |
+| E8 | Diagnostics, convergence helper, standard plots | E7 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E8.1 conservation diagnostics delivered; pressure, temperature, E8.2, E8.3 to do |
+| E9 | Energy in both coordinates (may need an approved derivation) | E2 | hard | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: the L0 energy delivered; the Composer energy needs an approved derivation |
 | G1 | Fast T0 gate in CI on every pull request | T0.1-T0.5 | medium | done (a pytest file; runs in CI with the `tests` job of P2) |
-| T0.1 | Earth-moon, hydrogen-like orbit, two protons under L0 | E1-E4 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
-| T0.2 | Conservation of `rho_mu`, energy and momentum, 200 bodies | E1-E4 | medium | confirmed (reproduced on Windows by Claude Opus 5.5) |
-| T0.3 | Angle invariance under L0, six frame angles | T0.1 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
-| T0.4 | Universal free fall under L0 | T0.1 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
-| T0.5 | Field split: Composer set equals Maxwell | E2 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
-| T9.1 | Neutron effective charge 9.0e-19 e under L1a | T0 | easy | confirmed (recomputed independently by Claude Opus 5.5) |
+| T0.1 | Earth-moon, hydrogen-like orbit, two protons under L0 | E1-E4 | easy | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
+| T0.2 | Conservation of `rho_mu`, energy and momentum, 200 bodies | E1-E4 | medium | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
+| T0.3 | Angle invariance under L0, six frame angles | T0.1 | easy | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
+| T0.4 | Universal free fall under L0 | T0.1 | easy | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
+| T0.5 | Field split: Composer set equals Maxwell | E2 | easy | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
+| T9.1 | Neutron effective charge 9.0e-19 e under L1a | T0 | easy | confirmed (agent, same sponsor; D27): recomputed independently by Claude Opus 5.5 |
 | T9.2 | Hydrogen binding 5.71 eV under the charge share | T0 | medium | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; to be reproduced by a human or another model) |
-| T9.3 | Equivalent field 1.14e11 V/m for a charge in gravity | T0 | easy | confirmed (recomputed independently by Claude Opus 5.5) |
+| T9.3 | Equivalent field 1.14e11 V/m for a charge in gravity | T0 | easy | confirmed (agent, same sponsor; D27): recomputed independently by Claude Opus 5.5 |
 | T9.4 | Opposite pushes for particle and antiparticle near a neutral mass | T0 | easy | confirmed (produced independently by Claude Fable 5.2, #16, and Claude Opus 5.5, #22: same forces, 1.5124e-8 N) |
 
 ### The numerical conventions of D21, as scenarios

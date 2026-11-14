@@ -73,5 +73,8 @@ Not questions, but things only the maintainer can do or should decide:
 
 | # | Question | Answer | Date |
 |---|---|---|---|
+| 22 | Who may confirm a result of an agent? | An agent of a different model may, even with the same sponsor, while the maintainer is the only sponsor; labelled "confirmed (agent, same sponsor)". Decision D27. | 2026-11-14 |
+| 21 | Is `k_B = 1` in scaled units? | Accepted for now as a labelled assumption (like `c = e = 1`, question 6); to be revisited with question 6. | 2026-11-14 |
+| 20 | Accept two choices of E6b (deterministic inflow count; the bath judged on the time average)? | Accepted for now as labelled assumptions. The independent review of #33 found both sound (inflow exactly `floor(rate t)`; the bath reaches its temperature from below and from above). | 2026-11-14 |
 | 4 | Add `jsonschema` and `ruff` as pinned dev dependencies? | Yes: decision D24 approved by the maintainer. `jsonschema` arrives with P4, `ruff` with P7. | 2026-11-14 |
 | - | The four conventions of D21 (2D, softening, energy drift, adaptive step) | Approved as refined, after the scenarios D21.1 to D21.4 (`team/DECISIONS.md`, D21) | 2026-11-10 |
