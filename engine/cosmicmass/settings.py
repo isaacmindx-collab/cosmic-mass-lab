@@ -47,6 +47,7 @@ _UNIVERSE = {
     "box": None,
     "inflow": None,
     "heat_bath": None,
+    "moving_fields": False,  # E2.2 (D41): the second field B_cal of moving bodies; off keeps old results
 }
 _INFLOW = {"preset", "name", "m", "q", "rate", "velocity", "face"}
 _TOP = {"scenario", "universe", "law", "bodies", "populations", "numerics", "kind", "preregistered", "producer"}
@@ -296,6 +297,8 @@ def load_settings(source) -> Settings:
             ) from None
     if universe["inflow"] is not None:
         universe["inflow"] = _inflow(universe)
+    if not isinstance(universe["moving_fields"], bool):
+        raise SettingsError("'universe.moving_fields' must be true or false")
     if universe["heat_bath"] is not None:
         universe["heat_bath"] = _heat_bath(universe["heat_bath"], universe["units"])
 
@@ -344,6 +347,7 @@ def load_settings(source) -> Settings:
         magnetic = background != "none" and any(
             np.any(np.asarray(background.get(key, 0.0)) != 0) for key in ("B_g", "b")
         )
+        magnetic = magnetic or universe["moving_fields"]  # E2.2: the bodies make a second field too
         # the Boris push reads only L0's v x B_cal: with L6 on (law.B_cal), velocity Verlet
         numerics["integrator"] = "boris" if magnetic and law_spec.moving == "off" else "verlet"
     if numerics["integrator"] not in ("verlet", "boris"):

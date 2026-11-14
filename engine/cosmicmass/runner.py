@@ -129,7 +129,12 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         sep = smallest_separation(state)
         softening = float(num["softening_fraction"] * sep) if np.isfinite(sep) else 0.0
     background = None if universe["background"] == "none" else universe["background"]
-    solver = DirectSum(constants=constants, softening=softening, background=background)
+    solver = DirectSum(
+        constants=constants,
+        softening=softening,
+        background=background,
+        moving=bool(universe.get("moving_fields", False)),  # E2.2 (D41)
+    )
     box = universe.get("box") or {}
     inflow = make_inflow(universe["inflow"], box, t0=state.t) if universe.get("inflow") else None
     bath = make_heat_bath(universe["heat_bath"], universe["units"]) if universe.get("heat_bath") else None
