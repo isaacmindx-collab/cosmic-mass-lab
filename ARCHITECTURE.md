@@ -555,6 +555,7 @@ flowchart LR
     PUSH["push or pull request"]
     V["verify: 6 verification scripts<br/>(10,000+ checks)"]
     A["archcheck:<br/>tools/check_architecture.py<br/>registry, diagrams, D18"]
+    R["lint: ruff check<br/>(pinned in pyproject.toml)"]
     T["tests: pytest engine/tests<br/>coverage at least 90%"]
     G["gate: T0 fast run<br/>engine/gates"]:::planned
     OK["green: may merge<br/>(one approving review)"]
@@ -562,6 +563,8 @@ flowchart LR
 
     PUSH --> V --> OK
     PUSH --> A --> OK
+    PUSH --> R --> OK
+    R -.-> NO
     PUSH --> T --> G --> OK
     V -.-> NO
     A -.-> NO
@@ -698,6 +701,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | P7 (`P7-ruff-devcontainer`, stacked on `P5-scenario-scaffold`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | section 9: new CI job `lint` (`ruff check`); lint fixes without change of behaviour: unused imports in `gates/t9.py`, `engine/tests/test_runner.py`, `scenarios/D21/run.py`, a variable name in `tools/check_architecture.py`. No module, edge or contract changed |
 | 2026-11-14 | P5 (`P5-scenario-scaffold`, stacked on `P4-result-schemas`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `tools/new_scenario.py` implemented (node `scaffold` no longer planned); section 4: the scaffold writes files that use `settings` and become a `scen` (dotted edges: it does not import them); section 10: its signatures (additions) |
 | 2026-11-14 | P4 (`P4-result-schemas`, stacked on `T9.2-hydrogen-share`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `engine/schemas/` (node `schemas`) and `tools/validate_results.py` (node `validate`) in section 4, with edges `tests --> validate --> schemas`; section 10: the validator's signatures (additions); `jsonschema==4.26.0` pinned (D13). No engine module or contract changed |
 | 2026-11-14 | T9.2 (`T9.2-hydrogen-share`, stacked on `T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_2`, which uses `runner` (new edge `limits --> runner` in section 4) and the helpers `_pair`, `_relative_track` of `gates/t0.py` (edge `limits --> gate` already there); scenario row `scenarios/T9.2/`; no contract changed |

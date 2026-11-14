@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P7
+- Did: configured ruff in `pyproject.toml` (lint rules for errors and likely bugs; `verification/` and `sources/` excluded), pinned `ruff==0.17.5`, added the CI job `lint`, fixed four lint items (no change of behaviour); fixed the dev container, which did not install the engine; proposed D23 for the first format pass.
+- Result: `ruff check .` clean; a clean clone in a new environment, with only the container's command, runs `pytest`: 206 passed. Software facts only; no finding.
+- Next: review (stacked on P5, #26); D23; a real Codespace start to confirm.
+- Blocked by / questions: Docker is not available here, so the container image itself was not built.
+- Architecture: updated (section 9: job `lint`; section 11)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P5
 - Did: wrote `tools/new_scenario.py` (settings, `run.py` with `--dry-run`, notebook, registry row; checks first, never overwrites), `engine/tests/test_new_scenario.py` (9 tests on a copy of the repository) and `scenarios/README.md`.
 - Result: a scaffolded scenario passes `tools/check_architecture.py` and runs a 10-step L0 dry run (the done-when of P5); a full run writes results that follow the P4 schemas. Software facts only; no finding.
