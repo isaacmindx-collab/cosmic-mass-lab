@@ -32,14 +32,21 @@ from .frame import Frame
 from .laws.base import Law
 from .state import State
 
-__all__ = ["StepContext", "Integrator", "VelocityVerlet", "nearest_distances", "REST_FRACTION"]
+__all__ = ["StepContext", "Integrator", "VelocityVerlet", "nearest_distances", "nearest_neighbours", "REST_FRACTION"]
 
 REST_FRACTION = 0.1  # floor of the speed in the adaptive step, as a fraction of sqrt(|a| l)
 
 
 def nearest_distances(state: State) -> np.ndarray:
     """Distance from each body to the nearest other alive body (infinite if there is none)."""
+    return nearest_neighbours(state)[0]
+
+
+def nearest_neighbours(state: State) -> tuple:
+    """For each body, the distance to the nearest other alive body (infinite if there is none)
+    and the index of that body (the body's own index if there is none)."""
     out = np.full(state.n, np.inf)
+    partner = np.arange(state.n)
     idx = np.flatnonzero(state.alive)
     if len(idx) > 1:
         x = state.x[idx]
@@ -50,7 +57,8 @@ def nearest_distances(state: State) -> np.ndarray:
             rows = np.arange(dist.shape[0])
             dist[rows, start + rows] = np.inf
             out[idx[start:start + step]] = dist.min(axis=1)
-    return out
+            partner[idx[start:start + step]] = idx[dist.argmin(axis=1)]
+    return out, partner
 
 
 @dataclass
@@ -65,6 +73,9 @@ class StepContext:
     eta: float = 1e-3  # D10: largest velocity change per step, as a fraction of the speed
     dt_min: float = 0.0
     dt_max: float = np.inf
+    # whose motion the step rule looks at: "absolute" (each body's own velocity and acceleration:
+    # D10 and D21) or "neighbour" (relative to its nearest neighbour; tested in scenario Q4, not a default)
+    speed_reference: str = "absolute"
     _cache: tuple | None = field(default=None, repr=False)
 
     def acceleration(self, state: State) -> np.ndarray:
@@ -96,10 +107,16 @@ class VelocityVerlet:
 
     def next_dt(self, state: State, ctx: StepContext) -> float:
         moving = state.alive & ~state.fixed
-        a = np.linalg.norm(ctx.acceleration(state), axis=1)
-        speed = np.linalg.norm(state.v, axis=1)
-        reach = nearest_distances(state)
+        acceleration, velocity = ctx.acceleration(state), state.v
+        reach, partner = nearest_neighbours(state)
         near = np.isfinite(reach)
+        if ctx.speed_reference == "neighbour":  # motion relative to the nearest neighbour (a fixed body is at rest)
+            velocity = np.where(moving[:, None], state.v, 0.0)
+            acceleration, velocity = acceleration - acceleration[partner], velocity - velocity[partner]
+        elif ctx.speed_reference != "absolute":
+            raise ValueError(f"speed_reference must be 'absolute' or 'neighbour', not {ctx.speed_reference!r}")
+        a = np.linalg.norm(acceleration, axis=1)
+        speed = np.linalg.norm(velocity, axis=1)
         dt = np.inf
         # D10: |a| dt <= eta |v|, with the floor of the speed for bodies at rest;
         # a body with no neighbour does not limit the step
