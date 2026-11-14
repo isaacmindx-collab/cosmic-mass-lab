@@ -96,12 +96,7 @@ class Inflow:
         d = state.dimension
         x = self.lower + rng.random((k, d)) * (self.upper - self.lower)
         x[:, self.axis] = self.lower[self.axis] if self.side == "lower" else self.upper[self.axis]
-        state.m = np.append(state.m, np.full(k, self.m))
-        state.q = np.append(state.q, np.full(k, self.q))
-        state.x = np.vstack([state.x, x])
-        state.v = np.vstack([state.v, np.tile(self.velocity, (k, 1))])
-        state.fixed = np.append(state.fixed, np.zeros(k, dtype=bool))
-        state.alive = np.append(state.alive, np.ones(k, dtype=bool))
+        state.extend(np.full(k, self.m), np.full(k, self.q), x, np.tile(self.velocity, (k, 1)))
         self.added += k
         return {"inflow": {"bodies": k, "m": k * self.m, "q": k * self.q}}
 

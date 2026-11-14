@@ -48,8 +48,7 @@ def test_the_readings_are_registered_hypotheses():
     for reading in READINGS:
         law = make_law(reading)
         assert law.hypothesis is True and law.id == reading
-        with pytest.raises(NotImplementedError):  # not yet: it needs a spin per body (question 24)
-            make_law(LawSpec(reading=reading, direction="torque"))
+        assert make_law(LawSpec(reading=reading, direction="torque")).spec.direction == "torque"  # D37
 
 
 def test_the_readings_by_hand():

@@ -47,7 +47,23 @@ Options: sign (L2), strength lambda (L3: a number or cos(phi_bar)), terms (L5), 
   `exp(-r/L) (1 + r/L) / r^2`; L0's Real part is never screened. The screened field is filled by
   the `StepContext` (`FieldSample.screened`).
 
-Not yet: the direction "torque" (it needs a spin per body, question 24) and the reading L1e.
+- L4 "torque" (decision D37): what the reading adds does not push the body but turns its spin,
+  with the torque `+/- lambda R |added|` about the axis normal to the plane of motion (`R`, the
+  body's radius; a point body gets none). The spin does not act back on the motion.
+
+**L1e** (`docs/05`: "`mu a = mu (E_cal + v x B_cal)` as a General Number equation, so
+`a = E_cal + v x B_cal` (motion in two coordinates)"). The body's place is a General Number,
+`X = x + xc G` (the optional columns of D37), and its acceleration is the General Number vector
+
+    a = (g + v x B_g) + (e + v x b) G,
+
+the same for every body: the cosmic mass has dropped out. The Real coordinate `x` accelerates
+with `g + v x B_g`, the Composer coordinate `xc` with `e + v x b`. With the strength (one rule,
+as above): the Real acceleration is L0's plus `lambda (Re(a) - L0's)`, and the Composer
+acceleration is `lambda Com(a)`, so that lambda = 1 is the law as written and lambda = 0 is L0
+with the Composer coordinate at rest. Labelled choices (`team/notes/E4.md`): the fields are those
+at the Real positions `x`; `v` is the Real velocity, as written. An identity worth knowing
+(mathematics): `Re(mu a) / Re(mu)` is L0's acceleration, so L0 is the Real reading of `mu a`.
 """
 
 import numpy as np
@@ -58,7 +74,13 @@ from ..state import State
 from .base import ForcePair, Law, LawSpec, register
 from .l0 import cross, lorentz_argument
 
-__all__ = ["L1a", "L1b", "L1c", "L1d"]
+__all__ = ["L1a", "L1b", "L1c", "L1d", "L1e", "signed_strength"]
+
+
+def signed_strength(spec: LawSpec, frame: Frame) -> float:
+    """`+/- lambda` (options L2 and L3), with lambda a number or `cos(phi_bar)`."""
+    lam = frame.cos_phi() if spec.strength == "cos_phi_bar" else float(spec.strength)
+    return lam if spec.sign == "+" else -lam
 
 
 class _ComposerReading(Law):
@@ -66,15 +88,9 @@ class _ComposerReading(Law):
 
     hypothesis = True
 
-    def __init__(self, spec: LawSpec | None = None):
-        super().__init__(spec)
-        if self.spec.direction == "torque":
-            raise NotImplementedError(f"{self.reading}: the direction 'torque' needs a spin per body (question 24)")
-
     def strength(self, frame: Frame) -> float:
         """The signed strength: `+/- lambda`, with lambda a number or `cos(phi_bar)` (L3)."""
-        lam = frame.cos_phi() if self.spec.strength == "cos_phi_bar" else float(self.spec.strength)
-        return lam if self.spec.sign == "+" else -lam
+        return signed_strength(self.spec, frame)
 
     def composer_coordinate(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray:
         """The selected terms of `Com(mu E_cal)` (L5), with the moving-body term of L6, shape `(N, d)`.
@@ -114,9 +130,12 @@ class _ComposerReading(Law):
         return {"off": static, "on": static + moving, "only": moving}[self.spec.moving]
 
     def direct(self, added: np.ndarray, state: State) -> np.ndarray:
-        """Option L4: the direction of what is added."""
+        """Option L4: the direction of what is added. With "torque" it pushes nothing: it turns the
+        body's spin instead (`torque`)."""
         if self.spec.direction == "radial":
             return added
+        if self.spec.direction == "torque":
+            return np.zeros_like(added)
         if self.spec.direction == "perpendicular":  # +90 deg in the plane of motion (about z in 3D)
             turned = added.copy()  # in 3D the z component is kept: a turn about z
             turned[:, 0], turned[:, 1] = -added[:, 1], added[:, 0]
@@ -136,6 +155,22 @@ class _ComposerReading(Law):
         c = self.composer_coordinate(state, fields, frame)
         added = self.direct(self.added(self.real_part(state, fields, frame), c, frame), state)
         return ForcePair(real=real, composer=self.strength(frame) * added)
+
+    def torque(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray | None:
+        """Option L4 "torque" (decision D37): what the reading adds does not push the body; it acts at
+        the body's surface and turns its spin, with the torque `+/- lambda R |added|` about the axis
+        normal to the plane of motion (z; in 3D the torque is along z). `R` is the body's radius: a
+        point body (`R = 0`) gets none. `None` for the other directions."""
+        if self.spec.direction != "torque":
+            return None
+        c = self.composer_coordinate(state, fields, frame)
+        size = np.linalg.norm(self.added(self.real_part(state, fields, frame), c, frame), axis=1)
+        about_z = self.strength(frame) * state.radius * size
+        if state.dimension == 2:
+            return about_z
+        out = np.zeros((state.n, 3))
+        out[:, 2] = about_z
+        return out
 
 
 @register
@@ -184,3 +219,42 @@ class L1d(_ComposerReading):
         direction[use_sh] = shadow[use_sh] / size_sh[use_sh, None]
         direction[use_c] = composer[use_c] / size_c[use_c, None]
         return length[:, None] * direction - real
+
+
+@register
+class L1e(Law):
+    """Hypothesis: `mu a = mu (E_cal + v x B_cal)` as a General Number equation: every body has the
+    General Number acceleration `a = E_cal + v x B_cal`, and moves in two coordinates (D37)."""
+
+    reading = "L1e"
+    hypothesis = True
+
+    def __init__(self, spec: LawSpec | None = None):
+        super().__init__(spec)
+        for option, default in (("direction", "radial"), ("terms", "all"), ("moving", "off"), ("range", "1/r^2")):
+            if getattr(self.spec, option) != default:
+                raise ValueError(f"L1e: the option {option} does not apply to this reading (it has no Composer force)")
+
+    def general_acceleration(self, state: State, fields: FieldSample) -> tuple:
+        """The two coordinates of `a = E_cal + v x B_cal`: `(g + v x B_g, e + v x b)`, each `(N, d)`."""
+        return fields.g + cross(state.v, fields.B_g), fields.e + cross(state.v, fields.b)
+
+    def forces(self, state: State, fields: FieldSample, frame: Frame) -> ForcePair:
+        real = (state.mu(frame)[:, None] * lorentz_argument(state, fields, frame)).re  # L0
+        lam = signed_strength(self.spec, frame)
+        re_a, _ = self.general_acceleration(state, fields)
+        # the Real acceleration is L0's + lambda (Re(a) - L0's): as a force, inertia Re(a) - L0's force
+        composer = lam * (self.inertia(state, frame)[:, None] * re_a - real)
+        return ForcePair(real=real, composer=composer)
+
+    def composer_acceleration(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray:
+        return signed_strength(self.spec, frame) * self.general_acceleration(state, fields)[1]
+
+    def velocity_coupling(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray:
+        """`v x W` is the velocity-dependent force: `(1 - lambda)` of L0's coupling plus `lambda` of
+        `inertia B_g` (under `a = E_cal + v x B_cal` the Real velocity turns in `B_g` alone)."""
+        lam = signed_strength(self.spec, frame)
+        inertia = self.inertia(state, frame)
+        l0 = super().velocity_coupling(state, fields, frame)
+        own = inertia[:, None] * fields.B_g if fields.B_g.ndim == 2 else inertia * fields.B_g
+        return (1.0 - lam) * l0 + lam * own
