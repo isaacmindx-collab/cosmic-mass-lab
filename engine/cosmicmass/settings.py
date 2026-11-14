@@ -310,6 +310,15 @@ def load_settings(source) -> Settings:
             x += [list(r) for r in made["x"]]
             v += [list(r) for r in made["v"]]
             fixed += [False] * spec["n"]
+        # Super-particles move with the real particle's thermal speeds but carry `weight` times its mass, so
+        # every temperature computed from the bodies' own masses (E8 diagnostics, the E6b heat bath) is `weight`
+        # times too high. Until the bodies carry their weight (a State column, a maintainer's decision), a heat
+        # bath with weighted bodies is refused, and the summary labels the temperature (review of #66).
+        if universe["heat_bath"] is not None and any(float(p.get("weight", 1.0)) != 1.0 for p in populations):
+            raise SettingsError(
+                "'universe.heat_bath' cannot be used with populations of 'weight' other than 1: the bath would "
+                "drive super-particles to the temperature of their whole mass, not of the real particles"
+            )
     state = State.from_bodies(bodies, x, v, fixed)
     if numerics["integrator"] is None:  # D10: velocity Verlet, Boris with a second field B_cal
         magnetic = background != "none" and any(
