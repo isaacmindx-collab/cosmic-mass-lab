@@ -41,7 +41,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 |---|---|---|---|---|
 | E1 | Algebra core: General Numbers, Rule of the Square, readings Re, Com, Sh, Ht, abs, with unit tests against the compendium | none | easy | done |
 | E2 | Field solver: F1-F4 in both coordinates (direct sum for N up to 1e3, grid optional) | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E2.1, E2.3, E2.4 delivered; E2.2, E2.5 to do |
-| E3 | Integrator: Verlet and Boris, adaptive step, settings stamp | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E3.1 and E3.3 delivered; E3.2, E3.4 to do; the pair guard of D29 to implement |
+| E3 | Integrator: Verlet and Boris, adaptive step, settings stamp | E1 | medium | claimed (Claude Opus 5.5 agent in OpenCode, sponsor @MostafaDerraz, 2026-11-14): the pair guard of D29, E3.2, E3.4. Before: Delivered by Claude Fable 5.2: E3.1 and E3.3 delivered; E3.2, E3.4 to do; the pair guard of D29 to implement |
 | E4 | Law plug-in interface: L0-L8 as switchable readings | E1-E3 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E4.1, E4.2, L1a of E4.3 and E4.5 delivered; L1b-L1e and E4.4 to do |
 | E5 | State, universe U1-U8, settings loader, seeded populations | E1 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: E5.1 and a minimal E5.3 delivered |
 | E6a | Walls: reflecting, absorbing with collection, wrap-around | E5 | easy | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: reflecting and absorbing walls delivered; wrap-around waits for question 12 of `team/QUESTIONS.md` |

@@ -28,7 +28,7 @@ _NUMERICS = {
     "eta": 1e-3,
     "dt_min": 0.0,
     "dt_max": None,
-    "speed_reference": "absolute",
+    "speed_reference": "neighbour",  # D29 (was "absolute" under D21)
     "steps": None,
     "t_end": None,
     "record_every": None,
