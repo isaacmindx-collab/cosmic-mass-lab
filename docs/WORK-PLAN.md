@@ -197,7 +197,7 @@ Goal: an engine that implements the compendium exactly, runs L0 and every L1-L8 
 | E2.2 | `B_g` and `b` from moving cosmic masses (slow-body form of F3-F4) | `fields/direct.py` | one moving proton gives the analytic slow-body field within 1e-6; `B = -s^2 b` | E2.1 | 4 h |
 | E2.3 | background fields (U5) and fixed sources (U6) added in the solver | `fields/direct.py` | uniform `g`, `e`, `B_g`, `b` appear unchanged at every point | E2.1 | 1 h |
 | E2.4 | vectorisation and speed: `O(N^2)` in NumPy blocks, 2D and 3D | `fields/direct.py` | N = 1000 in 2D: one field evaluation under 0.5 s on a laptop or Codespace | E2.1 | 2 h |
-| E2.5 | fast solver for large N (tree or grid), same interface | `fields/tree.py` | agrees with direct sum within 1e-3 at N = 10^4; faster from N = 5000 | E2.4, needed in S5 | 8 h |
+| E2.5 | fast solver for large N (tree or grid), same interface. **Moved to S5 (D40)**: not part of the S2 exit gate | `fields/tree.py` | agrees with direct sum within 1e-3 at N = 10^4; faster from N = 5000 | E2.4, needed in S5 | 8 h |
 
 ### E3. Integrators
 
@@ -257,7 +257,7 @@ Goal: an engine that implements the compendium exactly, runs L0 and every L1-L8 
 | E9 | energy of bodies and fields from the compendium, in both coordinates. If the compendium does not define the Composer energy for a law, write the definition as a **derivation** (`AGENTS.md`, rule 7) for the physics lead's approval | `energy.py` | under L0 the energy is Newton plus Coulomb energy and is conserved in T0.2; every definition cites its source or its approved derivation | E2.1 | 5 h |
 
 **S2 exit gate:**
-- all E rows in the registry are `implemented`, with at least 90% coverage;
+- all E rows in the registry are `implemented` (except E2.5, moved to S5 by D40; a `deprecated` row counts as closed), with at least 90% coverage;
 - the reduce-to-L0 test passes for every law;
 - the code review is done by the engine lead.
 

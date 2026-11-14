@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the rest of M1: split, D40, registry
+- Did: mapped what M1's exit gates still need (S2: every E row implemented; S3: T0 and T9 confirmed, done; the M1 review). The maintainer chose to split the open engine parts (Claude Code: E9, E2.2, the registry; OpenCode: D37, D36, E5.2, E7) and to move E2.5 to S5 (D40). Recorded D40, the work plan's S2 gate, the registry (`modifiers` deprecated, `fieldsfast` moved to S5), the E2 claim, and the split in the team chat.
+- Result: records only. E9 is in #70; OpenCode's D37 is in #69.
+- Next: the E2.2 derivation for the physics lead.
+- Blocked by / questions: none.
+- Architecture: registry rows only
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E9: the Composer energy (D23)
 - Did: on the maintainer's split of the rest of M1 (my share: E9, E2.2, the registry), implemented E9: `energy.composer_energy` (D23: `-G lambda s sum Com(mu_a mu_b) / r` within its scope; `None` outside it); `Diagnostics(..., law=)` reports `energy_com` and `energy_total` (what the law conserves) and their drifts; the runner passes the law; schema addition; 6 tests.
 - Result: on an eccentric orbit of two charged bodies under L1a (lambda 0.5, 20,000 steps) the Real energy alone drifts by 4.1e-3, Real plus Composer by 3.7e-8 (L0 on the same orbit: 2.8e-8). Full suite 313 passed.
