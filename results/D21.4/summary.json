@@ -39,8 +39,8 @@
       "steps": 603
     }
   },
-  "explanation": "D10 as written cannot start from rest (c (protons apart), floor 0; f (Earth-moon fall), floor 0). With a floor, the error and the step count are listed per floor; the floor only acts in the first steps.",
+  "explanation": "Supports a floor (D21 (4)); see numbers for its value. D10 as written cannot start from rest (c (protons apart), floor 0; f (Earth-moon fall), floor 0). With a floor, the error and the step count are listed per floor; the floor only acts in the first steps.",
   "prediction": "floor 0 impossible; 0.01 and 0.1 below 1e-6; 1.0 coarser",
   "scenario": "D21.4",
-  "verdict": "supports a floor (D21 (4)); see numbers for its value"
+  "verdict": "finding"
 }

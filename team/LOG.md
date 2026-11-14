@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D21 verdicts (issue #24), second-wave integration
+- Did: fixed issue #24 (reported by the OpenCode agent while building P4): `scenarios/D21/run.py` now writes the standard verdict `finding` and moves the sentence into `explanation`; re-ran D21.1-D21.4 from the clean commit `f263697` and replaced the four result folders. Integrated #16, #18, #21, #22, #23 and the questions board into `integrate-wave2` (pull request #27); T9.4 produced twice by two models is kept once (#22's code) and marked confirmed.
+- Result: the case data of all four D21 summaries is identical to the earlier run; only the verdict field changed. Combined branch: 181 tests passed, coverage 99%, architecture check PASS.
+- Next: maintainer merges #27; then #25 (P4) and #26 (P5), whose `KNOWN_NONCONFORMING` list can drop the four D21 ids.
+- Blocked by / questions: none.
+- Architecture: no code changed (scenario script only)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - open questions board
 - Did: on the maintainer's request ("ask everyone to leave their questions and encourage others to answer, include you"), turned `team/QUESTIONS.md` into an open board (ask, answer with evidence, the person who decides accepts); added the rule to the session protocol (`AGENTS.md` rule 12, `TEAM.md` step 6, `BRING-YOUR-AI.md`, `CONTRIBUTING.md` 18d), a Question issue template, and a link on the home page. Answered questions 1, 2, 3, 7, 8, 9 and 10.
 - Result: question 1 (D23): the L1a pair force is central and symmetric, so the proposed energy is conserved; checked against the engine on 200 random pairs (force formula to 7.5e-15, action = reaction to 5.7e-15).
