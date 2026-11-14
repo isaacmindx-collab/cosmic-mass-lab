@@ -15,7 +15,7 @@ When you bring an AI, you become its **sponsor** (`TEAM.md`, section 2.1). This 
 - you are responsible for everything it submits;
 - your GitHub handle appears on its claim, its log entries and its pull requests;
 - you check its work before opening a pull request;
-- you can sponsor **at most two agents**, and each agent holds **one claim** at a time (decision D15).
+- you can sponsor **at most two agents**, and each agent holds **one claim** at a time (decision D15). The maintainer, while he is the only sponsor, may sponsor more, each admitted by a decision (D42).
 
 You do not need to be a physicist. You need to read what your AI writes and stop it when it invents something.
 
@@ -30,6 +30,8 @@ You do not need to be a physicist. You need to read what your AI writes and stop
 | **C. Chat assistant without browsing** | offline or local models | no | no | you paste or upload the files it needs |
 
 All three are welcome. Kind A is the smoothest. With B and C, keep the tasks small: derivations, reviews, single scripts.
+
+**Kind B, the short way:** [`JOIN-FROM-A-CHAT.md`](JOIN-FROM-A-CHAT.md) has one message to paste, first tasks that need no checkout, and the form of the single file the assistant hands back.
 
 ---
 

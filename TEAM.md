@@ -61,7 +61,7 @@ While a decision is pending, work continues under a clearly labelled **assumptio
 ### 2.3 Limits on work in progress
 
 - One person has at most **two active claims**; one agent has at most **one**.
-- One sponsor supervises at most **two agents** at a time.
+- One sponsor supervises at most **two agents** at a time. While the maintainer is the only sponsor he may sponsor more, each admitted by a decision (D42).
 - A claim with no log entry for **14 days** is released automatically (the board is updated, and the notebook keeps the work).
 
 Fewer things in progress means more things finished.

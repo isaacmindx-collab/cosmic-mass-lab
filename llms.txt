@@ -8,6 +8,7 @@ Start here, in this order:
 - [TEAM.md](TEAM.md): objective, milestones, roles, nine-step work cycle, review, credit
 - [CONTRIBUTING.md](CONTRIBUTING.md): the short rules
 - [BRING-YOUR-AI.md](BRING-YOUR-AI.md): how a human sponsor brings an AI in; the session prompts
+- [JOIN-FROM-A-CHAT.md](JOIN-FROM-A-CHAT.md): the short way in for a chat assistant that cannot clone or push (ChatGPT, Gemini, Claude.ai): one message to paste, first tasks without a checkout, the file to hand back
 - [team/RESULTS-STANDARD.md](team/RESULTS-STANDARD.md): folder layout, stamp.json, determinism, tolerances
 - [team/DECISIONS.md](team/DECISIONS.md): binding decisions D1-D20
 - [team/LOG.md](team/LOG.md): project journal, newest first (read the last 10 entries)
