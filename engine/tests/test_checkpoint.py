@@ -3,6 +3,7 @@ same result"), the progress line, step control, the T0 status of the stamp and t
 the outputs against the P4 schemas. Software checks only: nothing here is a result."""
 
 import copy
+import dataclasses
 import json
 import signal
 import subprocess
@@ -65,7 +66,23 @@ L1A = copy.deepcopy(ORBIT)  # a hypothesis of the Composer coordinate, with movi
 L1A["scenario"] = "l1a"
 L1A["law"] = {"id": "L1a", "lambda": 1e-3, "range": "screened"}
 L1A["bodies"][0]["q"], L1A["bodies"][1]["q"] = 1e-3, -1e-3
-SCENES = {"orbit": ORBIT, "gas": GAS, "absorbing": ABSORBING, "boris": BORIS, "l1a": L1A}
+L1E = copy.deepcopy(L1A)  # motion in two coordinates (D37): the Composer position and velocity are columns too
+L1E["scenario"] = "l1e"
+L1E["law"] = {"id": "L1e", "lambda": 0.5}
+L1E["bodies"][1].update(xc=[0.0, 0.1], vc=[0.01, 0.0])
+TORQUE = copy.deepcopy(L1A)  # the direction "torque" (D37): the spin and the radius are columns too
+TORQUE["scenario"] = "torque"
+TORQUE["law"] = {"id": "L1a", "lambda": 1e-3, "direction": "torque"}
+TORQUE["bodies"][1].update(radius=0.05, spin=0.2)
+SCENES = {
+    "orbit": ORBIT,
+    "gas": GAS,
+    "absorbing": ABSORBING,
+    "boris": BORIS,
+    "l1a": L1A,
+    "l1e": L1E,
+    "torque": TORQUE,
+}
 
 
 def with_numerics(settings: dict, **numerics) -> dict:
@@ -106,8 +123,14 @@ def test_a_run_interrupted_and_resumed_gives_the_same_result(scene, tmp_path):
 
     assert files(again.folder) == files(whole.folder)  # byte for byte
     assert again.summary == whole.summary and again.timeseries == whole.timeseries
-    for name in ("m", "q", "x", "v", "fixed", "alive"):
+    columns = [item.name for item in dataclasses.fields(whole.state) if item.name != "t"]
+    assert {"m", "q", "x", "v", "fixed", "alive", "xc", "vc", "spin", "radius"} <= set(columns)
+    for name in columns:  # every column of the state, those of D37 too
         assert np.array_equal(getattr(again.state, name), getattr(whole.state, name))
+    if scene == "l1e":
+        assert whole.state.xc.any() and whole.state.vc.any()
+    if scene == "torque":
+        assert whole.state.spin[1] != 0.2 and whole.state.radius[1] == 0.05  # the spin was turned
     assert again.state.t == whole.state.t and not saved.exists()
     assert again.stamp["resumed_at_steps"] == [57] and "resumed_at_steps" not in whole.stamp
     assert validate_outputs(again.stamp, again.summary) == []
