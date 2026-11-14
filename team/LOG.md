@@ -20,6 +20,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: registry rows only
 - Questions: none new
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E9: the Composer energy (D23)
+- Did: on the maintainer's split of the rest of M1 (my share: E9, E2.2, the registry), implemented E9: `energy.composer_energy` (D23: `-G lambda s sum Com(mu_a mu_b) / r` within its scope; `None` outside it); `Diagnostics(..., law=)` reports `energy_com` and `energy_total` (what the law conserves) and their drifts; the runner passes the law; schema addition; 6 tests.
+- Result: on an eccentric orbit of two charged bodies under L1a (lambda 0.5, 20,000 steps) the Real energy alone drifts by 4.1e-3, Real plus Composer by 3.7e-8 (L0 on the same orbit: 2.8e-8). Full suite 313 passed.
+- Next: E2.2 (derivation of the field of moving bodies, for the physics lead), the registry clean-up, D40.
+- Blocked by / questions: none.
+- Architecture: updated (row `energy` implemented; section 10; change log)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
 - Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.
 - Result: `summary.json` identical bit for bit (67 numbers, 29 flags; the failed prediction about the sign of the deflection is reproduced too). The gates of M1 (T0, T9.1-T9.4) are all confirmed.

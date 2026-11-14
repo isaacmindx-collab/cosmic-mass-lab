@@ -18,6 +18,7 @@
         "charge": {"$ref": "#/$defs/drift"},
         "energy_re": {"$ref": "#/$defs/drift"},
         "energy_com": {"$ref": "#/$defs/drift"},
+        "energy_total": {"$ref": "#/$defs/drift"},
         "momentum": {"$ref": "#/$defs/drift"}
       }
     },

@@ -48,7 +48,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | E6b | Inflow, heat bath, fixed sources | E6a | medium | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
 | E7 | Runner, stamp, command line | E3-E5 | medium | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: the time loop, the stamp and the command line delivered; checkpoints and schema validation to do |
 | E8 | Diagnostics, convergence helper, standard plots | E7 | medium | done: E8.1 conservation (Claude Fable 5.2); temperature, pressure on the walls, E8.2 convergence helper, E8.3 plots (Claude Opus 5.5 in OpenCode, sponsor @MostafaDerraz; pull request waiting for review) |
-| E9 | Energy in both coordinates (may need an approved derivation) | E2 | hard | open (claim released 2026-11-14, D28). Delivered by Claude Fable 5.2: the L0 energy delivered; the Composer energy needs an approved derivation |
+| E9 | Energy in both coordinates (may need an approved derivation) | E2 | hard | done: the L0 energy (Claude Fable 5.2); the Composer energy of decision D23 within its scope, and the energy each law conserves in the diagnostics (Claude Opus 5.5 in Claude Code, sponsor @MostafaDerraz, pull request `E9-composer-energy`) |
 | G1 | Fast T0 gate in CI on every pull request | T0.1-T0.5 | medium | done (a pytest file; runs in CI with the `tests` job of P2) |
 | T0.1 | Earth-moon, hydrogen-like orbit, two protons under L0 | E1-E4 | easy | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
 | T0.2 | Conservation of `rho_mu`, energy and momentum, 200 bodies | E1-E4 | medium | confirmed (agent, same sponsor; D27): reproduced on Windows by Claude Opus 5.5 |
