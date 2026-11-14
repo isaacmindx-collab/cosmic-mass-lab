@@ -50,7 +50,7 @@ _UNIVERSE = {
 }
 _INFLOW = {"preset", "name", "m", "q", "rate", "velocity", "face"}
 _TOP = {"scenario", "universe", "law", "bodies", "populations", "numerics", "kind", "preregistered", "producer"}
-_BODY = {"preset", "name", "m", "q", "x", "v", "fixed"}
+_BODY = {"preset", "name", "m", "q", "x", "v", "fixed", "xc", "vc", "spin", "radius"}
 
 
 class SettingsError(ValueError):
@@ -107,7 +107,24 @@ def _body(entry: dict, index: int, dimension: int, units: str):
         if not isinstance(value, list) or len(value) != dimension:
             raise SettingsError(f"'{where}.{key}' must be a list of {dimension} numbers")
         vectors.append([float(c) for c in value])
-    return body, vectors[0], vectors[1], bool(entry.get("fixed", False))
+    extra = {}  # the optional columns of D37, only those given
+    for key in ("xc", "vc"):
+        if key in entry:
+            if not isinstance(entry[key], list) or len(entry[key]) != dimension:
+                raise SettingsError(f"'{where}.{key}' must be a list of {dimension} numbers")
+            extra[key] = [float(c) for c in entry[key]]
+    if "spin" in entry:
+        spin = entry["spin"]
+        ok = isinstance(spin, (int, float)) if dimension == 2 else (isinstance(spin, list) and len(spin) == 3)
+        if not ok or isinstance(spin, bool):
+            raise SettingsError(f"'{where}.spin' must be " + ("a number" if dimension == 2 else "a list of 3 numbers"))
+        extra["spin"] = float(spin) if dimension == 2 else [float(c) for c in spin]
+    if "radius" in entry:
+        radius = entry["radius"]
+        if isinstance(radius, bool) or not isinstance(radius, (int, float)) or radius < 0:
+            raise SettingsError(f"'{where}.radius' must be a number, not negative")
+        extra["radius"] = float(radius)
+    return body, vectors[0], vectors[1], bool(entry.get("fixed", False)), extra
 
 
 def _inflow(universe: dict) -> dict:
@@ -320,6 +337,9 @@ def load_settings(source) -> Settings:
                 "drive super-particles to the temperature of their whole mass, not of the real particles"
             )
     state = State.from_bodies(bodies, x, v, fixed)
+    for i, entry in enumerate(parsed):  # the optional columns of D37, for the listed bodies that give them
+        for key, value in entry[4].items():
+            getattr(state, key)[i] = value
     if numerics["integrator"] is None:  # D10: velocity Verlet, Boris with a second field B_cal
         magnetic = background != "none" and any(
             np.any(np.asarray(background.get(key, 0.0)) != 0) for key in ("B_g", "b")

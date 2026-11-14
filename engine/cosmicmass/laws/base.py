@@ -115,6 +115,24 @@ class Law:
             return readings.Sh(mu)
         return readings.abs(mu)
 
+    def velocity_coupling(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray:
+        """The vector `W` such that the velocity-dependent part of the force is `v x W` (used by the
+        Boris push). L0's: `m B_g + q B = m B_g - s^2 q b`, the Real coordinate of `mu B_cal`.
+        Shape `(N,)` in 2D (out of the plane), `(N, 3)` in 3D."""
+        if fields.B_g.ndim == 2:
+            return state.m[:, None] * fields.B_g - frame.s**2 * state.q[:, None] * fields.b
+        return state.m * fields.B_g - frame.s**2 * state.q * fields.b
+
+    def composer_acceleration(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray | None:
+        """The acceleration of the Composer coordinate of each body's position, shape `(N, d)`, for a
+        law in which bodies move in two coordinates (L1e); `None` for every other law (D37)."""
+        return None
+
+    def torque(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray | None:
+        """The torque on each body's spin (option L4 "torque"), shape `(N,)` in 2D, `(N, 3)` in 3D;
+        `None` when the law gives none (D37)."""
+        return None
+
 
 _REGISTRY: dict[str, type[Law]] = {}
 
