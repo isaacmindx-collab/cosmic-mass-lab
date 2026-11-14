@@ -25,6 +25,7 @@
   "cosmicmass/laws/l0.py",
   "cosmicmass/laws/l1.py",
   "cosmicmass/matter.py",
+  "cosmicmass/populations.py",
   "cosmicmass/readings.py",
   "cosmicmass/runner.py",
   "cosmicmass/settings.py",

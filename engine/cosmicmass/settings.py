@@ -12,10 +12,12 @@ from pathlib import Path
 
 import numpy as np
 
+from .constants import SI, scaled
 from .environment import K_B, Environment, HeatBath, Inflow
 from .frame import DEFAULT_PHI_BAR_DEG, Frame
 from .laws import Law, LawSpec, make_law
 from .matter import PRESETS, CosmicMass
+from .populations import POPULATION_KEYS, SHAPES, generate
 from .state import State
 
 __all__ = ["Settings", "SettingsError", "load_settings", "make_inflow", "make_heat_bath"]
@@ -47,7 +49,7 @@ _UNIVERSE = {
     "heat_bath": None,
 }
 _INFLOW = {"preset", "name", "m", "q", "rate", "velocity", "face"}
-_TOP = {"scenario", "universe", "law", "bodies", "numerics", "kind", "preregistered", "producer"}
+_TOP = {"scenario", "universe", "law", "bodies", "populations", "numerics", "kind", "preregistered", "producer"}
 _BODY = {"preset", "name", "m", "q", "x", "v", "fixed"}
 
 
@@ -174,11 +176,65 @@ def make_heat_bath(spec: dict, units: str) -> HeatBath:
     return HeatBath(spec["temperature"], spec["collision_rate"], K_B[units])
 
 
+def _population(entry, index: int, universe: dict) -> tuple:
+    """One entry of `populations` (E5.4), checked; returns the real particle and the spec."""
+    where, d = f"populations[{index}]", universe["dimension"]
+    _known(entry, POPULATION_KEYS, where)
+    if "preset" in entry:
+        if universe["units"] != "SI" or "m" in entry or "q" in entry:
+            raise SettingsError(f"'{where}': give a 'preset' (SI only), or both 'm' and 'q'")
+        if entry["preset"] not in PRESETS:
+            raise SettingsError(f"'{where}.preset': unknown preset {entry['preset']!r}; known: {sorted(PRESETS)}")
+        body = PRESETS[entry["preset"]]
+    elif "m" in entry and "q" in entry:
+        body = CosmicMass(float(entry["m"]), float(entry["q"]), str(entry.get("name", "")))
+    else:
+        raise SettingsError(f"'{where}': give a 'preset', or both 'm' and 'q'")
+    spec = dict(entry)
+    n = spec.get("n")
+    if not isinstance(n, int) or isinstance(n, bool) or n < 1:
+        raise SettingsError(f"'{where}.n' must be a positive whole number")
+    shape = spec.get("shape", "box")
+    spec["shape"] = shape
+    if shape not in SHAPES:
+        raise SettingsError(f"'{where}.shape' must be one of {list(SHAPES)}")
+
+    def vector(key, default=None):
+        value = spec.get(key, default)
+        if not isinstance(value, list) or len(value) != d:
+            raise SettingsError(f"'{where}.{key}' must be a list of {d} numbers")
+        return [float(c) for c in value]
+
+    if shape == "box":
+        box = universe.get("box") or {}
+        spec["lower"], spec["upper"] = vector("lower", box.get("lower")), vector("upper", box.get("upper"))
+        if not all(lo < hi for lo, hi in zip(spec["lower"], spec["upper"])):
+            raise SettingsError(f"'{where}': lower must be below upper on every axis")
+    else:
+        spec["centre"] = vector("centre", [0.0] * d)
+        radius, width = spec.get("radius"), spec.get("width", 0.0)
+        if not isinstance(radius, (int, float)) or not isinstance(width, (int, float)) or not 0 <= width < 2 * radius:
+            raise SettingsError(f"'{where}': give a 'radius' > 0 and a 'width' between 0 and twice the radius")
+    spec["bulk"] = vector("bulk", [0.0] * d)
+    for key in ("temperature", "weight"):
+        value = spec.get(key, 0.0 if key == "temperature" else 1.0)
+        if not isinstance(value, (int, float)) or value < 0 or (key == "weight" and value == 0):
+            raise SettingsError(
+                f"'{where}.{key}' must be a number, not negative" + (", not zero" if key == "weight" else "")
+            )
+    if "keplerian" in spec:
+        kepler = spec["keplerian"]
+        _known(kepler if isinstance(kepler, dict) else 0, ("mass", "centre"), f"{where}.keplerian")
+        if not isinstance(kepler.get("mass"), (int, float)) or kepler["mass"] <= 0:
+            raise SettingsError(f"'{where}.keplerian.mass' must be a positive number")
+    return body, spec
+
+
 def load_settings(source) -> Settings:
     """Load settings from a path to a JSON file, or from a dictionary."""
     data = source if isinstance(source, dict) else json.loads(Path(source).read_text(encoding="utf-8"))
     _known(data, _TOP, "settings")
-    for required in ("scenario", "bodies"):
+    for required in ("scenario",):  # bodies, populations or both: checked below
         if required not in data:
             raise SettingsError(f"missing field '{required}'")
 
@@ -231,14 +287,30 @@ def load_settings(source) -> Settings:
     except (ValueError, TypeError) as exc:
         raise SettingsError(f"'law': {exc}") from None
 
-    if not isinstance(data["bodies"], list) or not data["bodies"]:
-        raise SettingsError("'bodies' must be a non-empty list")
-    parsed = [_body(b, i, universe["dimension"], universe["units"]) for i, b in enumerate(data["bodies"])]
-    bodies = [p[0] for p in parsed]
-    state = State.from_bodies(bodies, [p[1] for p in parsed], [p[2] for p in parsed], [p[3] for p in parsed])
-
     _known(data.get("numerics", {}), _NUMERICS, "numerics")
     numerics = {**_NUMERICS, **data.get("numerics", {})}
+
+    listed = data.get("bodies", [])
+    populations = data.get("populations", [])
+    if not isinstance(listed, list) or not isinstance(populations, list) or not (listed or populations):
+        raise SettingsError("give a non-empty list of 'bodies', or 'populations', or both")
+    parsed = [_body(b, i, universe["dimension"], universe["units"]) for i, b in enumerate(listed)]
+    bodies = [p[0] for p in parsed]
+    x = [p[1] for p in parsed]
+    v = [p[2] for p in parsed]
+    fixed = [p[3] for p in parsed]
+    if populations:  # E5.4: seeded populations, after the listed bodies, in the order given
+        rng = np.random.default_rng((int(numerics["seed"]), 1))  # a stream of its own (the runner's is (seed))
+        constants = SI if universe["units"] == "SI" else scaled()
+        for k, entry in enumerate(populations):
+            body, spec = _population(entry, k, universe)
+            made = generate(spec, universe["dimension"], constants, rng, (body.m, body.q))
+            weighted = CosmicMass(float(made["m"][0]), float(made["q"][0]), body.name)
+            bodies += [weighted] * spec["n"]
+            x += [list(r) for r in made["x"]]
+            v += [list(r) for r in made["v"]]
+            fixed += [False] * spec["n"]
+    state = State.from_bodies(bodies, x, v, fixed)
     if numerics["integrator"] is None:  # D10: velocity Verlet, Boris with a second field B_cal
         magnetic = background != "none" and any(
             np.any(np.asarray(background.get(key, 0.0)) != 0) for key in ("B_g", "b")
@@ -254,6 +326,8 @@ def load_settings(source) -> Settings:
         "preregistered": bool(data.get("preregistered", False)),
         "producer": data.get("producer", ""),
     }
+    if populations:  # as given: with numerics.seed they rebuild the same bodies (E5.4)
+        meta["populations"] = populations
     if meta["kind"] not in ("mathematics", "measurement-check", "finding"):
         raise SettingsError("'kind' must be 'mathematics', 'measurement-check' or 'finding'")
     return Settings(str(data["scenario"]), frame, universe, law_spec, state, bodies, numerics, meta)

@@ -36,6 +36,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: no code changed
 - Questions: answered (1, 12, 13, 24, by the maintainer)
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E5.4: seeded populations
+- Did: claimed E5; wrote `populations.py` (box, shell, ring; bulk flow, thermal spread, Keplerian speeds; super-particles) and the settings key `populations`, seeded from `numerics.seed`; the stamp keeps them. Opened issues #57 (E4, question 24) and #58 (E6, question 12) for the maintainer.
+- Result: the same seed gives identical arrays; 10^4 protons at 1e4 K have their kinetic temperature within 1% (the done-when of E5.4). Software checks; no finding.
+- Next: E5.2 (`Universe`), then E7.1, E7.2, E2.5.
+- Blocked by / questions: none new; #57 and #58 wait for the maintainer.
+- Architecture: updated (section 2 row `populations`; section 4 node and edge; section 10 additions; section 11)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E8; the journal and the discussions (D35)
 - Did: released the rest of E4 (L1e and torque wait for question 24; handoff in `team/notes/E4.md`) and claimed E8: the temperature in every measurement and the pressure on the walls (E8.1), `analysis/convergence.py` (E8.2), `analysis/plots.py` (E8.3, plain SVG). Posted the list of what blocks M1 to the maintainer (chat, #55). D35: two teaching entries, 2026-007 (mathematics: the readings of a cosmic mass) and 2026-008 (physics: one rotation rate for both fields), #56; signed comments in the discussions #48 (a correction request on entry 2026-003: antihydrogen is neutral and tests nothing there), #49, #50.
 - Result: a dilute gas presses on the walls with `N k_B T / A` within 5%; the convergence block of the standard; figures made again byte for byte from a results folder. Software checks; no finding.

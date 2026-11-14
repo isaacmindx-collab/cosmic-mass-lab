@@ -155,7 +155,12 @@
         "environment": {"$ref": "#/$defs/environment"},
         "kind": {"$ref": "#/$defs/kind"},
         "preregistered": {"type": "boolean"},
-        "producer": {"type": "string"}
+        "producer": {"type": "string"},
+        "populations": {
+          "type": "array",
+          "description": "the seeded populations of the settings (E5.4), as given; with numerics.seed they rebuild the same bodies",
+          "items": {"type": "object", "required": ["n"]}
+        }
       }
     },
     "case_stamp": {
