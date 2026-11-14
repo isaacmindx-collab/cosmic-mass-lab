@@ -31,7 +31,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | P2 | CI job for tests and coverage | P1 | easy | done |
 | P3 | Architecture check `tools/check_architecture.py` in CI | none | easy | done |
 | P4 | JSON schemas for `stamp.json` and `summary.json` | P1 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
-| P5 | Scenario scaffold `tools/new_scenario.py` | P1, P4 | easy | open |
+| P5 | Scenario scaffold `tools/new_scenario.py` | P1, P4 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
 | P6 | Branch protection, labels, description and topics | P2 | maintainer | open |
 | P7 | Ruff lint and format; check the Codespaces dev container | P1 | easy | open |
 

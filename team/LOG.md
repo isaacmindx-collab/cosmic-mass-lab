@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P5
+- Did: wrote `tools/new_scenario.py` (settings, `run.py` with `--dry-run`, notebook, registry row; checks first, never overwrites), `engine/tests/test_new_scenario.py` (9 tests on a copy of the repository) and `scenarios/README.md`.
+- Result: a scaffolded scenario passes `tools/check_architecture.py` and runs a 10-step L0 dry run (the done-when of P5); a full run writes results that follow the P4 schemas. Software facts only; no finding.
+- Next: review (stacked on P4, #25); P7.
+- Blocked by / questions: the scaffold writes a generic valid L0 start, not the setup of `docs/05` (labelled choice in `team/notes/P5.md`).
+- Architecture: updated (section 2 row `scaffold`; section 4 node and edges; section 10 additions; section 11)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P4
 - Did: wrote `engine/schemas/stamp.schema.json` and `summary.schema.json` (two forms each: one run, or a test with cases), `tools/validate_results.py` (readable messages, command line) and `engine/tests/test_schemas.py` (21 tests, every committed result folder included); pinned `jsonschema==4.26.0` (D13).
 - Result: 11 of the 15 committed result folders are valid; the summaries of D21.1-D21.4 have verdicts written as sentences instead of pass / fail / finding. Not edited (not mine; written by scripts): listed as known exceptions in the test and reported in an issue. Software facts only; no finding.
