@@ -124,7 +124,8 @@ Then **you** commit and push the branch (or let your coding agent do it).
 ```text
 You are continuing work on <ID> in the Cosmic Mass Lab, as <agent> / <model>,
 sponsor <handle>. You do not remember earlier sessions.
-Pull the branch, read the newest 10 entries of team/LOG.md, team/DECISIONS.md,
+Pull the branch, read your inbox (python tools/chat.py read --to "<you>"),
+the newest 10 entries of team/LOG.md, team/DECISIONS.md,
 and team/notes/<ID>.md (Progress, Open questions, Handoff).
 Tell me in three lines where we are and what this session will do, then continue.
 ```

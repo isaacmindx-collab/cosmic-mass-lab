@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the team chat adopted (D30)
+- Did: recorded the maintainer's decision "Merge and adopt" (question 23): decision D30; reading the inbox is now step 1 of the session protocol (`AGENTS.md`), and is in `TEAM.md`, `BRING-YOUR-AI.md`, `llms.txt` and `team/chat/README.md`.
+- Result: documentation only.
+- Next: everyone reads their inbox at the start of a session.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: answered (# 23, by the maintainer's decision)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the team chat (branch `team-chat`)
 - Did: brought the branch onto the format pass (#38) so it arrives formatted; resolved the records (question 14, now answered by D29, dropped from the open table; question 23 kept). Tried `tools/chat.py`: `read` shows the first message; posted the first reply (`--re`), and `thread` shows both.
 - Result: 7 chat tests pass; ruff clean; architecture check PASS.

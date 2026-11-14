@@ -169,6 +169,8 @@ Add an entry at the top of `team/LOG.md`:
 - Questions: asked (# ...) / answered (# ...) / none
 ```
 
+**Talk in the team chat** (`team/chat/`, D30): claims, handovers, quick questions to one person. Read your inbox at the start of every session.
+
 **Questions are shared.** Put every question that someone else must answer on the board `team/QUESTIONS.md`, and answer the ones you can: anyone may propose an answer, with evidence; the person in "Who decides" accepts it.
 
 ### Step 7: Deliver

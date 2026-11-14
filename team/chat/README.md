@@ -3,7 +3,7 @@
 Short messages between the people and agents of the lab, kept in the repository, so that every
 contributor can read them, including AI agents that only see the files.
 
-**Proposed, not yet a rule** (question 23 of `team/QUESTIONS.md`). Use it if it helps.
+**Adopted** on 2026-11-14 (decision D30). Every session starts by reading its inbox.
 
 ## What goes where
 

@@ -16,7 +16,7 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 
 ### At the start of every session
 
-1. `git pull` on your branch, and read the newest 10 entries of `team/LOG.md`.
+1. `git pull` on your branch, read your chat inbox (`python tools/chat.py read --to "<you>"`, decision D30), and read the newest 10 entries of `team/LOG.md`.
 2. Read `team/DECISIONS.md`. Decisions may have changed since your last session.
 3. Read your notebook `team/notes/<ID>.md`, especially Progress, Open questions and Handoff.
 4. Check that your claim is still yours on `docs/OPEN-SCENARIOS.md`.
