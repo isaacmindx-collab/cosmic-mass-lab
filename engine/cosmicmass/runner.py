@@ -59,6 +59,31 @@ def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True
     return row
 
 
+def wall_pressure(box: dict, load: dict, elapsed: float) -> dict | None:
+    """E8.1: the pressure on the walls of a box, from the momentum they took over `elapsed`
+    (`docs/05`, T6.1: "pressure from Re momentum flux on the walls"). Each wall: its momentum
+    divided by the time and by its size (a length in 2D, an area in 3D); and the mean over the
+    whole boundary. In 2D (bodies moving in a plane, D21) it is a force per unit length, to be
+    compared with `n k T` for `n` per unit area. None without a box or without time."""
+    if not box or elapsed <= 0:
+        return None
+    extent = np.subtract(box["upper"], box["lower"]).astype(float)
+    d = len(extent)
+    faces = {}
+    for axis in range(d):
+        others = np.delete(extent, axis)
+        faces[axis] = float(np.prod(others))  # 2D: the length of the wall; 3D: its area
+    per_wall = {}
+    for axis in range(d):
+        for side in ("lower", "upper"):
+            key = f"{axis}-{side}"
+            per_wall[key] = load.get(key, 0.0) / (elapsed * faces[axis])
+    boundary = 2 * sum(faces.values())
+    total = sum(load.values())
+    return {"momentum": {k: load.get(k, 0.0) for k in per_wall}, "pressure": per_wall,
+            "pressure_mean": total / (elapsed * boundary), "elapsed": elapsed}  # fmt: skip
+
+
 def run(settings, out_root: Path | str | None = Path("results"), now=None) -> RunResult:
     """Run a settings object, file or dictionary. With `out_root=None` nothing is written."""
     settings = settings if isinstance(settings, Settings) else load_settings(settings)
@@ -99,6 +124,7 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
     rows, step, dt, wall_hits = [_row(0, 0.0, first, state, **columns)], 0, 0.0, 0
     temperatures = []  # with a heat bath: the temperature after every step
     wall_impulse = np.zeros(state.dimension)  # momentum given to the walls so far
+    wall_load = {}  # E8.1: the size of the momentum each wall took, for the pressure
     t_end = np.inf if num["t_end"] is None else num["t_end"]
     max_steps = np.inf if num["steps"] is None else num["steps"]
     while step < max_steps and state.t < t_end:
@@ -115,10 +141,13 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
                 if "wall" not in event:  # inflow and heat bath: counted by the environment
                     continue
                 wall_hits += event["bodies"]
+                axis, side = event["wall"]
                 if "absorbed" in event:  # an absorbing wall takes the whole momentum of the body
                     wall_impulse += event["absorbed"]["momentum"]
                 else:
-                    wall_impulse[event["wall"][0]] += event["impulse"]
+                    wall_impulse[axis] += event["impulse"]
+                key = f"{axis}-{side}"
+                wall_load[key] = wall_load.get(key, 0.0) + abs(event["impulse"])
             ctx.invalidate()
         if bath is not None:
             temperatures.append(kinetic_temperature(state, bath.k_b))
@@ -139,6 +168,7 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         "conservation": drifts(first, last),
         "wall_hits": wall_hits,
         "wall_impulse": [float(p) for p in wall_impulse],
+        "walls": wall_pressure(box, wall_load, last["t"] - first["t"]),
         "absorbed": {
             "bodies": environment.collected["bodies"],
             "m": environment.collected["m"],

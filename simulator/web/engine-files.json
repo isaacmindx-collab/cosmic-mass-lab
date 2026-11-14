@@ -3,6 +3,9 @@
  "files": [
   "cosmicmass/__init__.py",
   "cosmicmass/__main__.py",
+  "cosmicmass/analysis/__init__.py",
+  "cosmicmass/analysis/convergence.py",
+  "cosmicmass/analysis/plots.py",
   "cosmicmass/constants.py",
   "cosmicmass/diagnostics.py",
   "cosmicmass/energy.py",

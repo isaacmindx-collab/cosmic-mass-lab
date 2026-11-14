@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E8; the journal and the discussions (D35)
+- Did: released the rest of E4 (L1e and torque wait for question 24; handoff in `team/notes/E4.md`) and claimed E8: the temperature in every measurement and the pressure on the walls (E8.1), `analysis/convergence.py` (E8.2), `analysis/plots.py` (E8.3, plain SVG). Posted the list of what blocks M1 to the maintainer (chat, #55). D35: two teaching entries, 2026-007 (mathematics: the readings of a cosmic mass) and 2026-008 (physics: one rotation rate for both fields), #56; signed comments in the discussions #48 (a correction request on entry 2026-003: antihydrogen is neutral and tests nothing there), #49, #50.
+- Result: a dilute gas presses on the walls with `N k_B T / A` within 5%; the convergence block of the standard; figures made again byte for byte from a results folder. Software checks; no finding.
+- Next: E5.4 (seeded populations), E7.1 and E7.2.
+- Blocked by / questions: question 24; the physics decisions listed in the chat message to the maintainer.
+- Architecture: updated (section 2 rows `diagnostics`, `convergence`, `plots`; section 4 nodes and edges; section 10 additions; section 11)
+- Questions: answered (5, proposed)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4 part B: L4, L6, L8
 - Did: the options L4 (radial, perpendicular, along the velocity), L6 (the Composer coordinate of `mu (v x B_cal)`, on or only) and L8 (the Composer coupling screened over the Debye length of the population; `DirectSum.at_bodies_screened`, `debye_length`, `FieldSample.screened`); definitions labelled in `team/notes/E4.md`.
 - Result: hand cases; the reduce-to-L0 test over every direction x moving option, bit for bit; L8 screens the Composer coupling and never L0. Software checks against mathematics; no finding.

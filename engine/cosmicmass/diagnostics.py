@@ -1,15 +1,17 @@
-"""Conservation diagnostics (task E8.1, MVP part): total cosmic mass (mass and charge),
-energy and momentum, and their drift over a run (`team/RESULTS-STANDARD.md`, section 4).
+"""Diagnostics (task E8.1): total cosmic mass (mass and charge), energy, momentum and the
+temperature of the moving bodies, and their drift over a run (`team/RESULTS-STANDARD.md`,
+section 4). The pressure on the walls is computed by the runner (`runner.wall_pressure`), from
+the momentum the walls took.
 
 The energy is the L0 energy of `energy.py` (Real coordinate). The Composer energy is
-"not defined" until a derivation is approved. Temperature and the pressure on the
-walls (E8.1) are outside the MVP.
+"not defined" until a derivation is approved (E9).
 """
 
 import numpy as np
 
 from .constants import Constants
 from .energy import energy_l0
+from .environment import K_B, kinetic_temperature
 from .frame import Frame
 from .state import State
 
@@ -28,6 +30,7 @@ class Diagnostics:
         energy = energy_l0(state, self.frame, self.constants, self.softening, self.background)
         return {
             "t": float(state.t),
+            "temperature": kinetic_temperature(state, K_B[self.constants.units]),  # E8.1 (E6b's definition)
             "mass": float(total.re),
             "charge": float(total.com),
             "kinetic": energy["kinetic"],
