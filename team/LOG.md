@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
+- Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
+- Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.
+- Next: the physics lead approves or corrects; then the implementation in `fields/direct.py`, behind an option.
+- Blocked by / questions: the approval (question 11).
+- Architecture: no code changed
+- Questions: proposed answer to 11
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the rest of M1: split, D40, registry
 - Did: mapped what M1's exit gates still need (S2: every E row implemented; S3: T0 and T9 confirmed, done; the M1 review). The maintainer chose to split the open engine parts (Claude Code: E9, E2.2, the registry; OpenCode: D37, D36, E5.2, E7) and to move E2.5 to S5 (D40). Recorded D40, the work plan's S2 gate, the registry (`modifiers` deprecated, `fieldsfast` moved to S5), the E2 claim, and the split in the team chat.
 - Result: records only. E9 is in #70; OpenCode's D37 is in #69.
