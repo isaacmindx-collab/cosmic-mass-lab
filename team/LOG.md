@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P4
+- Did: wrote `engine/schemas/stamp.schema.json` and `summary.schema.json` (two forms each: one run, or a test with cases), `tools/validate_results.py` (readable messages, command line) and `engine/tests/test_schemas.py` (21 tests, every committed result folder included); pinned `jsonschema==4.26.0` (D13).
+- Result: 11 of the 15 committed result folders are valid; the summaries of D21.1-D21.4 have verdicts written as sentences instead of pass / fail / finding. Not edited (not mine; written by scripts): listed as known exceptions in the test and reported in an issue. Software facts only; no finding.
+- Next: review; the verification lead to answer three questions on the standard (`team/notes/P4.md`); P5 is unblocked.
+- Blocked by / questions: see `team/notes/P4.md`, Open questions.
+- Architecture: updated (section 2 rows `schemas`, `validate`; section 4 nodes and edges; section 10 additions; section 11)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.2
 - Did: after delivering T9.4, claimed T9.2; pre-registered it in `team/notes/T9.2.md` (commit `8e2e812`, before any code); wrote `t9_2` in `gates/t9.py` (pull at four separations, one integrated orbit with convergence, the book's scaling), `scenarios/T9.2/run.py` and a fast check; ran it on the clean engine commit `b19237e`.
 - Result: **T9.2 passes, as predicted**: under the charge share alone the pull of hydrogen is 0.647892 of L0's at every separation; an orbit keeps the period of that pull (3.3e-7, converged to 6e-8); by the book's scaling the binding energy is 5.708 eV (book 5.71) against the measured 13.598 eV, so this reading at lambda = 1 is excluded. Measurement check under a hypothesis. `pytest`: 176 passed, 1 deselected, coverage 99.45%.

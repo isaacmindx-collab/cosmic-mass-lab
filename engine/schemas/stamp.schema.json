@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MostafaDerraz/cosmic-mass-lab/engine/schemas/stamp.schema.json",
+  "title": "stamp.json of a run (team/RESULTS-STANDARD.md, section 2)",
+  "description": "Either the stamp of one run (written by the runner) or the stamp of a test with several cases (written by gates.t0.write_gate_result), whose cases are each the stamp of one run.",
+  "oneOf": [
+    {"$ref": "#/$defs/run_stamp"},
+    {"$ref": "#/$defs/case_stamp"}
+  ],
+  "$defs": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}-[0-9]{6}-([0-9a-f]{7,40}(-dirty)?|unknown)$",
+      "description": "YYYYMMDD-HHMMSS-<short engine commit> (UTC)"
+    },
+    "engine_commit": {
+      "type": "string",
+      "pattern": "^([0-9a-f]{7,40}(-dirty)?|unknown)$"
+    },
+    "kind": {"enum": ["mathematics", "measurement-check", "finding"]},
+    "number": {"type": "number"},
+    "vector": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 3},
+    "law": {
+      "type": "object",
+      "description": "The law block: the reading L0 or L1a-L1e and the options L2-L8 (laws/base.py, LawSpec.to_dict).",
+      "required": ["id", "sign", "lambda", "direction", "terms", "B_cal", "inertia", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"enum": ["L0", "L1a", "L1b", "L1c", "L1d", "L1e"]},
+        "sign": {"enum": ["+", "-"]},
+        "lambda": {"oneOf": [{"type": "number"}, {"const": "cos_phi_bar"}]},
+        "direction": {"enum": ["radial", "perpendicular", "torque", "velocity"]},
+        "terms": {"enum": ["all", "s q g", "-m E/s", "-2 cos q E"]},
+        "B_cal": {"enum": ["off", "on", "only"]},
+        "inertia": {"enum": ["Re", "Sh", "abs"]},
+        "range": {"enum": ["1/r^2", "screened"]}
+      }
+    },
+    "universe": {
+      "type": "object",
+      "required": ["phi_bar_deg", "dimension", "units", "boundary", "background"],
+      "additionalProperties": false,
+      "properties": {
+        "phi_bar_deg": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 180},
+        "dimension": {"enum": [2, 3]},
+        "units": {"enum": ["SI", "scaled"]},
+        "boundary": {"enum": ["open", "reflecting", "absorbing", "wrap"]},
+        "background": {
+          "oneOf": [
+            {"const": "none"},
+            {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": false,
+              "properties": {
+                "g": {"$ref": "#/$defs/vector"},
+                "e": {"$ref": "#/$defs/vector"},
+                "B_g": {"oneOf": [{"type": "number"}, {"$ref": "#/$defs/vector"}]},
+                "b": {"oneOf": [{"type": "number"}, {"$ref": "#/$defs/vector"}]}
+              }
+            }
+          ]
+        },
+        "box": {
+          "type": "object",
+          "required": ["lower", "upper"],
+          "additionalProperties": false,
+          "properties": {"lower": {"$ref": "#/$defs/vector"}, "upper": {"$ref": "#/$defs/vector"}}
+        }
+      }
+    },
+    "matter": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "m", "q", "n"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "m": {"type": "number"},
+          "q": {"type": "number"},
+          "n": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "numerics": {
+      "type": "object",
+      "description": "The numerics of the run; the standard's keys are required, a scenario may add more.",
+      "required": ["integrator", "adaptive", "dt_initial", "softening", "steps", "seed"],
+      "properties": {
+        "integrator": {"enum": ["verlet", "boris"]},
+        "adaptive": {"type": "boolean"},
+        "dt_initial": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "softening": {"type": "number", "minimum": 0},
+        "steps": {"type": ["integer", "null"], "minimum": 0},
+        "seed": {"type": "integer"},
+        "t_end": {"type": ["number", "null"]},
+        "eta": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "environment": {
+      "type": "object",
+      "required": ["python", "sympy", "mpmath", "numpy"],
+      "properties": {
+        "python": {"type": "string"},
+        "sympy": {"type": "string"},
+        "mpmath": {"type": "string"},
+        "numpy": {"type": "string"}
+      }
+    },
+    "run_stamp": {
+      "type": "object",
+      "required": ["scenario", "run_id", "engine_commit", "t0_status", "law", "universe", "matter",
+                   "numerics", "environment", "kind", "preregistered", "producer"],
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {"type": "string", "minLength": 1},
+        "run_id": {"$ref": "#/$defs/run_id"},
+        "engine_commit": {"$ref": "#/$defs/engine_commit"},
+        "t0_status": {"enum": ["pass", "fail", "not run"]},
+        "law": {"$ref": "#/$defs/law"},
+        "universe": {"$ref": "#/$defs/universe"},
+        "matter": {"$ref": "#/$defs/matter"},
+        "numerics": {"$ref": "#/$defs/numerics"},
+        "environment": {"$ref": "#/$defs/environment"},
+        "kind": {"$ref": "#/$defs/kind"},
+        "preregistered": {"type": "boolean"},
+        "producer": {"type": "string"}
+      }
+    },
+    "case_stamp": {
+      "type": "object",
+      "required": ["scenario", "run_id", "engine_commit", "kind", "preregistered", "producer", "cases"],
+      "additionalProperties": false,
+      "properties": {
+        "scenario": {"type": "string", "minLength": 1},
+        "run_id": {"$ref": "#/$defs/run_id"},
+        "engine_commit": {"$ref": "#/$defs/engine_commit"},
+        "kind": {"$ref": "#/$defs/kind"},
+        "preregistered": {"type": "boolean"},
+        "producer": {"type": "string"},
+        "cases": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"$ref": "#/$defs/run_stamp"}
+        }
+      }
+    }
+  }
+}

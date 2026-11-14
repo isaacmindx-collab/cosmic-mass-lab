@@ -82,6 +82,8 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | - | `scenarios/T0.5/` | T0.5 | implemented | field split: the Composer part of one proton's field is Coulomb's field |
 | - | `scenarios/D21/` | D21.1-D21.4 | implemented | the four numerical conventions of decision D21 run against their alternatives (`run.py 1..4`) |
 | archcheck | `tools/check_architecture.py` | P3 | implemented | checks this registry and the diagrams against the code (rule D18) |
+| schemas | `engine/schemas/` | P4 | implemented | JSON schemas (draft 2020-12) of `stamp.json` and `summary.json`, from `team/RESULTS-STANDARD.md`, sections 2 and 4; each has two forms: one run, or a test with cases |
+| validate | `tools/validate_results.py` | P4 | implemented | validates the results folders against `engine/schemas/`, one readable line per problem; used by `engine/tests/test_schemas.py` on every committed result. Outside the package, so the web universe does not load `jsonschema` |
 | scaffold | `tools/new_scenario.py` | P5 | planned | creates `scenarios/<ID>/`, settings, notebook and a registry row |
 | webui | `simulator/web/` | UI1 | in-progress | interactive universe in the browser: the unchanged engine runs in Pyodide in a web worker (`worker.js`, `bridge.py`); page `index.html`, `app.js`; `engine-files.json` lists the engine files it loads (D22, proposed) |
 <!-- registry:end -->
@@ -137,6 +139,8 @@ flowchart TB
         webui["simulator/web<br/>(engine in Pyodide)"]
         scaffold["tools/new_scenario.py"]:::planned
         archcheck["tools/check_architecture.py"]
+        validate["tools/validate_results.py"]
+        schemas["engine/schemas<br/>(stamp, summary)"]
         cli["python -m cosmicmass<br/>__main__.py"]
         scen["scenarios/ID/run.py"]
         gate["gates/t0.py"]
@@ -201,6 +205,8 @@ flowchart TB
     gate --> settings
     gate --> stamp
     tests -.->|"any layer"| gn
+    tests --> validate
+    validate --> schemas
     webui --> runner
     scaffold --> settings
     runner --> integrators
@@ -670,6 +676,13 @@ def energy_l0(state, frame, constants, softening=0.0, background=None) -> dict: 
 # keys: kinetic, interaction (-G_N sum Re(mu_a mu_b) / r), background (-sum Re[mu E_cal] . x), total
 ```
 
+```python
+# tools/validate_results.py (P4): outside the package
+def validate(data, name: str) -> list[str]: ...      # name: "stamp" | "summary"; [] if valid, else "place: problem" lines
+def validate_folder(folder) -> list[str]: ...        # both files of one run folder
+def main(argv=None) -> int: ...                      # python tools/validate_results.py [folders]; 0 if all valid
+```
+
 **Units:** SI everywhere inside the engine. Scaled units (`G_N = K = 1`, `s = 1`) are a `Frame` and `constants` choice, never a hidden factor (D7).
 
 ---
@@ -680,6 +693,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | P4 (`P4-result-schemas`, stacked on `T9.2-hydrogen-share`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `engine/schemas/` (node `schemas`) and `tools/validate_results.py` (node `validate`) in section 4, with edges `tests --> validate --> schemas`; section 10: the validator's signatures (additions); `jsonschema==4.26.0` pinned (D13). No engine module or contract changed |
 | 2026-11-14 | T9.2 (`T9.2-hydrogen-share`, stacked on `T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_2`, which uses `runner` (new edge `limits --> runner` in section 4) and the helpers `_pair`, `_relative_track` of `gates/t0.py` (edge `limits --> gate` already there); scenario row `scenarios/T9.2/`; no contract changed |
 | 2026-11-14 | T9.4 (`T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_4` (no existing signature changed); scenario row `scenarios/T9.4/`; no new module, edge or contract |
 | 2026-11-11 | UI1, first version (`UI1-web-universe`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `simulator/web/` in progress: web worker running the unchanged engine in Pyodide, bridge, page; nodes `UI` and `webui` no longer planned; test `engine/tests/test_web_universe.py`. No engine module or contract changed |
