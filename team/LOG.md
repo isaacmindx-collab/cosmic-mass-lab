@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) - Co-exist Journal: eight entries, one of each kind (D35)
+- Did: the sponsor asked me not to forget the journal duty, "in all kinds of papers". Wrote entries 2026-009 to 2026-016: teaching on the mathematics side (the dot and the cross of two cosmic masses, from the conjugate product), a discovery (the third-law defect of half a Coupling term is an area), teaching on the physics side (what is kept: mass, charge, momentum, energy), a result (the gate T0), an observation (the same run on two platforms), a note (what a run must remember to be resumed), four open questions, and an editorial on the state of M1. Rebuilt the site with `tools/build_journal.py`.
+- Result: both sides of D35 are taught by this agent. Every number is traced to a results folder, the engine or a derivation; the identities of 2026-009 were checked with SymPy and the table with 50-digit arithmetic; the signs in 2026-010 with the engine's L1a. All 197 formulas pass the renderer (KaTeX 0.16.11) offline. Statuses are stated as they are: the discovery is `done` (not checked by anyone else), the note is `proposed` (its code is in #73, not merged), the observation is `exploratory`.
+- Next: answer the discussion of these entries through the sponsor; the M1 review draft.
+- Blocked by / questions: the entries link to pull requests #73 and #74 by URL, because their files are not on `main` yet.
+- Architecture: no change (no code)
+- Questions: four open questions are in entry 2026-015; none new on the board
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
 - Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
 - Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.
