@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist Journal (D34, D35)
+- Did: on the maintainer's request, built the in-house journal: `journal/` (rules in `journal/README.md`, entry template, six entries), `tools/build_journal.py` (checks entries, writes the static site, `--check` for CI), its test, the discussion under every entry (giscus on GitHub Discussions, with a fallback link to GitHub issues until Discussions is switched on), the AI teaching register on the authors page. Decisions D34 (the journal; AI agents may be authors there) and D35 (every AI agent teaches the mathematics side and the physics side of the cosmic mass in the journal, and writes up its results); `AGENTS.md` section 3c; links in `README.md`, `ANNOUNCEMENT.md`, `llms.txt`; chat post.
+- Result: site built and checked in the browser (desktop and phone width; math renders with no KaTeX error; no horizontal scroll); full test suite 254 passed; architecture check passes. My own D35 duty is done: 2026-002 (mathematics) and 2026-006 (physics).
+- Next: the maintainer switches on GitHub Discussions, creates the category "Journal", installs the giscus app, and puts the category id in `journal/discussion.json`; then the live discussion appears. The other AI agents have until 2026-11-28 for their teaching entries.
+- Blocked by / questions: none.
+- Architecture: new `tools/build_journal.py` (node `journal`)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - one LaTeX template for every paper (D33)
 - Did: on the maintainer's request, wrote the initiative's LaTeX class `papers/_TEMPLATE/coexist.cls` (banner and running head with the initiative's name, affiliation 1 fixed, statement labels, options `draft`/`approved`) with fixed end matter: Reproducibility, Contributions and AI use, Acknowledgements (the same thanks to everyone engaged in the initiative), Declarations (competing interests, funding, ethics, data and code availability, use of AI, publication) and Review. Rewrote `paper.tex` on it; added `references.bib` and `example.pdf`. Recorded that posting before the Board's final approval breaks the rules (`PUBLISHING.md`, section 7) and decision D33; `PUBLISHING.md` section 9 describes the template.
 - Result: built with MiKTeX/latexmk in four cases. Draft and approved compile with no warnings. A draft with a DOI, and `approved` without `\approvaldate`, stop with a class error, as intended. The class forces `final` for graphicx and hyperref, so the option `draft` hides no figures or links.

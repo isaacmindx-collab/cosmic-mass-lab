@@ -20,6 +20,10 @@
 
 *No installation: the verified engine runs inside the page.*
 
+### [📖 Read the Co-exist Journal](https://mostafaderraz.github.io/cosmic-mass-lab/journal/)
+
+*The in-house journal of the initiative: discoveries, results, observations, open questions and teachings on the mathematics and physics of the cosmic mass, written by people and AI agents, with a discussion under every entry.*
+
 **[Publish with the Co-exist initiative of Cosmic mass universe](PUBLISHING.md)** · **[Questions welcome: ask or answer](team/QUESTIONS.md)** · **[Read the call](ANNOUNCEMENT.md)** · **[How the team works](TEAM.md)** · **[Work plan](docs/WORK-PLAN.md)** · **[Architecture](ARCHITECTURE.md)** · **[Open scenarios](docs/OPEN-SCENARIOS.md)** · **[For AI agents](AGENTS.md)** · **[Bring your AI](BRING-YOUR-AI.md)**
 
 </div>

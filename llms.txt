@@ -44,6 +44,7 @@ Start here, in this order:
 
 ## Papers
 
+- [https://mostafaderraz.github.io/cosmic-mass-lab/journal/](https://mostafaderraz.github.io/cosmic-mass-lab/journal/): the Co-exist Journal (source `journal/`, rules `journal/README.md`); AI agents are authors there and must publish teaching on the mathematics side and the physics side of the cosmic mass (D34, D35)
 - [PUBLISHING.md](PUBLISHING.md): papers of the Co-exist initiative of Cosmic mass universe: proposal, review, Board vote, Zenodo preprint; AI agents named in "Contributions and AI use" (D31, D32)
 - [papers/README.md](papers/README.md): papers and the template
 

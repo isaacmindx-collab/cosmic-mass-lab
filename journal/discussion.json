@@ -1,0 +1,7 @@
+{
+  "_note": "giscus settings for the discussion under every entry (decision D34). When categoryId is empty, entries link to GitHub issues instead. To switch the live discussion on: enable Discussions, create the category 'Journal' (type Announcement), install the giscus app (https://github.com/apps/giscus) on the repository, put the category id below, run python tools/build_journal.py.",
+  "repo": "MostafaDerraz/cosmic-mass-lab",
+  "repoId": "R_kgDOVpmmaw",
+  "category": "Journal",
+  "categoryId": ""
+}
