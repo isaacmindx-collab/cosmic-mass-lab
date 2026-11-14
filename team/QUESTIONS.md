@@ -1,8 +1,15 @@
-# Questions for the maintainer
+# Questions and answers
 
-Open questions left by the agents, waiting for an answer from the maintainer (Mostafa Derraz) or from the lead concerned. One row per question. When a question is answered, move it to "Answered" with the date and the answer, or turn it into a decision in `team/DECISIONS.md`.
+**Everyone asks, everyone answers.** This is the open question board of the lab, for humans and AI agents alike. No question is too small, and you do not need to be an expert to propose an answer: a derivation, a run, a reference or a counterexample all help.
 
-Questions that a run can settle do not belong here: they are run as scenarios, with their alternatives (see `team/notes/D21.md` and `team/notes/Q.md`).
+## How it works
+
+1. **Ask:** add a row to "Open" (or open an issue with the **Question** template). Say why it matters and where the details are. Sign it: `@handle` or `agent / model (sponsor @handle)`.
+2. **Answer:** add your answer under "Proposed answers", with the question number, your evidence (derivation, run id, test, reference) and your signature. Several answers to one question are welcome; disagreeing with an earlier answer is welcome too, with evidence.
+3. **Decide:** the person in "Who decides" (the maintainer or the lead concerned) accepts an answer, turns it into a decision in `team/DECISIONS.md`, or asks for more. Only then does the question move to "Answered".
+4. **Can a run settle it?** Then turn it into a scenario with its alternatives (as in `team/notes/D21.md` and `team/notes/Q.md`), and link the scenario here.
+
+**Every session ends with its questions** (`AGENTS.md`, rule 12; `TEAM.md`, section 5, step 6), and **every session that can, answers one open question.**
 
 ## Open
 
@@ -23,12 +30,39 @@ Questions that a run can settle do not belong here: they are run as scenarios, w
 | 13 | **Absorbing surfaces of bodies (T4.3):** a planet that collects what falls on it needs a radius, which a body does not have (`State` holds `m`, `q`, `x`, `v`). Should `State` gain a `radius` column, and should the collected momentum move the planet? | Needed by T4.3 (self-charging planets). It changes the `State` contract of `ARCHITECTURE.md`, section 10. | engine lead | `team/notes/E6a.md` | 2026-11-11 |
 | 14 | **Amend convention 4 of D21 (the adaptive step)?** Scenario Q4 shows that the current rule depends on the frame: a scene moving as a whole costs 29 times more steps (186,692 against 6,449 for Sun, Earth and moon over a month), with no gain that was asked for. A rule relative to the nearest neighbour removes this and is as accurate on four setups. It is available as an option, not as the default. | The web universe and every scenario with a moving system (T4, T5) pay this cost. Before adopting the new rule, one more scenario is needed: a close pair passing fast near a third body, where the new rule could step too far. Should that scenario be run, and with which guard? | numerics lead, maintainer | `team/notes/Q4.md`; `team/notes/UI1.md` | 2026-11-11 |
 
+## Proposed answers
+
+Answers proposed by contributors. They are not decisions until the person who decides accepts them.
+
+### Q1 (energy of L1a, D23): yes, it follows from the force. Proposed by Claude Opus 5.5 (sponsor @MostafaDerraz), 2026-11-14
+- **Derivation.** The field of a body b at rest, at the place of body a, is `E_cal = -G mu_b r_ab / r^3` (compendium). With all three terms and the radial direction, L1a reads the product `mu_a E_cal = -G (mu_a mu_b) r_ab / r^3` as the force `-G [Re + lambda s Com](mu_a mu_b) r_ab / r^3`. The product of General Numbers commutes, `mu_a mu_b = mu_b mu_a`, so the force on b is equal and opposite, along the line joining them. A central pair force `-G c_ab r / r^3` with a constant `c_ab` has the potential `-G c_ab / r`, so `kinetic - G sum [Re + lambda s Com](mu_a mu_b) / r` is conserved exactly, for inertia `Re(mu)` and bodies at rest or slow (no `B_cal`).
+- **Independent check against the engine** (not the script of Q2): on 200 random pairs (masses 1e-30 to 1e-26 kg, charges of both signs, lambda in (-1, 1), frame angles 10 to 170 deg), the engine's L1a force equals that formula to 7.5e-15, and action equals reaction to 5.7e-15. Q2 then shows the energy conserved numerically to 4.1e-7.
+- **Scope to write into D23:** terms `all`, direction `radial`, inertia `Re`, no `B_cal`. The single-term options are not reciprocal (Q1), so they have no such energy; other inertias (L7) need their own check.
+
+### Q2 (the plug-in L1a and its signs): the three terms match the compendium product. Proposed by Claude Opus 5.5, 2026-11-14
+- From the product rule `(a + bG)(c + dG) = (ac - s^2 bd) + (ad + bc + 2 s cos(phi) bd) G`, with `mu = m + qG` and `E_cal = g + eG`: `Com(mu E_cal) = m e + q g + 2 s cos(phi) q e`. Times `lambda s` this gives `s q g`, `s m e = -m E / s` (with `E = -s^2 e`) and `2 s^2 cos(phi) q e = -2 cos(phi) q E`: exactly the three terms of `laws/l1.py`. Checked by hand in the review of pull request #10, and by T9.1 (9.009e-19 e) and T9.3 (1.138e11 V/m), both recomputed independently.
+
+### Q3 ("radial" for L1a): both readings agree for L1a. Proposed by Claude Opus 5.5, 2026-11-14
+- The Composer coordinate is linear in the field, and the field of many bodies is the sum of their fields. So "along the total field at the body" is the sum of the pairwise forces along each joining line: the two readings of "radial" give the same force for L1a. They differ only for a direction that is not linear in the field (for example "perpendicular to the total field"). Suggestion: define the L4 options relative to each pair's joining line, so that every option stays a sum of pair forces.
+
+### Q7 (judge T0.1 against the analytic period?): yes, as the primary criterion. Proposed by Claude Opus 5.5, 2026-11-14
+- The criterion's 27.3 days is a rounded number for the real Moon, not the two-body period of the presets. Judging against the analytic two-body period, with the reference value reported beside it, tests the engine, which is what T0 is for. Today it passes either way (3.3e-7 against the analytic period).
+
+### Q8 (CODATA 2018 or 2022 for `K` in `docs/05`): use 2022 everywhere. Proposed by Claude Opus 5.5, 2026-11-14
+- The verified scripts and the engine use CODATA 2022, and Q3 shows the difference (6.8e-10 relative) changes no verdict. Updating the number in `docs/05` removes the disagreement.
+
+### Q9 (which chapter holds the limits?): Chapter 9 of this repository's book source. Proposed by Claude Opus 5.5, 2026-11-14
+- `sources/book/Chapters/Chapter09.tex` holds the table with 9.0e-19 e, 1.14e11 V/m and the measured neutron charge (-0.2 +/- 0.8)e-21 e (checked while reviewing pull request #10). D4 and `docs/05` should say "Chapter 9", unless the printed book numbers its chapters differently.
+
+### Q10 (binding energy for T9.2): the energy of Q1, if D23 is accepted. Proposed by Claude Opus 5.5, 2026-11-14
+- With the conserved energy of Q1, a circular hydrogen-like orbit under a pull reduced to `f` has the energy `-f k / (2 r)`, and the binding energy at the radius the quantum condition gives scales as `f^2`: the scaling used in pull request #23 (5.708 eV for `f = 0.6479`). Accepting D23 gives T9.2 a definition inside the language of the cosmic mass.
+
 ## Housekeeping for the maintainer
 
 Not questions, but things only the maintainer can do or should decide:
 
-- Create the tag `v0.1.0` and the GitHub release from `CHANGELOG.md` (the MVP is merged; the tag does not exist yet).
-- Close the pull requests whose content is already on `main` through #14: #5, #6, #7, #8, #9, #10, #11, #13.
+- ~~Create the tag `v0.1.0` and the GitHub release~~: done 2026-11-11.
+- ~~Close the pull requests whose content is already on `main` through #14~~: done 2026-11-11 (each closed with a pointer to #14).
 - Delete the throwaway branch `P2-red-demo` (a deliberately failing test; never merge it).
 - The checklist in `docs/MVP-PLAN.md`, section 4, still says "PR open" for every row; all ten are merged.
 - The board (`docs/OPEN-SCENARIOS.md`) still shows E2 to E9 as claimed under the MVP sprint (D20). The sprint is over; release the claims or reassign them.
