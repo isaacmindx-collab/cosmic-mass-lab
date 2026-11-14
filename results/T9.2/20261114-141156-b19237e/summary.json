@@ -1,0 +1,68 @@
+{
+  "cases": {
+    "binding": {
+      "binding_energy_eV": 5.707951600366543,
+      "book_value_eV": 5.71,
+      "factor": 0.6478920076403478,
+      "gap_eV": 7.890048399633458,
+      "measured_eV": 13.598,
+      "method": "the book's scaling (binding energy grows with the square of the pull, Bohr 1913), with f from the engine; not a quantum calculation by the engine",
+      "pass": true,
+      "ratio_to_measured": 0.4197640535642405,
+      "tolerance": {
+        "rounds_to_book_value_eV": 0.005
+      }
+    },
+    "orbit": {
+      "convergence": {
+        "change_half_to_quarter": 6.250097772664276e-08,
+        "period_eta": 1.8876666927661508e-16,
+        "period_eta_half": 1.887666220842256e-16,
+        "period_eta_quarter": 1.887666102861279e-16
+      },
+      "energy_re_drift_reported_not_judged": 5.750168088287948e-15,
+      "eta": 0.001,
+      "pass": true,
+      "period": 1.8876666927661508e-16,
+      "period_error": 3.3333830917747775e-07,
+      "period_predicted": 1.8876660635347368e-16,
+      "radius_largest_relative_change": 5.00000098435649e-07,
+      "speed": 1761390.5422823147,
+      "steps": 6284,
+      "tolerance": {
+        "convergence": 0.01,
+        "period": 0.001,
+        "radius": 0.001
+      }
+    },
+    "pull": {
+      "expected": 0.6478920076403478,
+      "factor": [
+        0.6478920076403477,
+        0.6478920076403477,
+        0.6478920076403477,
+        0.6478920076403479
+      ],
+      "largest_relative_error": 2.220446049250313e-16,
+      "pass": true,
+      "separations_in_a0": [
+        0.5,
+        1.0,
+        2.0,
+        5.0
+      ],
+      "share_pushes_back": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "tolerance": {
+        "relative": 1e-12
+      }
+    }
+  },
+  "explanation": "T9.2 under the hypothesis L1a (charge share only, L5c): every case meets its criterion.",
+  "scenario": "T9.2",
+  "verdict": "pass"
+}

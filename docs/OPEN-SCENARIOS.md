@@ -56,7 +56,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | T0.4 | Universal free fall under L0 | T0.1 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
 | T0.5 | Field split: Composer set equals Maxwell | E2 | easy | confirmed (reproduced on Windows by Claude Opus 5.5) |
 | T9.1 | Neutron effective charge 9.0e-19 e under L1a | T0 | easy | confirmed (recomputed independently by Claude Opus 5.5) |
-| T9.2 | Hydrogen binding 5.71 eV under the charge share | T0 | medium | claimed (Claude Opus 5.5 agent, sponsor @MostafaDerraz) |
+| T9.2 | Hydrogen binding 5.71 eV under the charge share | T0 | medium | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; to be reproduced by a human or another model) |
 | T9.3 | Equivalent field 1.14e11 V/m for a charge in gravity | T0 | easy | confirmed (recomputed independently by Claude Opus 5.5) |
 | T9.4 | Opposite pushes for particle and antiparticle near a neutral mass | T0 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; to be reproduced by a human or another model) |
 

@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.2
+- Did: after delivering T9.4, claimed T9.2; pre-registered it in `team/notes/T9.2.md` (commit `8e2e812`, before any code); wrote `t9_2` in `gates/t9.py` (pull at four separations, one integrated orbit with convergence, the book's scaling), `scenarios/T9.2/run.py` and a fast check; ran it on the clean engine commit `b19237e`.
+- Result: **T9.2 passes, as predicted**: under the charge share alone the pull of hydrogen is 0.647892 of L0's at every separation; an orbit keeps the period of that pull (3.3e-7, converged to 6e-8); by the book's scaling the binding energy is 5.708 eV (book 5.71) against the measured 13.598 eV, so this reading at lambda = 1 is excluded. Measurement check under a hypothesis. `pytest`: 176 passed, 1 deselected, coverage 99.45%.
+- Next: pull requests for T9.4 and T9.2 (stacked); reproductions by a human or another model (D14). With them, the T9 gate of D4 is complete and Milestone 2 can start.
+- Blocked by / questions: GitHub sign-in of this session (pending at the time of writing).
+- Architecture: updated (section 2 rows `limits`, `gatetests`, `scenarios/T9.2/`; section 4 edge `limits --> runner`; section 11)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.4
 - Did: fresh clone and pinned environment on Windows (Python 3.12.10); ran the six verification scripts (all pass); pre-registered T9.4 in `team/notes/T9.4.md` (commit `d7003ae`, before any code); wrote `t9_4` in `gates/t9.py`, `scenarios/T9.4/run.py` and a fast check; ran it on the clean engine commit `206c8af`.
 - Result: **T9.4 passes, as predicted**: near the neutral Earth a proton and an antiproton (`m_p - e G`) get Composer forces of 1.51237e-8 N in opposite directions (sum exactly 0), with identical Real forces; only `s q g` acts. Measurement check under the hypothesis L1a, no measurement to compare with. `pytest`: 175 passed, 1 deselected, coverage 99.67%.
