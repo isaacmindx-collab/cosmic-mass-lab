@@ -267,7 +267,8 @@ def write_gate_result(outcome: dict, out_root="results", producer: str = "", now
             stamps[name] = build_stamp(load_settings(item), 0.0, run_id, commit)
         else:
             stamps[name] = dict(item.stamp, run_id=run_id)
-            safe = name.replace(" ", "_")
+            # only letters, digits, ".", "-", "=", "," and "_": some systems refuse ":" or "/" in a file name
+            safe = "".join(c if c.isalnum() or c in ".-=," else "_" for c in name)
             with open(folder / f"timeseries-{safe}.csv", "w", newline="", encoding="utf-8") as handle:
                 writer = csv.DictWriter(handle, fieldnames=list(item.timeseries[0]))
                 writer.writeheader()

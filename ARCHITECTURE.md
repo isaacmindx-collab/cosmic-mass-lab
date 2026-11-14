@@ -53,12 +53,12 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | fieldsample | `engine/cosmicmass/fields/sample.py` | E4.2 | implemented | `FieldSample(g, e, B_g, b)` with `E_cal(frame)` and `B_cal(frame)`; the `FieldSolver` interface |
 | fields | `engine/cosmicmass/fields/direct.py` | E2.1 | in-progress | direct-sum field solver `DirectSum`: static `g`, `e` (F1-F2) with Plummer softening, no self-field, uniform backgrounds (U5); `B_g`, `b` from moving bodies (F3-F4, task E2.2) not yet |
 | fieldsfast | `engine/cosmicmass/fields/tree.py` | E2.5 | planned | fast solver for large N (tree or grid), same interface |
-| lawbase | `engine/cosmicmass/laws/base.py` | E4.1 | implemented | `Law` base class, `LawSpec` (reading and L2-L8 options, stamp form), `ForcePair`, registry of laws (`register`, `make_law`) |
+| lawbase | `engine/cosmicmass/laws/base.py` | E4.1 | implemented | `Law` base class, `LawSpec` (reading and L2-L8 options, stamp form), `ForcePair`, registry of laws (`register`, `make_law`); `third_law_residual` (E4.5) |
 | l0 | `engine/cosmicmass/laws/l0.py` | E4.2 | implemented | reference law L0: `Re(mu) dv/dt = Re[mu (E_cal + v x B_cal)]` |
 | l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | reading L1a of the Composer coordinate (hypothesis), with the options sign (L2), strength (L3) and terms (L5); L1b-L1e not yet |
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
-| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); Boris (E3.2) and the inertia readings (E3.4) not yet |
-| environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (the velocity is turned back, the body is not moved, the impulse on each wall is reported); absorbing walls, wrap-around, inflow, heat bath not yet |
+| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); Boris (E3.2) and the inertia readings (E3.4) not yet; option `speed_reference` of the step rule (`absolute`, the default, or `neighbour`, tested in Q4) |
+| environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; wrap-around, absorbing surfaces of bodies, inflow, heat bath not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | in-progress | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined yet), momentum; pressure and temperature not yet |
 | energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
 | runner | `engine/cosmicmass/runner.py` | E7.1 | in-progress | `run(settings) -> RunResult`: the time loop, stop conditions, outputs; `main(argv)` for the command line (E7.3); checkpoints and resuming not yet |
@@ -68,11 +68,15 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | plots | `engine/cosmicmass/analysis/plots.py` | E8.3 | planned | standard figures: Real and Composer planes, drifts, sweeps |
 | tests | `engine/tests/` | P1 | implemented | unit tests for every module (pytest), run in CI with coverage (P2); so far `test_pins.py` (pins of `pyproject.toml` equal `requirements.txt`), `test_import.py`, `test_constants_frame.py` (E1.1), `test_gn.py` (E1.2), `test_gnarray.py` (E1.3), `test_readings_matter.py` (E1.4, E1.5), `test_compendium.py` (E1.6), `test_state_laws.py` (E5.1, E4.1, E4.2), `test_settings.py` (E5.3), `test_fields.py` (E2.1, E2.3, E2.4), `test_integrators.py` (E3.1, E3.3, E6a; one test marked `slow`), `test_runner.py` (E7.1 to E7.3, E8.1, E9), `test_l1a.py` (E4.3, L1a) |
 | gate | `engine/cosmicmass/gates/t0.py` | T0, G1 | implemented | the consistency gate T0.1 to T0.5 as functions (`t0_1` ... `t0_5`, `run_gate`), and `write_gate_result` |
-| limits | `engine/cosmicmass/gates/t9.py` | T9.1, T9.3 | implemented | the measured limits T9.1 and T9.3 under L1a as functions (`t9_1`, `t9_3`) |
-| gatetests | `engine/gates/` | G1 | implemented | fast T0 gate and fast T9.1, T9.3 checks, run by pytest (in CI with the `tests` job of P2) |
+| limits | `engine/cosmicmass/gates/t9.py` | T9.1-T9.4 | implemented | the measured limits T9.1 to T9.4 under L1a as functions (`t9_1`, `t9_2`, `t9_3`, `t9_4`); `t9_2` also integrates one orbit with the runner |
+| gatetests | `engine/gates/` | G1 | implemented | fast T0 gate and fast T9.1 to T9.4 checks, run by pytest (in CI with the `tests` job of P2) |
 | - | `scenarios/T1.4/` | T1.4 (demo) | in-progress | demo of version 0.1.0: hydrogen-like pair under L0 and L1a, exploratory; `run.py` and `figures.py` (SVG, standard library) |
 | - | `scenarios/T9.1/` | T9.1 | implemented | neutron effective charge 9.0e-19 e under L1a |
+| - | `scenarios/T9.2/` | T9.2 | implemented | hydrogen under the charge share (L5c): the pull falls to 0.648 of Coulomb's; binding energy 5.71 eV by the book's scaling, against 13.598 eV |
 | - | `scenarios/T9.3/` | T9.3 | implemented | equivalent field 1.14e11 V/m for a charge in gravity (L5a) |
+| - | `scenarios/T9.4/` | T9.4 | implemented | a proton and an antiproton (`m_p - e G`) near the neutral Earth under L1a: opposite Composer pushes |
+| - | `scenarios/Q/` | Q1-Q3 | implemented | open questions run against their alternatives: third law under L1a, energy candidates of L1a, value of `K` |
+| - | `scenarios/Q4/` | Q4 | implemented | the adaptive step and the frame of description: the current rule against a rule relative to the nearest neighbour |
 | - | `scenarios/T0.1/` | T0.1 | implemented | Earth-moon, hydrogen-like orbit, two protons under L0 |
 | - | `scenarios/T0.2/` | T0.2 | implemented | conservation of `rho_mu`, energy and momentum, 200 bodies in a reflecting box |
 | - | `scenarios/T0.3/` | T0.3 | implemented | angle invariance under L0, six frame angles |
@@ -193,6 +197,7 @@ flowchart TB
     limits --> settings
     limits --> fields
     limits --> gate
+    limits --> runner
     scen --> gate
     gate --> runner
     gate --> settings
@@ -633,6 +638,7 @@ class Law:
     def inertia(self, state: State, frame: Frame) -> np.ndarray: ...
 # ForcePair(real, composer): shape (N, d) each; the force applied is real + composer (composer is 0 under L0)
 def make_law(spec: LawSpec | str) -> Law: ...
+def third_law_residual(law: Law, state: State, solver, frame: Frame) -> dict: ...   # E4.5: pair, residual, force, relative
 
 # settings.py
 def load_settings(source: Path | str | dict) -> Settings: ...
@@ -645,10 +651,12 @@ class Integrator(Protocol):
 # StepContext(law, solver, frame, eta=1e-3, dt_min=0.0, dt_max=inf): acceleration(state) is force / inertia
 #   for moving bodies and zero for fixed or absorbed ones; it remembers the last result, so call
 #   invalidate() after changing a state outside the integrator (for example after a wall acted)
+#   speed_reference="absolute" (default: D10 and D21) or "neighbour" (scenario Q4; not a default)
 
 # environment.py
 class Environment:      # Environment(boundary="open" | "reflecting", lower=None, upper=None)
     def apply(self, state: State, dt: float, rng=None) -> list: ...   # acts in place; one event per wall hit
+    # Environment.collected: {"bodies", "m", "q", "momentum"} taken by absorbing walls; boundary is "open" | "reflecting" | "absorbing"
 
 # runner.py
 def run(settings: Settings, out_root: Path = Path("results")) -> RunResult: ...
@@ -677,6 +685,11 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | T9.2 (`T9.2-hydrogen-share`, stacked on `T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_2`, which uses `runner` (new edge `limits --> runner` in section 4) and the helpers `_pair`, `_relative_track` of `gates/t0.py` (edge `limits --> gate` already there); scenario row `scenarios/T9.2/`; no contract changed |
+| 2026-11-14 | T9.4 (`T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_4` (no existing signature changed); scenario row `scenarios/T9.4/`; no new module, edge or contract |
+| 2026-11-11 | Q4: the step rule and the frame (`Q4-step-frame`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `integrators.py`: `nearest_neighbours` and the option `StepContext.speed_reference` (default unchanged); scenario row `scenarios/Q4/`; section 10: the option written out. No diagram changed |
+| 2026-11-11 | E6a: absorbing walls (`E6a-absorbing-walls`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `environment.py`: boundary `absorbing` and the collector `Environment.collected`; section 10: the collector and the three boundary names written out; the run summary gains `absorbed`. No diagram changed |
+| 2026-11-10 | E4.5, T9.4 and the question scenarios Q1-Q3 (`E4.5-T9.4`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/base.py` gains `third_law_residual`; `gates/t9.py` gains `t9_4`; scenario rows `scenarios/T9.4/` and `scenarios/Q/`; section 10: signature of `third_law_residual` added; no diagram changed |
 | 2026-11-11 | UI1, first version (`UI1-web-universe`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `simulator/web/` in progress: web worker running the unchanged engine in Pyodide, bridge, page; nodes `UI` and `webui` no longer planned; test `engine/tests/test_web_universe.py`. No engine module or contract changed |
 | 2026-11-10 | D21 scenarios (`D21-scenarios`, stacked on `T0-gate`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | scenario row `scenarios/D21/` (D21.1-D21.4); no engine module, diagram or contract changed |
 | 2026-11-10 | MVP-10: demo and release notes (`MVP-demo`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | scenario row `scenarios/T1.4/` (in progress: the demo only); package version 0.1.0; no module, diagram or contract changed |

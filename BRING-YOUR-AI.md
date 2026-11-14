@@ -111,8 +111,10 @@ We are ending this session. Before you stop:
 3. If you changed any code: update ARCHITECTURE.md (module registry, Mermaid
    diagrams, interface contracts, change log) and run
    python tools/check_architecture.py --base origin/main
-4. If we will not continue, fill in the Handoff section and say so.
-5. List every file you changed, and anything you could not verify.
+4. Put your open questions on team/QUESTIONS.md, and answer one open question
+   there if you can (with evidence and your signature).
+5. If we will not continue, fill in the Handoff section and say so.
+6. List every file you changed, and anything you could not verify.
 ```
 
 Then **you** commit and push the branch (or let your coding agent do it).

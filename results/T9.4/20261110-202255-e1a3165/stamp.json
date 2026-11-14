@@ -1,0 +1,130 @@
+{
+  "cases": {
+    "antiproton": {
+      "engine_commit": "e1a3165",
+      "environment": {
+        "mpmath": "1.3.0",
+        "numpy": "1.26.4",
+        "python": "3.12.3",
+        "sympy": "1.14.0"
+      },
+      "kind": "measurement-check",
+      "law": {
+        "B_cal": "off",
+        "direction": "radial",
+        "id": "L1a",
+        "inertia": "Re",
+        "lambda": 1.0,
+        "range": "1/r^2",
+        "sign": "+",
+        "terms": "all"
+      },
+      "matter": [
+        {
+          "m": 5.972e+24,
+          "n": 1,
+          "name": "Earth",
+          "q": 0.0
+        },
+        {
+          "m": 1.67262192e-27,
+          "n": 1,
+          "name": "antiproton",
+          "q": -1.602176634e-19
+        }
+      ],
+      "numerics": {
+        "adaptive": true,
+        "dt_initial": null,
+        "dt_max": null,
+        "dt_min": 0.0,
+        "eta": 0.001,
+        "integrator": "verlet",
+        "record_every": null,
+        "seed": 0,
+        "softening": 0.0,
+        "softening_fraction": 0.001,
+        "steps": 0,
+        "t_end": null
+      },
+      "preregistered": true,
+      "producer": "Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz)",
+      "run_id": "20261110-202255-e1a3165",
+      "scenario": "T9.4",
+      "t0_status": "not run",
+      "universe": {
+        "background": "none",
+        "boundary": "open",
+        "dimension": 2,
+        "phi_bar_deg": 79.86,
+        "units": "SI"
+      }
+    },
+    "proton": {
+      "engine_commit": "e1a3165",
+      "environment": {
+        "mpmath": "1.3.0",
+        "numpy": "1.26.4",
+        "python": "3.12.3",
+        "sympy": "1.14.0"
+      },
+      "kind": "measurement-check",
+      "law": {
+        "B_cal": "off",
+        "direction": "radial",
+        "id": "L1a",
+        "inertia": "Re",
+        "lambda": 1.0,
+        "range": "1/r^2",
+        "sign": "+",
+        "terms": "all"
+      },
+      "matter": [
+        {
+          "m": 5.972e+24,
+          "n": 1,
+          "name": "Earth",
+          "q": 0.0
+        },
+        {
+          "m": 1.67262192e-27,
+          "n": 1,
+          "name": "proton",
+          "q": 1.602176634e-19
+        }
+      ],
+      "numerics": {
+        "adaptive": true,
+        "dt_initial": null,
+        "dt_max": null,
+        "dt_min": 0.0,
+        "eta": 0.001,
+        "integrator": "verlet",
+        "record_every": null,
+        "seed": 0,
+        "softening": 0.0,
+        "softening_fraction": 0.001,
+        "steps": 0,
+        "t_end": null
+      },
+      "preregistered": true,
+      "producer": "Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz)",
+      "run_id": "20261110-202255-e1a3165",
+      "scenario": "T9.4",
+      "t0_status": "not run",
+      "universe": {
+        "background": "none",
+        "boundary": "open",
+        "dimension": 2,
+        "phi_bar_deg": 79.86,
+        "units": "SI"
+      }
+    }
+  },
+  "engine_commit": "e1a3165",
+  "kind": "measurement-check",
+  "preregistered": true,
+  "producer": "Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz)",
+  "run_id": "20261110-202255-e1a3165",
+  "scenario": "T9.4"
+}

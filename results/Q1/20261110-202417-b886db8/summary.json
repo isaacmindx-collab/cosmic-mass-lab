@@ -1,0 +1,207 @@
+{
+  "cases": {
+    "Earth, proton; L0": {
+      "composer_residual": 0.0,
+      "largest_force": 1.3605898496015842e-26,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "Earth, proton; L1a, -2 cos q E": {
+      "composer_residual": 0.0,
+      "largest_force": 1.3605898496015842e-26,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "Earth, proton; L1a, -m E/s": {
+      "composer_residual": 1.5123686890912403e-08,
+      "largest_force": 1.5123686890912403e-08,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 1.5123686890912403e-08,
+      "predicted_residual_visible_in_the_total_force": true,
+      "relative_residual": 1.0,
+      "residual": 1.5123686890912403e-08
+    },
+    "Earth, proton; L1a, all": {
+      "composer_residual": 0.0,
+      "largest_force": 1.5123686890912403e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "Earth, proton; L1a, s q g": {
+      "composer_residual": 1.5123686890912403e-08,
+      "largest_force": 1.5123686890912403e-08,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 1.5123686890912403e-08,
+      "predicted_residual_visible_in_the_total_force": true,
+      "relative_residual": 1.0,
+      "residual": 1.5123686890912403e-08
+    },
+    "proton, electron; L0": {
+      "composer_residual": 0.0,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "proton, electron; L1a, -2 cos q E": {
+      "composer_residual": 0.0,
+      "largest_force": 1.4947371061557647e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "proton, electron; L1a, -m E/s": {
+      "composer_residual": 2.0766734102987856e-26,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 2.0766734102987856e-26,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "proton, electron; L1a, all": {
+      "composer_residual": 0.0,
+      "largest_force": 1.4947371061557647e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "proton, electron; L1a, s q g": {
+      "composer_residual": 2.0766734102987856e-26,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 2.0766734102987856e-26,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "proton, neutron; L0": {
+      "composer_residual": 0.0,
+      "largest_force": 1.869818794551395e-44,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 2.662510526044492e-16,
+      "residual": 4.9784122222889134e-60
+    },
+    "proton, neutron; L1a, -2 cos q E": {
+      "composer_residual": 0.0,
+      "largest_force": 1.869818794551395e-44,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 2.662510526044492e-16,
+      "residual": 4.9784122222889134e-60
+    },
+    "proton, neutron; L1a, -m E/s": {
+      "composer_residual": 2.0784040098358262e-26,
+      "largest_force": 2.0784040098358262e-26,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 2.0784040098358265e-26,
+      "predicted_residual_visible_in_the_total_force": true,
+      "relative_residual": 1.0,
+      "residual": 2.0784040098358262e-26
+    },
+    "proton, neutron; L1a, all": {
+      "composer_residual": 2.8698592549372254e-42,
+      "largest_force": 2.0784040098358265e-26,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 1.3807995179743308e-16,
+      "residual": 2.8698592549372254e-42
+    },
+    "proton, neutron; L1a, s q g": {
+      "composer_residual": 2.0784040098358265e-26,
+      "largest_force": 2.0784040098358265e-26,
+      "obeys_third_law": false,
+      "pass": true,
+      "predicted_residual": 2.0784040098358265e-26,
+      "predicted_residual_visible_in_the_total_force": true,
+      "relative_residual": 1.0,
+      "residual": 2.0784040098358265e-26
+    },
+    "two protons; L0": {
+      "composer_residual": 0.0,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "two protons; L1a, -2 cos q E": {
+      "composer_residual": 0.0,
+      "largest_force": 1.4947371061557647e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "two protons; L1a, -m E/s": {
+      "composer_residual": 0.0,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "two protons; L1a, all": {
+      "composer_residual": 0.0,
+      "largest_force": 1.4947371061557647e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    },
+    "two protons; L1a, s q g": {
+      "composer_residual": 0.0,
+      "largest_force": 2.307077550778355e-08,
+      "obeys_third_law": true,
+      "pass": true,
+      "predicted_residual": 0.0,
+      "predicted_residual_visible_in_the_total_force": false,
+      "relative_residual": 0.0,
+      "residual": 0.0
+    }
+  },
+  "explanation": "Q1 under L0 and the hypothesis L1a: every case meets its criterion.",
+  "scenario": "Q1",
+  "verdict": "pass"
+}

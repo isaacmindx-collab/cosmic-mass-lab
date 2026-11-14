@@ -25,8 +25,8 @@
       "steps_3d": 6284
     }
   },
-  "explanation": "Planar motion in 2D gives the same orbits as the full 3D run to rounding, so D21's convention (1) loses nothing. A field falling as 1/r would need a 2D constant of gravitation that the compendium does not contain (mathematics, not run).",
+  "explanation": "Supports D21 (1). Planar motion in 2D gives the same orbits as the full 3D run to rounding, so D21's convention (1) loses nothing. A field falling as 1/r would need a 2D constant of gravitation that the compendium does not contain (mathematics, not run).",
   "prediction": "periods and drifts agree to rounding (relative difference below 1e-9)",
   "scenario": "D21.1",
-  "verdict": "supports D21 (1)"
+  "verdict": "finding"
 }
