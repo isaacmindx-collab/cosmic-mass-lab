@@ -33,7 +33,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | P4 | JSON schemas for `stamp.json` and `summary.json` | P1 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
 | P5 | Scenario scaffold `tools/new_scenario.py` | P1, P4 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
 | P6 | Branch protection, labels, description and topics | P2 | maintainer | open |
-| P7 | Ruff lint and format; check the Codespaces dev container | P1 | easy | open |
+| P7 | Ruff lint and format; check the Codespaces dev container | P1 | easy | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; lint in CI; the first format pass waits for D25) |
 
 ## Milestone 1: the engine and the gates
 

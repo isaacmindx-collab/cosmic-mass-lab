@@ -99,7 +99,7 @@ def changed_files(base: str):
                              cwd=ROOT, capture_output=True, text=True)
     if out.returncode != 0:
         raise RuntimeError(out.stderr.strip())
-    return [l.strip() for l in out.stdout.splitlines() if l.strip()]
+    return [line.strip() for line in out.stdout.splitlines() if line.strip()]
 
 
 def main() -> int:

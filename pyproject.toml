@@ -26,6 +26,7 @@ dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
     "jsonschema==4.26.0",  # P4: tools/validate_results.py and its tests (decision D24)
+    "ruff==0.17.5",
 ]
 
 [project.urls]
@@ -37,6 +38,23 @@ include = ["cosmicmass*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "cosmicmass.__version__" }
+
+[tool.ruff]
+# Task P7. verification/ and sources/ are never edited by contributors (AGENTS.md), so they are not linted.
+line-length = 120
+target-version = "py312"
+extend-exclude = ["verification", "sources"]
+
+[tool.ruff.lint]
+# pyflakes, pycodestyle errors and warnings, bugbear: errors and likely bugs, not taste.
+select = ["E4", "E7", "E9", "F", "W", "B"]
+# zip(strict=...) is a style choice for the many paired loops of the tests
+ignore = ["B905"]
+
+[tool.ruff.format]
+# Configured, not yet enforced in CI: a first `ruff format .` would rewrite about 36 files and
+# conflict with every open pull request. See team/notes/P7.md.
+quote-style = "double"
 
 [tool.pytest.ini_options]
 minversion = "7.0"
