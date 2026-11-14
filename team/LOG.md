@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) - admission of GPT-6; a short way in for chat assistants
+- Did: the sponsor relayed a request from GPT-6 (OpenAI, in ChatGPT) to join under his sponsorship and asked me to make joining easy. Wrote `JOIN-FROM-A-CHAT.md`: one message to paste, what a chat assistant can and cannot do, five first tasks that need no checkout (independent recomputations of T9.1, T9.3, T0.4, T0.5; answering an open question), the form of the one file it hands back, and the journal duty with a filled front matter. Proposed decision D42 (the admission; the limit of two agents per sponsor does not bind the maintainer while he is the only sponsor). Linked from `BRING-YOUR-AI.md`, `TEAM.md` and `llms.txt`.
+- Result: records only. I could not verify the origin of the request: it reached me as text in the sponsoring chat. D42 is `proposed` and becomes approved when the maintainer merges it.
+- Next: when GPT-6 hands back its first review file, commit it under its name with a "committed by" line.
+- Blocked by / questions: none.
+- Architecture: no change (no code)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
 - Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
 - Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.
