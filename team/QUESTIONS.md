@@ -15,7 +15,6 @@
 
 | # | Question | Why it matters | Who decides | Where the details are | Asked |
 |---|---|---|---|---|---|
-| 1 | **Approve the energy of L1a?** Candidate: `kinetic - G sum [Re(mu_a mu_b) + lambda s Com(mu_a mu_b)] / r`. Scenario Q2 found it conserved to 4.1e-7 or better on four runs, while the L0 energy is not. It is not in the compendium. | Proposed as decision D23. Until it is approved, `energy.py` reports the Composer energy as `null`, the Composer part of E9 is blocked, and the survival table T2 cannot classify L1a as conserving or not. | physics lead | `team/notes/Q.md` (Q1, Q2); `results/Q2/` | 2026-11-10 |
 | 2 | **Approve the law plug-in L1a?** In particular the three terms of option L5 and their signs: `s q g`; `s m e = -m E / s`; `2 s^2 cos(phi_bar) q e = -2 cos(phi_bar) q E`. | `TEAM.md`, section 2.1: every law plug-in needs the physics lead's approval. T9.1, T9.3, T9.4 and the demo all rest on it. | physics lead | `engine/cosmicmass/laws/l1.py`; `team/notes/T9.md` | 2026-11-10 |
 | 3 | **What does "radial" mean for L1a (option L4)?** The engine takes it as "along the field at the body". For two bodies this is the line joining them; for many bodies it is the direction of the total field. | A definition, not something a run can measure. It fixes what the other directions of L4 (perpendicular, torque, along the velocity) will be measured against. | physics lead | `team/notes/T9.md`, open questions | 2026-11-10 |
 | 5 | **Add a plotting library to the pinned environment?** | The figures of the demo and of the gallery are plain SVG written by hand, because there is none. The standard plots of E8.3 will need one. | verification lead | `team/notes/T1.4.md`; pull request #15 | 2026-11-10 |
@@ -25,9 +24,6 @@
 | 9 | **Which chapter holds the measured limits?** Decision D4 and `docs/05` say "the book's Chapter 10"; in the book source of this repository the limits (9.0e-19 e, 5.71 eV, 1.14e11 V/m) are in Chapter 9. | A reference to correct in D4 and `docs/05`, or a note that the chapters were renumbered. | maintainer | `team/notes/T9.md`, open questions | 2026-11-10 |
 | 10 | **How should "binding energy" be defined for T9.2** (hydrogen, 5.71 eV under the charge share)? The candidate of question 1 is the natural one. | T9.2 is one of the measured limits of D4 and is still open. | physics lead | `docs/05`, T9.2; `team/notes/Q.md` | 2026-11-10 |
 | 11 | **E2.2 needs a derivation:** the second field `B_cal` of a moving point body in the slow-body form. The compendium gives the field equations F3-F4, not the field of a moving point source. | Blocks E2.2, the Boris push (E3.2), option L6, and the tests T5. | physics lead | `docs/WORK-PLAN.md`, E2.2 | 2026-11-10 |
-| 12 | **What does the field do across a wrap-around boundary (U4)?** Three candidates: positions wrap and forces are those of open space; each pair interacts through its nearest image; a full periodic sum. | Wrap-around is the one wall of E6a not delivered. The first candidate breaks energy conservation at every crossing; the choice changes every result in a periodic box. A run can compare the candidates, so this should become a scenario once the alternatives are agreed. | physics lead, numerics lead | `team/notes/E6a.md` | 2026-11-11 |
-| 13 | **Absorbing surfaces of bodies (T4.3):** a planet that collects what falls on it needs a radius, which a body does not have (`State` holds `m`, `q`, `x`, `v`). Should `State` gain a `radius` column, and should the collected momentum move the planet? | Needed by T4.3 (self-charging planets). It changes the `State` contract of `ARCHITECTURE.md`, section 10. | engine lead | `team/notes/E6a.md` | 2026-11-11 |
-| 24 | **Extend `State` with optional columns for L1e and the spin (L4 "torque")?** L1e reads `mu a = mu (E_cal + v x B_cal)` as a General Number equation, so `a = E_cal + v x B_cal` has a Composer coordinate: the body moves in two coordinates and needs a Composer position and velocity (`xc`, `vc`). The direction "torque (spin)" of L4 turns the Composer force into a spin, which needs a spin per body. Question 13 asks the same for a `radius`. | E4.3 (L1e) and E4.4 (L4 torque) cannot be built without it; the S2 exit gate asks for every E row to be implemented. It changes the `State` contract (`ARCHITECTURE.md`, section 10). | engine lead, maintainer | `team/notes/E4.md` | 2026-11-14, Claude Opus 5.5 in OpenCode (sponsor @MostafaDerraz) |
 
 ## Proposed answers
 
@@ -88,6 +84,10 @@ Not questions, but things only the maintainer can do or should decide:
 
 | # | Question | Answer | Date |
 |---|---|---|---|
+| 24 | Extend `State` with optional columns for L1e and the spin? | Yes, all four (`xc`, `vc`, `spin`, `radius`), with defaults: decision D37. | 2026-11-14 |
+| 13 | Absorbing surfaces of bodies: should `State` gain a radius? | Yes, the optional column `radius` of D37. | 2026-11-14 |
+| 12 | The field across a wrap-around boundary? | The nearest image, with its stated limit for `1/r^2`: decision D36. | 2026-11-14 |
+| 1 | Approve the energy of L1a? | Yes, with its scope (all terms, radial, inertia `Re`, no `B_cal`): decision D23 approved. | 2026-11-14 |
 | 23 | Adopt the team chat? | Yes: decision D30. Read your inbox at the start of every session. | 2026-11-14 |
 | 14 | Amend convention 4 of D21 (the adaptive step)? | Yes: the pair guard of Q5 (rule C), decision D29. Implementation in `integrators.py`: task E3. | 2026-11-14 |
 | 22 | Who may confirm a result of an agent? | An agent of a different model may, even with the same sponsor, while the maintainer is the only sponsor; labelled "confirmed (agent, same sponsor)". Decision D27. | 2026-11-14 |

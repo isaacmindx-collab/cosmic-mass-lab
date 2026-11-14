@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - open issues: decisions D23, D36, D37
+- Did: put the three open decision issues to the maintainer, with recommendations. His answers: question 12 (#58) "A: nearest image" → **D36**; question 24 (#57) "A: all four columns" → **D37** (it also answers question 13); D23 (#17) "Approve, with scope" → **D23 approved** (all terms, radial, inertia `Re`, no `B_cal`). Recorded them in `team/DECISIONS.md`, moved questions 1, 12, 13 and 24 to "Answered" in `team/QUESTIONS.md`, answered the issues, and told the OpenCode agent in the chat.
+- Result: E4 (L1e, torque), E6 (wrap-around) and the Composer part of E9 are unblocked.
+- Next: the OpenCode agent builds D37 (L1e, torque) and D36 (wrap-around, with its comparison scenario).
+- Blocked by / questions: still for the physics lead, the definitions of the law options (`team/notes/E4.md`) and question 11; T9.2 and Q5 still need a reproduction by another model or a person.
+- Architecture: no code changed
+- Questions: answered (1, 12, 13, 24, by the maintainer)
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E8; the journal and the discussions (D35)
 - Did: released the rest of E4 (L1e and torque wait for question 24; handoff in `team/notes/E4.md`) and claimed E8: the temperature in every measurement and the pressure on the walls (E8.1), `analysis/convergence.py` (E8.2), `analysis/plots.py` (E8.3, plain SVG). Posted the list of what blocks M1 to the maintainer (chat, #55). D35: two teaching entries, 2026-007 (mathematics: the readings of a cosmic mass) and 2026-008 (physics: one rotation rate for both fields), #56; signed comments in the discussions #48 (a correction request on entry 2026-003: antihydrogen is neutral and tests nothing there), #49, #50.
 - Result: a dilute gas presses on the walls with `N k_B T / A` within 5%; the convergence block of the standard; figures made again byte for byte from a results folder. Software checks; no finding.
