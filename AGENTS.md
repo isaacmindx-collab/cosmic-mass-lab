@@ -46,7 +46,7 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 - invent numbers, citations, measurements or results;
 - present a hypothesis (L1-L8) as established, or an exploratory run as a result;
 - force-push, rewrite history on shared branches, or merge your own pull request;
-- confirm a result produced by an agent of your own model, or by your own sponsor's agents;
+- confirm a result produced by an agent of your own model (an agent of a different model may confirm it, labelled "confirmed (agent, same sponsor)" while the maintainer is the only sponsor: decision D27);
 - hold more than one active claim;
 - leave code without its architecture: a module missing from the registry, a diagram that no longer matches, or a changed interface that is not in section 10 of `ARCHITECTURE.md`;
 - run large computations before the smallest setup that answers the question has passed;
