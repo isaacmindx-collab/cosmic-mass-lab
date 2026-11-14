@@ -10,13 +10,13 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from .environment import Environment
+from .environment import K_B, Environment, HeatBath, Inflow
 from .frame import DEFAULT_PHI_BAR_DEG, Frame
 from .laws import Law, LawSpec, make_law
 from .matter import PRESETS, CosmicMass
 from .state import State
 
-__all__ = ["Settings", "SettingsError", "load_settings"]
+__all__ = ["Settings", "SettingsError", "load_settings", "make_inflow", "make_heat_bath"]
 
 # decision D10: velocity Verlet, adaptive step, softening 1e-3 of the smallest separation
 _NUMERICS = {"integrator": "verlet", "adaptive": True, "dt_initial": None, "softening": None,
@@ -24,7 +24,8 @@ _NUMERICS = {"integrator": "verlet", "adaptive": True, "dt_initial": None, "soft
              "speed_reference": "absolute",
              "steps": None, "t_end": None, "record_every": None, "seed": 0}
 _UNIVERSE = {"phi_bar_deg": None, "dimension": 2, "units": "SI", "boundary": "open", "background": "none",
-             "box": None}
+             "box": None, "inflow": None, "heat_bath": None}
+_INFLOW = {"preset", "name", "m", "q", "rate", "velocity", "face"}
 _TOP = {"scenario", "universe", "law", "bodies", "numerics", "kind", "preregistered", "producer"}
 _BODY = {"preset", "name", "m", "q", "x", "v", "fixed"}
 
@@ -86,6 +87,55 @@ def _body(entry: dict, index: int, dimension: int, units: str):
     return body, vectors[0], vectors[1], bool(entry.get("fixed", False))
 
 
+def _inflow(universe: dict) -> dict:
+    """Setting U7, normalised: `{"name", "m", "q", "rate", "velocity", "face": {"axis", "side"}}`."""
+    entry, where = universe["inflow"], "universe.inflow"
+    _known(entry, _INFLOW, where)
+    if universe["boundary"] == "open":
+        raise SettingsError(f"'{where}': the inflow enters a box; set 'universe.boundary' and 'universe.box'")
+    if "preset" in entry:
+        if universe["units"] != "SI" or "m" in entry or "q" in entry:
+            raise SettingsError(f"'{where}': give a 'preset' (SI only), or both 'm' and 'q'")
+        body = PRESETS.get(entry["preset"])
+        if body is None:
+            raise SettingsError(f"'{where}.preset': unknown preset {entry['preset']!r}; known: {sorted(PRESETS)}")
+        m, q, name = body.m, body.q, entry.get("name", body.name)
+    elif "m" in entry and "q" in entry:
+        m, q, name = float(entry["m"]), float(entry["q"]), str(entry.get("name", ""))
+    else:
+        raise SettingsError(f"'{where}': give a 'preset', or both 'm' and 'q'")
+    face = entry.get("face")
+    _known(face if isinstance(face, dict) else 0, ("axis", "side"), f"{where}.face")
+    out = {"name": name, "m": m, "q": q, "rate": entry.get("rate"), "velocity": entry.get("velocity"),
+           "face": {"axis": face.get("axis"), "side": face.get("side")}}
+    try:
+        make_inflow(out, universe["box"])
+    except (ValueError, TypeError) as exc:
+        raise SettingsError(f"'{where}': {exc}") from None
+    out["rate"], out["velocity"] = float(out["rate"]), [float(c) for c in out["velocity"]]
+    return out
+
+
+def _heat_bath(entry, units: str) -> dict:
+    _known(entry, ("temperature", "collision_rate"), "universe.heat_bath")
+    try:
+        HeatBath(entry.get("temperature"), entry.get("collision_rate"), K_B[units])
+    except (ValueError, TypeError):
+        raise SettingsError("'universe.heat_bath' needs a positive 'temperature' and a positive "
+                            "'collision_rate'") from None
+    return {"temperature": float(entry["temperature"]), "collision_rate": float(entry["collision_rate"])}
+
+
+def make_inflow(spec: dict, box: dict, t0: float = 0.0) -> Inflow:
+    """The `Inflow` of a normalised inflow block and the box, counting from `t0`."""
+    return Inflow(spec["m"], spec["q"], spec["rate"], spec["velocity"], spec["face"]["axis"], spec["face"]["side"],
+                  box["lower"], box["upper"], spec.get("name", ""), t0=t0)
+
+
+def make_heat_bath(spec: dict, units: str) -> HeatBath:
+    return HeatBath(spec["temperature"], spec["collision_rate"], K_B[units])
+
+
 def load_settings(source) -> Settings:
     """Load settings from a path to a JSON file, or from a dictionary."""
     data = source if isinstance(source, dict) else json.loads(Path(source).read_text(encoding="utf-8"))
@@ -129,6 +179,10 @@ def load_settings(source) -> Settings:
         except (ValueError, TypeError, AssertionError):
             raise SettingsError(f"'universe.box' needs 'lower' and 'upper', lists of {universe['dimension']} "
                                 "numbers with lower < upper") from None
+    if universe["inflow"] is not None:
+        universe["inflow"] = _inflow(universe)
+    if universe["heat_bath"] is not None:
+        universe["heat_bath"] = _heat_bath(universe["heat_bath"], universe["units"])
 
     try:
         law_spec = LawSpec.from_dict(data.get("law", {"id": "L0"}))

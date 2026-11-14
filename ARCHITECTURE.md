@@ -58,7 +58,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | reading L1a of the Composer coordinate (hypothesis), with the options sign (L2), strength (L3) and terms (L5); L1b-L1e not yet |
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
 | integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); Boris (E3.2) and the inertia readings (E3.4) not yet; option `speed_reference` of the step rule (`absolute`, the default, or `neighbour`, tested in Q4) |
-| environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; wrap-around, absorbing surfaces of bodies, inflow, heat bath not yet |
+| environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | in-progress | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined yet), momentum; pressure and temperature not yet |
 | energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
 | runner | `engine/cosmicmass/runner.py` | E7.1 | in-progress | `run(settings) -> RunResult`: the time loop, stop conditions, outputs; `main(argv)` for the command line (E7.3); checkpoints and resuming not yet |
@@ -392,8 +392,21 @@ classDiagram
         +next_dt(state, context) float
     }
     class Environment {
+        +Inflow inflow
+        +HeatBath heat_bath
         +apply(state, dt, rng) list
     }
+    class Inflow {
+        +int added
+        +apply(state, rng) dict
+    }
+    class HeatBath {
+        +float temperature
+        +int collisions
+        +apply(state, dt, rng) dict
+    }
+    Environment --> Inflow
+    Environment --> HeatBath
     class Diagnostics {
         +measure(state, fields) dict
     }
@@ -669,8 +682,14 @@ class Integrator(Protocol):
 #   speed_reference="absolute" (default: D10 and D21) or "neighbour" (scenario Q4; not a default)
 
 # environment.py
-class Environment:      # Environment(boundary="open" | "reflecting", lower=None, upper=None)
-    def apply(self, state: State, dt: float, rng=None) -> list: ...   # acts in place; one event per wall hit
+class Environment:      # Environment(boundary="open" | "reflecting" | "absorbing", lower=None, upper=None,
+                        #             inflow: Inflow | None = None, heat_bath: HeatBath | None = None)   (E6b: additions)
+    def apply(self, state: State, dt: float, rng=None) -> list: ...   # acts in place: walls, then inflow, then bath
+    # events: walls {"wall", "bodies", "impulse"[, "absorbed"]}; {"inflow": {"bodies", "m", "q"}}; {"heat_bath": {"bodies"}}
+    # rng (a seeded generator) is required when there is an inflow or a heat bath; the runner passes default_rng(seed)
+class Inflow:           # Inflow(m, q, rate, velocity, axis, side, lower, upper, name="", t0=0.0); appends bodies to the state
+class HeatBath:         # HeatBath(temperature, collision_rate, k_b)
+def kinetic_temperature(state, k_b) -> float: ...   # sum m v^2 / (d N k_B) over alive, moving bodies
     # Environment.collected: {"bodies", "m", "q", "momentum"} taken by absorbing walls; boundary is "open" | "reflecting" | "absorbing"
 
 # runner.py
@@ -711,6 +730,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E6b (`E6b-inflow-heat-bath`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `environment.py`: `Inflow`, `HeatBath`, `kinetic_temperature`, `K_B`; `Environment` takes them as optional arguments (addition, no existing call changed); settings: `universe.inflow` and `universe.heat_bath`; runner: one seeded generator for the environment, summary `inflow` and `heat_bath`, a `temperature` column with a bath, no per-body columns with an inflow; stamp and `engine/schemas/stamp.schema.json`: the two blocks. Section 5: the two classes; section 10: their signatures |
 | 2026-11-14 | P7 (`P7-ruff-devcontainer`, stacked on `P5-scenario-scaffold`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | section 9: new CI job `lint` (`ruff check`); lint fixes without change of behaviour: unused imports in `gates/t9.py`, `engine/tests/test_runner.py`, `scenarios/D21/run.py`, a variable name in `tools/check_architecture.py`. No module, edge or contract changed |
 | 2026-11-14 | P5 (`P5-scenario-scaffold`, stacked on `P4-result-schemas`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `tools/new_scenario.py` implemented (node `scaffold` no longer planned); section 4: the scaffold writes files that use `settings` and become a `scen` (dotted edges: it does not import them); section 10: its signatures (additions) |
 | 2026-11-14 | P4 (`P4-result-schemas`, stacked on `T9.2-hydrogen-share`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `engine/schemas/` (node `schemas`) and `tools/validate_results.py` (node `validate`) in section 4, with edges `tests --> validate --> schemas`; section 10: the validator's signatures (additions); `jsonschema==4.26.0` pinned (D13). No engine module or contract changed |

@@ -18,10 +18,10 @@ import numpy as np
 
 from .constants import SI, scaled
 from .diagnostics import Diagnostics, drifts
-from .environment import Environment
+from .environment import Environment, kinetic_temperature
 from .fields import DirectSum, smallest_separation
 from .integrators import StepContext, VelocityVerlet
-from .settings import Settings, SettingsError, load_settings
+from .settings import Settings, SettingsError, load_settings, make_heat_bath, make_inflow
 from .stamp import build_stamp, engine_commit, make_run_id, write_results
 from .state import State
 
@@ -39,11 +39,13 @@ class RunResult:
     timeseries: list
 
 
-def _row(step: int, dt: float, measured: dict, state: State) -> dict:
+def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True, k_b: float | None = None) -> dict:
     row = {"step": step, "t": measured["t"], "dt": dt, "kinetic": measured["kinetic"],
            "energy_re": measured["energy_re"], "mass": measured["mass"], "charge": measured["charge"]}
     row.update({f"p{k}": p for k, p in enumerate(measured["momentum"])})
-    if state.n <= _MAX_BODIES_IN_TIMESERIES:
+    if k_b is not None:  # a heat bath: the temperature of the moving bodies
+        row["temperature"] = kinetic_temperature(state, k_b)
+    if bodies and state.n <= _MAX_BODIES_IN_TIMESERIES:  # not with inflow: the number of bodies grows
         for i in range(state.n):
             row.update({f"x{i}_{k}": float(c) for k, c in enumerate(state.x[i])})
             row.update({f"v{i}_{k}": float(c) for k, c in enumerate(state.v[i])})
@@ -68,7 +70,11 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
     background = None if universe["background"] == "none" else universe["background"]
     solver = DirectSum(constants=constants, softening=softening, background=background)
     box = universe.get("box") or {}
-    environment = Environment(universe["boundary"], box.get("lower"), box.get("upper"))
+    inflow = make_inflow(universe["inflow"], box, t0=state.t) if universe.get("inflow") else None
+    bath = make_heat_bath(universe["heat_bath"], universe["units"]) if universe.get("heat_bath") else None
+    environment = Environment(universe["boundary"], box.get("lower"), box.get("upper"), inflow=inflow, heat_bath=bath)
+    rng = np.random.default_rng(num["seed"])  # every random draw of the run (D13: the seed is in the stamp)
+    columns = {"bodies": inflow is None, "k_b": bath.k_b if bath is not None else None}
     ctx = StepContext(settings.make_law(), solver, settings.frame, eta=num["eta"], dt_min=num["dt_min"],
                       speed_reference=num["speed_reference"],
                       dt_max=np.inf if num["dt_max"] is None else num["dt_max"])
@@ -77,7 +83,8 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
 
     every = num.get("record_every") or (max(1, num["steps"] // 1000) if num["steps"] else 100)
     first = diagnostics.measure(state)
-    rows, step, dt, wall_hits = [_row(0, 0.0, first, state)], 0, 0.0, 0
+    rows, step, dt, wall_hits = [_row(0, 0.0, first, state, **columns)], 0, 0.0, 0
+    temperatures = []  # with a heat bath: the temperature after every step
     wall_impulse = np.zeros(state.dimension)  # momentum given to the walls so far
     t_end = np.inf if num["t_end"] is None else num["t_end"]
     max_steps = np.inf if num["steps"] is None else num["steps"]
@@ -89,20 +96,24 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         if last_step:
             state.t = float(t_end)  # end exactly on t_end
         step += 1
-        events = environment.apply(state, dt)
+        events = environment.apply(state, dt, rng)
         if events:
-            wall_hits += sum(event["bodies"] for event in events)
             for event in events:
+                if "wall" not in event:  # inflow and heat bath: counted by the environment
+                    continue
+                wall_hits += event["bodies"]
                 if "absorbed" in event:  # an absorbing wall takes the whole momentum of the body
                     wall_impulse += event["absorbed"]["momentum"]
                 else:
                     wall_impulse[event["wall"][0]] += event["impulse"]
             ctx.invalidate()
+        if bath is not None:
+            temperatures.append(kinetic_temperature(state, bath.k_b))
         if step % every == 0:
-            rows.append(_row(step, dt, diagnostics.measure(state), state))
+            rows.append(_row(step, dt, diagnostics.measure(state), state, **columns))
     last = diagnostics.measure(state)
     if rows[-1]["step"] != step:
-        rows.append(_row(step, dt, last, state))
+        rows.append(_row(step, dt, last, state, **columns))
 
     with_walls = dict(last, momentum=[p + w for p, w in zip(last["momentum"], wall_impulse)])
     summary = {
@@ -117,6 +128,13 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         "wall_impulse": [float(p) for p in wall_impulse],
         "absorbed": {"bodies": environment.collected["bodies"], "m": environment.collected["m"],
                      "q": environment.collected["q"], "alive_at_the_end": int(state.alive.sum())},
+        # E6b: what entered (mass and charge drifts include it) and what the heat bath did
+        "inflow": None if inflow is None else {"bodies": inflow.added, "m": inflow.added * inflow.m,
+                                               "q": inflow.added * inflow.q},
+        "heat_bath": None if bath is None else {
+            "temperature": bath.temperature, "collisions": bath.collisions,
+            "temperature_mean_second_half": float(np.mean(temperatures[len(temperatures) // 2:]))
+            if temperatures else None},
         # momentum of the bodies plus the momentum they gave to the walls: conserved with reflecting walls
         "momentum_with_walls_drift": drifts(first, with_walls)["momentum"],
         "convergence": None,  # filled by the convergence helper (E8.2), not by a single run

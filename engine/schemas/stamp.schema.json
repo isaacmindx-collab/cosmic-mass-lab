@@ -66,6 +66,35 @@
           "required": ["lower", "upper"],
           "additionalProperties": false,
           "properties": {"lower": {"$ref": "#/$defs/vector"}, "upper": {"$ref": "#/$defs/vector"}}
+        },
+        "inflow": {
+          "type": "object",
+          "description": "Setting U7 (E6b), as normalised by settings.py",
+          "required": ["name", "m", "q", "rate", "velocity", "face"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {"type": "string"},
+            "m": {"type": "number"},
+            "q": {"type": "number"},
+            "rate": {"type": "number", "exclusiveMinimum": 0},
+            "velocity": {"$ref": "#/$defs/vector"},
+            "face": {
+              "type": "object",
+              "required": ["axis", "side"],
+              "additionalProperties": false,
+              "properties": {"axis": {"enum": [0, 1, 2]}, "side": {"enum": ["lower", "upper"]}}
+            }
+          }
+        },
+        "heat_bath": {
+          "type": "object",
+          "description": "Andersen heat bath (E6b)",
+          "required": ["temperature", "collision_rate"],
+          "additionalProperties": false,
+          "properties": {
+            "temperature": {"type": "number", "exclusiveMinimum": 0},
+            "collision_rate": {"type": "number", "exclusiveMinimum": 0}
+          }
         }
       }
     },

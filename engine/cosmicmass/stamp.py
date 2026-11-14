@@ -46,8 +46,9 @@ def build_stamp(settings, softening: float, run_id: str, commit: str, t0_status:
         matter[key] = matter.get(key, 0) + 1
     numerics = {**settings.numerics, "softening": softening}
     universe = {k: settings.universe[k] for k in ("phi_bar_deg", "dimension", "units", "boundary", "background")}
-    if settings.universe.get("box") is not None:
-        universe["box"] = settings.universe["box"]
+    for key in ("box", "inflow", "heat_bath"):
+        if settings.universe.get(key) is not None:
+            universe[key] = settings.universe[key]
     return {
         "scenario": settings.scenario,
         "run_id": run_id,
