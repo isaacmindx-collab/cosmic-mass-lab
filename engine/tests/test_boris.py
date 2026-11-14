@@ -124,6 +124,11 @@ def test_integrator_settings_and_refusals():
     assert explicit.numerics["integrator"] == "verlet"  # an explicit choice is kept
     with pytest.raises(SettingsError, match="integrator"):
         load_settings({**base, "numerics": {"integrator": "leapfrog"}})
+    # L6 on (law.B_cal) with a second field: D10's choice falls back to Verlet, and Boris is refused early
+    l6 = {**base, "universe": {"background": {"b": 1.0}}, "law": {"id": "L1a", "B_cal": "on"}}
+    assert load_settings(l6).numerics["integrator"] == "verlet"
+    with pytest.raises(SettingsError, match="B_cal on"):
+        load_settings({**l6, "numerics": {"integrator": "boris"}})
 
     class Law:  # a law that reads the Composer coordinate of mu (v x B_cal) (L6 on): not for Boris
         class spec:
