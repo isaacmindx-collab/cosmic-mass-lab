@@ -84,6 +84,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | - | `scenarios/T0.5/` | T0.5 | implemented | field split: the Composer part of one proton's field is Coulomb's field |
 | - | `scenarios/D21/` | D21.1-D21.4 | implemented | the four numerical conventions of decision D21 run against their alternatives (`run.py 1..4`) |
 | archcheck | `tools/check_architecture.py` | P3 | implemented | checks this registry and the diagrams against the code (rule D18) |
+| chat | `tools/chat.py` | team chat (question 23, proposed) | implemented | the team chat in `team/chat/`: one message per file; `post`, `read` (inbox: `--to`, `--since`), `thread`; standard library only |
 | schemas | `engine/schemas/` | P4 | implemented | JSON schemas (draft 2020-12) of `stamp.json` and `summary.json`, from `team/RESULTS-STANDARD.md`, sections 2 and 4; each has two forms: one run, or a test with cases |
 | validate | `tools/validate_results.py` | P4 | implemented | validates the results folders against `engine/schemas/`, one readable line per problem; used by `engine/tests/test_schemas.py` on every committed result. Outside the package, so the web universe does not load `jsonschema` |
 | scaffold | `tools/new_scenario.py` | P5 | implemented | creates `scenarios/<ID>/` (`settings.json`: a valid 10-step L0 start; `run.py`: calls the runner, `--dry-run` writes nothing), the notebook from `team/notes/_TEMPLATE.md` and a registry row; never overwrites |
@@ -142,6 +143,7 @@ flowchart TB
         webui["simulator/web<br/>(engine in Pyodide)"]
         scaffold["tools/new_scenario.py"]
         archcheck["tools/check_architecture.py"]
+        chat["tools/chat.py<br/>(team chat, team/chat/)"]
         validate["tools/validate_results.py"]
         schemas["engine/schemas<br/>(stamp, summary)"]
         gallery["tools/make_gallery.py"]
@@ -213,6 +215,7 @@ flowchart TB
     gate --> stamp
     tests -.->|"any layer"| gn
     tests --> validate
+    tests --> chat
     validate --> schemas
     webui --> runner
     scaffold -.->|"writes settings.json and run.py,<br/>which use"| settings
@@ -699,6 +702,12 @@ def main(argv=None) -> int: ...                      # python tools/validate_res
 # tools/new_scenario.py (P5): outside the package
 def scaffold(scenario: str, title: str, root=ROOT) -> list[Path]: ...   # raises ScaffoldError; writes nothing on error
 def main(argv=None) -> int: ...                      # python tools/new_scenario.py <ID> "<title>"; 2 on error
+
+# tools/chat.py (team chat, question 23): outside the package, standard library only
+def post(sender, to, subject, body, re_id="", folder=CHAT, now=None) -> Path: ...   # one new file; ChatError, nothing written
+def load(folder=CHAT) -> list[Message]: ...          # every message, oldest first (README.md excluded)
+def inbox(messages, name="", since="") -> list[Message]: ...   # to `name` and to all, on or after YYYY-MM-DD
+def thread(messages, root_id) -> list[Message]: ...  # a message and every reply to it
 ```
 
 **Units:** SI everywhere inside the engine. Scaled units (`G_N = K = 1`, `s = 1`) are a `Frame` and `constants` choice, never a hidden factor (D7).
@@ -711,6 +720,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | team chat (`team-chat`; question 23, proposed) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `tools/chat.py` (node `chat`, section 4, used by `tests`); `team/chat/` with its README and the first message; section 10: its signatures. No engine module changed |
 | 2026-11-14 | P7 (`P7-ruff-devcontainer`, stacked on `P5-scenario-scaffold`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | section 9: new CI job `lint` (`ruff check`); lint fixes without change of behaviour: unused imports in `gates/t9.py`, `engine/tests/test_runner.py`, `scenarios/D21/run.py`, a variable name in `tools/check_architecture.py`. No module, edge or contract changed |
 | 2026-11-14 | P5 (`P5-scenario-scaffold`, stacked on `P4-result-schemas`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `tools/new_scenario.py` implemented (node `scaffold` no longer planned); section 4: the scaffold writes files that use `settings` and become a `scen` (dotted edges: it does not import them); section 10: its signatures (additions) |
 | 2026-11-14 | P4 (`P4-result-schemas`, stacked on `T9.2-hydrogen-share`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `engine/schemas/` (node `schemas`) and `tools/validate_results.py` (node `validate`) in section 4, with edges `tests --> validate --> schemas`; section 10: the validator's signatures (additions); `jsonschema==4.26.0` pinned (D13). No engine module or contract changed |
