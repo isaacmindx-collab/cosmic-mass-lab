@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2 built (D41)
+- Did: the maintainer approved the derivation ("Approved, build E2.2"): decision D41, question 11 answered. Implemented `DirectSum(..., moving=True)` (`B_g = v x g / c^2`, `b = v x e / c^2`, same softening, fixed bodies at rest, 2D out of the plane) behind the setting `universe.moving_fields` (off by default); D10's integrator choice picks Boris when it is on; stamp schema; 5 tests.
+- Result: one moving proton gives Biot-Savart to 1e-12 and `B = -s^2 b`; two parallel moving protons feel exactly `(G m^2 - K q^2) V^2 / (c^2 d^2)` (gravitomagnetic repulsion minus magnetic attraction); off by default, nothing changes. E2 is done for M1.
+- Next: the OpenCode agent's share of M1 (D36, E5.2, E7); the maintainer's approvals and the M1 review.
+- Blocked by / questions: none.
+- Architecture: updated (row `fields` implemented; section 10; change log)
+- Questions: answered (11, by the maintainer)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
 - Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
 - Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.

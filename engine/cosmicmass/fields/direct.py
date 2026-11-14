@@ -1,4 +1,4 @@
-"""Direct-sum solver of the static cosmic field (tasks E2.1, E2.3, E2.4).
+"""Direct-sum solver of the cosmic field (tasks E2.1, E2.2, E2.3, E2.4).
 
 Compendium, section "Cosmic Mass", paragraph "Cosmic Field Law and law of motion":
 the field of a source at rest is `E_cal = -G mu_s e_r / r^2`. With `mu_s = m_s + q_s G`
@@ -9,9 +9,21 @@ its two coordinates are
 where `r_j` points from source j to the field point. Maxwell's field is `E = -s^2 e`,
 so one proton gives `E = K e / r^2` (test T0.5).
 
+The second field of moving bodies (E2.2; the approved answer to question 11, decision D41,
+derivation in `team/notes/E2.2.md`): to first order in `v/c`, a body moving with velocity `v_j`
+adds `B_cal = (1/c^2) v_j x E_cal_j`, that is
+
+    B_g = (1/c^2) sum_j v_j x g_j      and      b = (1/c^2) sum_j v_j x e_j,
+
+so `B = -s^2 b` is the Biot-Savart field with `mu_0 = 4 pi K / c^2`. It is computed only when the
+solver is made with `moving=True` (setting `universe.moving_fields`), so that every result made
+without it stays the same. Fixed bodies count as at rest. In 2D the second field is the component
+out of the plane, `v_x g_y - v_y g_x`.
+
 Scope and labelled assumptions:
-- static part only: `B_g` and `b` from moving bodies (E2.2) are outside the MVP, so the
-  second field is the uniform background alone;
+- without `moving=True` the second field is the uniform background alone;
+- first order in `v/c` (slow bodies): no retardation, no radiation; the velocity-dependent forces
+  between two moving bodies do not obey Newton's third law at this order (`team/notes/E2.2.md`);
 - in 2D the bodies are points of three-dimensional space that move in a plane, so the
   field still falls as `1/r^2` (T0.1 asks for the 27.3-day month in 2D);
 - softening (decision D10) has the Plummer form `r / (r^2 + eps^2)^(3/2)`; D10 gives the
@@ -77,7 +89,14 @@ class DirectSum:
     none). `background` maps any of "g", "e", "B_g", "b" to a uniform field.
     """
 
-    def __init__(self, constants: Constants = SI, softening: float = 0.0, background: dict | None = None):
+    def __init__(
+        self,
+        constants: Constants = SI,
+        softening: float = 0.0,
+        background: dict | None = None,
+        moving: bool = False,
+    ):
+        self.moving = bool(moving)  # E2.2: the second field of moving bodies (D41)
         if not softening >= 0:
             raise ValueError("the softening length must be zero or positive")
         unknown = sorted(set(background or {}) - set(BACKGROUND_KEYS))
@@ -116,6 +135,9 @@ class DirectSum:
         src = np.flatnonzero(state.alive)
         xs, ms, qs = state.x[src], state.m[src], state.q[src]
         g, e = np.zeros_like(points), np.zeros_like(points)
+        zero = FieldSample.zeros(len(points), d)
+        bg, bc = zero.B_g.copy(), zero.b.copy()  # sum_j weight m_j (v_j x r_j), and with q_j
+        vs = np.where(state.fixed[src, None], 0.0, state.v[src]) if self.moving else None
         step = max(1, _BLOCK // max(1, len(src)))
         eps2 = self.softening**2
         for start in range(0, len(points) if len(src) else 0, step):
@@ -132,9 +154,21 @@ class DirectSum:
                     weight = np.where(np.isfinite(dist2), weight * np.exp(-ratio) * (1 + ratio), 0.0)
             g[start : start + step] = np.einsum("pn,pnd->pd", weight * ms, r)
             e[start : start + step] = np.einsum("pn,pnd->pd", weight * qs, r)
+            if vs is not None:  # E2.2: v_j x r_j for every pair
+                if d == 3:
+                    turn = np.cross(np.broadcast_to(vs[None, :, :], r.shape), r)  # (p, n, 3)
+                    bg[start : start + step] = np.einsum("pn,pnd->pd", weight * ms, turn)
+                    bc[start : start + step] = np.einsum("pn,pnd->pd", weight * qs, turn)
+                else:
+                    turn = vs[None, :, 0] * r[:, :, 1] - vs[None, :, 1] * r[:, :, 0]  # (p, n), out of the plane
+                    bg[start : start + step] = np.einsum("pn,pn->p", weight * ms, turn)
+                    bc[start : start + step] = np.einsum("pn,pn->p", weight * qs, turn)
         G = self.constants.G_N
-        zero = FieldSample.zeros(len(points), d)
-        field = FieldSample(-G * g, -G * e, zero.B_g, zero.b)
+        if vs is not None:  # B_cal = (1/c^2) sum_j v_j x E_cal_j, with E_cal_j = -G mu_j r_j / |r_j|^3
+            c2 = self.constants.c**2
+            field = FieldSample(-G * g, -G * e, -G * bg / c2, -G * bc / c2)
+        else:
+            field = FieldSample(-G * g, -G * e, zero.B_g, zero.b)
         return field + self._background(len(points), d) if self.background else field
 
     def _background(self, points: int, d: int) -> FieldSample:

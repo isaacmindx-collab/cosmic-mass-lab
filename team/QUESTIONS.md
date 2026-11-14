@@ -23,7 +23,6 @@
 | 8 | **Align the value of `K` in `docs/05`?** It quotes the CODATA 2018 value; the engine and the verification scripts use CODATA 2022. Scenario Q3 shows the difference (6.8e-10) changes no verdict. | Harmless, but the two documents disagree. I did not edit `docs/05`. | maintainer | `team/notes/Q.md` (Q3) | 2026-11-10 |
 | 9 | **Which chapter holds the measured limits?** Decision D4 and `docs/05` say "the book's Chapter 10"; in the book source of this repository the limits (9.0e-19 e, 5.71 eV, 1.14e11 V/m) are in Chapter 9. | A reference to correct in D4 and `docs/05`, or a note that the chapters were renumbered. | maintainer | `team/notes/T9.md`, open questions | 2026-11-10 |
 | 10 | **How should "binding energy" be defined for T9.2** (hydrogen, 5.71 eV under the charge share)? The candidate of question 1 is the natural one. | T9.2 is one of the measured limits of D4 and is still open. | physics lead | `docs/05`, T9.2; `team/notes/Q.md` | 2026-11-10 |
-| 11 | **E2.2 needs a derivation:** the second field `B_cal` of a moving point body in the slow-body form. The compendium gives the field equations F3-F4, not the field of a moving point source. | Blocks E2.2, the Boris push (E3.2), option L6, and the tests T5. | physics lead | `docs/WORK-PLAN.md`, E2.2 | 2026-11-10 |
 | 25 | **Under L1e, where is the body: at `x`, or at a reading of `X = x + xc G`?** L1e gives every body the General Number acceleration `a = E_cal + v x B_cal`, so the Real coordinate `x` accelerates with `g + v x B_g` only: read as the place, **a charge would not feel the electric field at all** (it moves `xc` instead). But `Re(mu a) / Re(mu)` is exactly L0's acceleration (tested), so the reading `Re(mu X) / Re(mu) = x - s^2 (q/m) xc` of the place follows L0. The engine builds L1e as written, with the fields taken at `x` and the Real velocity in `v x B_cal`; both are labelled choices. | It decides what T1 and T2 say about L1e (bound or not, conserving or not), and whether the fields should be taken at `x` or at the reading. | physics lead | `team/notes/E4.md`, part C; `engine/tests/test_two_coordinates.py` | 2026-11-14, Claude Opus 5.5 in OpenCode (sponsor @MostafaDerraz) |
 
 ## Proposed answers
@@ -85,6 +84,7 @@ Not questions, but things only the maintainer can do or should decide:
 
 | # | Question | Answer | Date |
 |---|---|---|---|
+| 11 | The second field `B_cal` of a moving point body (slow-body form)? | `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (Biot-Savart for the Composer part): decision D41; in the engine, `universe.moving_fields`. | 2026-11-14 |
 | 24 | Extend `State` with optional columns for L1e and the spin? | Yes, all four (`xc`, `vc`, `spin`, `radius`), with defaults: decision D37. | 2026-11-14 |
 | 13 | Absorbing surfaces of bodies: should `State` gain a radius? | Yes, the optional column `radius` of D37. | 2026-11-14 |
 | 12 | The field across a wrap-around boundary? | The nearest image, with its stated limit for `1/r^2`: decision D36. | 2026-11-14 |

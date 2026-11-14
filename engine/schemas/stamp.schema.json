@@ -45,6 +45,7 @@
         "dimension": {"enum": [2, 3]},
         "units": {"enum": ["SI", "scaled"]},
         "boundary": {"enum": ["open", "reflecting", "absorbing", "wrap"]},
+        "moving_fields": {"type": "boolean", "description": "E2.2 (D41): the second field of moving bodies"},
         "background": {
           "oneOf": [
             {"const": "none"},
