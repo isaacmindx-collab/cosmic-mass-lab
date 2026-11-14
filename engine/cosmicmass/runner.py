@@ -46,6 +46,7 @@ def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True
         "dt": dt,
         "kinetic": measured["kinetic"],
         "energy_re": measured["energy_re"],
+        "energy_total": measured.get("energy_total"),  # E9: the energy the law conserves (empty if not defined)
         "mass": measured["mass"],
         "charge": measured["charge"],
     }
@@ -131,7 +132,7 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         dt_max=np.inf if num["dt_max"] is None else num["dt_max"],
     )
     integrator = Boris() if num["integrator"] == "boris" else VelocityVerlet()
-    diagnostics = Diagnostics(settings.frame, constants, softening, background)
+    diagnostics = Diagnostics(settings.frame, constants, softening, background, law=ctx.law)  # E9: Composer energy
 
     every = num.get("record_every") or (max(1, num["steps"] // 1000) if num["steps"] else 100)
     first = diagnostics.measure(state)
@@ -236,7 +237,8 @@ def main(argv=None) -> int:
         f"{result.summary['steps']} steps to t = {result.summary['t_end']:.6g}"
     )
     print(
-        f"drifts: energy (Re) {drift['energy_re']}, momentum {drift['momentum']}, "
+        f"drifts: energy (Re) {drift['energy_re']}, energy (total, E9) {drift.get('energy_total')}, "
+        f"momentum {drift['momentum']}, "
         f"mass {drift['mass']}, charge {drift['charge']}"
     )
     print(f"results: {result.folder}")
