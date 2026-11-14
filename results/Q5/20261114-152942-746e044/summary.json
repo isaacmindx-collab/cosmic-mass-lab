@@ -1,0 +1,130 @@
+{
+  "cases": {
+    "1: trap; A (not run)": {
+      "pass": true,
+      "steps_from_the_rule": 12000000,
+      "why_not_run": "dt <= eta l / |v| = 3.3e-8 for each pair member"
+    },
+    "1: trap; B": {
+      "deflection": -0.004435217370701346,
+      "deflection_error_vs_reference": 0.00039777040225885685,
+      "energy_end_drift": 3.698086281644919e-11,
+      "energy_largest_excursion": 3.698086281644919e-11,
+      "pair_separation": 0.010005896607801774,
+      "pair_separation_error_vs_reference": 1.9322907229835096e-07,
+      "pass": true,
+      "steps": 473
+    },
+    "1: trap; C": {
+      "deflection": -0.004433454369045077,
+      "deflection_error_vs_reference": 1.1166792091010791e-07,
+      "energy_end_drift": 4.833911049217932e-13,
+      "energy_largest_excursion": 4.833911049217932e-13,
+      "pair_separation": 0.01000589467477122,
+      "pair_separation_error_vs_reference": 3.989542030069515e-11,
+      "pass": true,
+      "steps": 9599
+    },
+    "1: trap; C, eta/2": {
+      "deflection": -0.004433453991824344,
+      "deflection_error_vs_reference": 2.658285103152025e-08,
+      "energy_end_drift": 1.2589929099249275e-13,
+      "energy_largest_excursion": 1.2678746941219288e-13,
+      "pair_separation": 0.010005894674469714,
+      "pair_separation_error_vs_reference": 9.762635144738852e-12,
+      "pass": true,
+      "steps": 19198
+    },
+    "1: trap; C, eta/4": {
+      "deflection": -0.0044334538975392595,
+      "deflection_error_vs_reference": 5.316116880038635e-09,
+      "energy_end_drift": 1.8207657603852567e-14,
+      "energy_largest_excursion": 1.9539925233402755e-14,
+      "pair_separation": 0.010005894674425074,
+      "pair_separation_error_vs_reference": 5.3013149425851225e-12,
+      "pass": true,
+      "steps": 38395
+    },
+    "1: trap; C, eta/8 (reference)": {
+      "deflection": -0.0044334538739705005,
+      "deflection_error_vs_reference": 0.0,
+      "energy_end_drift": 4.6629367034256575e-15,
+      "energy_largest_excursion": 3.275157922644212e-14,
+      "pair_separation": 0.01000589467437203,
+      "pair_separation_error_vs_reference": 0.0,
+      "pass": true,
+      "steps": 76789
+    },
+    "2: Earth-moon, own frame; B": {
+      "energy_end_drift": 1.2656542480726785e-14,
+      "energy_largest_excursion": 2.625677453238495e-13,
+      "pass": true,
+      "period_error": 3.3333833604487495e-07,
+      "steps": 6284
+    },
+    "2: Earth-moon, own frame; C": {
+      "energy_end_drift": 1.2656542480726785e-14,
+      "energy_largest_excursion": 2.625677453238495e-13,
+      "pass": true,
+      "period_error": 3.3333833604487495e-07,
+      "steps": 6284
+    },
+    "2: Earth-moon, plus 29780 m per s; B": {
+      "energy_end_drift": 1.2878587085651816e-14,
+      "energy_largest_excursion": 1.865174681370263e-14,
+      "pass": true,
+      "period_error": 3.3333855187223094e-07,
+      "steps": 6284
+    },
+    "2: Earth-moon, plus 29780 m per s; C": {
+      "energy_end_drift": 1.2878587085651816e-14,
+      "energy_largest_excursion": 1.865174681370263e-14,
+      "pass": true,
+      "period_error": 3.3333855187223094e-07,
+      "steps": 6284
+    },
+    "3: Sun-Earth-moon; B": {
+      "earth_moon_separation": 384749719.87614995,
+      "energy_end_drift": 8.79296635503124e-14,
+      "energy_largest_excursion": 2.3936408410918375e-13,
+      "pass": true,
+      "separation_error_vs_reference": 2.771000007228963e-08,
+      "steps": 6449
+    },
+    "3: Sun-Earth-moon; B, eta = 1.25e-4 (reference)": {
+      "earth_moon_separation": 384749709.21473545,
+      "energy_end_drift": 1.1213252548714081e-14,
+      "energy_largest_excursion": 3.3306690738754696e-14,
+      "pass": true,
+      "steps": 51588
+    },
+    "3: Sun-Earth-moon; C": {
+      "earth_moon_separation": 384749719.8803976,
+      "energy_end_drift": 8.58202398035246e-14,
+      "energy_largest_excursion": 2.389199948993337e-13,
+      "pass": true,
+      "separation_error_vs_reference": 2.7721040130046504e-08,
+      "steps": 6449
+    },
+    "predictions": {
+      "flags": {
+        "1: B takes a few hundred to about 2,000 steps": true,
+        "1: B's deflection error between 1e-4 and 1e-2": true,
+        "1: C takes 4,000 to 20,000 steps": true,
+        "1: C's deflection within 1e-5 of the reference": true,
+        "1: the reference agrees with the impulse within 1%": false,
+        "1: the reference has converged (eta/4 to eta/8 below 1e-6)": true,
+        "2: C takes the same steps in both frames": true,
+        "2: C's period error within a factor 2 of B's": true,
+        "2: C's steps within 10% of B's, own frame": true,
+        "3: C within 1e-5 of the reference": true,
+        "3: C's steps within 10% of B's": true
+      },
+      "impulse_estimate": 0.004443056206258323,
+      "pass": false
+    }
+  },
+  "explanation": "Q5 under the reference law L0 (a test of the step rule): at least one case fails.",
+  "scenario": "Q5",
+  "verdict": "fail"
+}

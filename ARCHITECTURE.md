@@ -71,13 +71,13 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | limits | `engine/cosmicmass/gates/t9.py` | T9.1-T9.4 | implemented | the measured limits T9.1 to T9.4 under L1a as functions (`t9_1`, `t9_2`, `t9_3`, `t9_4`); `t9_2` also integrates one orbit with the runner |
 | gatetests | `engine/gates/` | G1 | implemented | fast T0 gate and fast T9.1 to T9.4 checks, run by pytest (in CI with the `tests` job of P2) |
 | - | `scenarios/T1.4/` | T1.4 (demo) | in-progress | demo of version 0.1.0: hydrogen-like pair under L0 and L1a, exploratory; `run.py` and `figures.py` (SVG, standard library) |
-| - | `scenarios/Q5/` | Q5 | implemented | the nearest-neighbour step (rule B of Q4) on a fast passage, and a pair guard (rule C, written in the script, not in the engine); answers question 14 |
 | - | `scenarios/T9.1/` | T9.1 | implemented | neutron effective charge 9.0e-19 e under L1a |
 | - | `scenarios/T9.2/` | T9.2 | implemented | hydrogen under the charge share (L5c): the pull falls to 0.648 of Coulomb's; binding energy 5.71 eV by the book's scaling, against 13.598 eV |
 | - | `scenarios/T9.3/` | T9.3 | implemented | equivalent field 1.14e11 V/m for a charge in gravity (L5a) |
 | - | `scenarios/T9.4/` | T9.4 | implemented | a proton and an antiproton (`m_p - e G`) near the neutral Earth under L1a: opposite Composer pushes |
 | - | `scenarios/Q/` | Q1-Q3 | implemented | open questions run against their alternatives: third law under L1a, energy candidates of L1a, value of `K` |
 | - | `scenarios/Q4/` | Q4 | implemented | the adaptive step and the frame of description: the current rule against a rule relative to the nearest neighbour |
+| - | `scenarios/Q5/` | Q5 | implemented | the nearest-neighbour step (rule B of Q4) on a fast passage, and a pair guard (rule C, written in the script, not in the engine); answers question 14 |
 | - | `scenarios/T0.1/` | T0.1 | implemented | Earth-moon, hydrogen-like orbit, two protons under L0 |
 | - | `scenarios/T0.2/` | T0.2 | implemented | conservation of `rho_mu`, energy and momentum, 200 bodies in a reflecting box |
 | - | `scenarios/T0.3/` | T0.3 | implemented | angle invariance under L0, six frame angles |
@@ -89,6 +89,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | validate | `tools/validate_results.py` | P4 | implemented | validates the results folders against `engine/schemas/`, one readable line per problem; used by `engine/tests/test_schemas.py` on every committed result. Outside the package, so the web universe does not load `jsonschema` |
 | scaffold | `tools/new_scenario.py` | P5 | implemented | creates `scenarios/<ID>/` (`settings.json`: a valid 10-step L0 start; `run.py`: calls the runner, `--dry-run` writes nothing), the notebook from `team/notes/_TEMPLATE.md` and a registry row; never overwrites |
 | webui | `simulator/web/` | UI1 | in-progress | interactive universe in the browser: the unchanged engine runs in Pyodide in a web worker (`worker.js`, `bridge.py`); page `index.html`, `app.js`; `engine-files.json` lists the engine files it loads (D22, proposed) |
+| gallery | `tools/make_gallery.py` | - | implemented | draws the figures of `docs/GALLERY.md` (SVG, standard library) from the stored results |
 <!-- registry:end -->
 
 ### Scenario scripts
@@ -144,6 +145,7 @@ flowchart TB
         archcheck["tools/check_architecture.py"]
         validate["tools/validate_results.py"]
         schemas["engine/schemas<br/>(stamp, summary)"]
+        gallery["tools/make_gallery.py"]
         cli["python -m cosmicmass<br/>__main__.py"]
         scen["scenarios/ID/run.py"]
         gate["gates/t0.py"]
@@ -195,6 +197,9 @@ flowchart TB
 
     scen --> runner
     cli --> runner
+    gallery --> gate
+    gallery --> runner
+    gallery --> fields
     scen --> settings
     gatetests --> gate
     gatetests --> limits
@@ -558,6 +563,7 @@ flowchart LR
     PUSH["push or pull request"]
     V["verify: 6 verification scripts<br/>(10,000+ checks)"]
     A["archcheck:<br/>tools/check_architecture.py<br/>registry, diagrams, D18"]
+    R["lint: ruff check<br/>(pinned in pyproject.toml)"]
     T["tests: pytest engine/tests<br/>coverage at least 90%"]
     G["gate: T0 fast run<br/>engine/gates"]:::planned
     OK["green: may merge<br/>(one approving review)"]
@@ -565,6 +571,8 @@ flowchart LR
 
     PUSH --> V --> OK
     PUSH --> A --> OK
+    PUSH --> R --> OK
+    R -.-> NO
     PUSH --> T --> G --> OK
     V -.-> NO
     A -.-> NO
@@ -705,6 +713,7 @@ Newest first. One line per pull request that changed the architecture.
 | Date | Pull request | Who | Change |
 |---|---|---|---|
 | 2026-11-14 | Q5 (`Q5-step-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | scenario row `scenarios/Q5/` (its own time loop around `VelocityVerlet.step`, with the candidate rule C); test `engine/tests/test_q5_step_guard.py`. No engine module, edge or contract changed |
+| 2026-11-14 | P7 (`P7-ruff-devcontainer`, stacked on `P5-scenario-scaffold`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | section 9: new CI job `lint` (`ruff check`); lint fixes without change of behaviour: unused imports in `gates/t9.py`, `engine/tests/test_runner.py`, `scenarios/D21/run.py`, a variable name in `tools/check_architecture.py`. No module, edge or contract changed |
 | 2026-11-14 | P5 (`P5-scenario-scaffold`, stacked on `P4-result-schemas`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `tools/new_scenario.py` implemented (node `scaffold` no longer planned); section 4: the scaffold writes files that use `settings` and become a `scen` (dotted edges: it does not import them); section 10: its signatures (additions) |
 | 2026-11-14 | P4 (`P4-result-schemas`, stacked on `T9.2-hydrogen-share`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `engine/schemas/` (node `schemas`) and `tools/validate_results.py` (node `validate`) in section 4, with edges `tests --> validate --> schemas`; section 10: the validator's signatures (additions); `jsonschema==4.26.0` pinned (D13). No engine module or contract changed |
 | 2026-11-14 | T9.2 (`T9.2-hydrogen-share`, stacked on `T9.4-antiparticle`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `gates/t9.py` gains `t9_2`, which uses `runner` (new edge `limits --> runner` in section 4) and the helpers `_pair`, `_relative_track` of `gates/t0.py` (edge `limits --> gate` already there); scenario row `scenarios/T9.2/`; no contract changed |
@@ -714,6 +723,7 @@ Newest first. One line per pull request that changed the architecture.
 | 2026-11-10 | E4.5, T9.4 and the question scenarios Q1-Q3 (`E4.5-T9.4`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/base.py` gains `third_law_residual`; `gates/t9.py` gains `t9_4`; scenario rows `scenarios/T9.4/` and `scenarios/Q/`; section 10: signature of `third_law_residual` added; no diagram changed |
 | 2026-11-11 | UI1, first version (`UI1-web-universe`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `simulator/web/` in progress: web worker running the unchanged engine in Pyodide, bridge, page; nodes `UI` and `webui` no longer planned; test `engine/tests/test_web_universe.py`. No engine module or contract changed |
 | 2026-11-10 | D21 scenarios (`D21-scenarios`, stacked on `T0-gate`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | scenario row `scenarios/D21/` (D21.1-D21.4); no engine module, diagram or contract changed |
+| 2026-11-10 | Gallery (`gallery`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | **new tool** `tools/make_gallery.py` (node `gallery` in section 4, uses `gate`, `runner`, `fields`); no engine module or contract changed |
 | 2026-11-10 | MVP-10: demo and release notes (`MVP-demo`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | scenario row `scenarios/T1.4/` (in progress: the demo only); package version 0.1.0; no module, diagram or contract changed |
 | 2026-11-10 | MVP-9: L1a and the measured limits (`T9-limits`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | `laws/l1.py` in progress (L1a with sign, strength, terms; node `l1` stays dashed); **new module** `gates/t9.py` (node `limits`); scenario rows `scenarios/T9.1/`, `scenarios/T9.3/`; section 4: `gatetests` and `scen` use `limits`. `write_gate_result` takes the kind and the law of the result (keyword arguments with the old behaviour as default) |
 | 2026-11-10 | MVP-8: the consistency gate (`T0-gate`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | **new module** `gates/t0.py` (node `gate`), `engine/gates/` implemented (the fast gate is collected by pytest; section 9 is left as it is until the `tests` job of P2 is merged), five scenario rows `scenarios/T0.1/` to `scenarios/T0.5/`; section 4: `gatetests` and `scen` use `gate`, which uses `runner`, `settings` and `stamp`; section 8: `run.py` exists. The summary of a run gains `wall_impulse` and `momentum_with_walls_drift` (no signature changed) |

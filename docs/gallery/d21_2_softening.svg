@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="588" font-family="sans-serif" font-size="12">
+<rect width="640" height="588" fill="white"/>
+<text x="70" y="534" font-size="11">D21.2: with softening 0 the error shrinks when the step is halved. With the softening of D10 it</text>
+<text x="70" y="550" font-size="11">grows: the softened run converges to a different answer. Check of the engine against mathematics,</text>
+<text x="70" y="566" font-size="11">reference law L0.</text>
+<line x1="70" y1="254.6" x2="620" y2="254.6" stroke="#444"/>
+<text x="70" y="40">error of the separation of two protons against the closed form, in units of 1e-7</text>
+<rect x="80.0" y="101.7" width="70.7" height="152.9" fill="#1f4e9c"/>
+<text x="115.3" y="96.7" text-anchor="middle">3.816</text>
+<text x="115.3" y="466" text-anchor="middle">step eta</text>
+<rect x="168.3" y="216.3" width="70.7" height="38.3" fill="#e08e0b"/>
+<text x="203.7" y="211.3" text-anchor="middle">0.9552</text>
+<text x="203.7" y="466" text-anchor="middle">step eta / 2</text>
+<text x="159.5" y="486" text-anchor="middle" font-weight="bold">softening 0</text>
+<rect x="345.0" y="254.6" width="70.7" height="49.2" fill="#1f4e9c"/>
+<text x="380.3" y="317.7" text-anchor="middle">-1.227</text>
+<text x="380.3" y="466" text-anchor="middle">step eta</text>
+<rect x="433.3" y="254.6" width="70.7" height="163.8" fill="#e08e0b"/>
+<text x="468.7" y="432.3" text-anchor="middle">-4.088</text>
+<text x="468.7" y="466" text-anchor="middle">step eta / 2</text>
+<text x="424.5" y="486" text-anchor="middle" font-weight="bold">softening of D10</text>
+</svg>

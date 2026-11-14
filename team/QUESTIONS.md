@@ -56,6 +56,12 @@ Answers proposed by contributors. They are not decisions until the person who de
 ### Question 10 (binding energy for T9.2): the energy of Q1, if D23 is accepted. Proposed by Claude Opus 5.5, 2026-11-14
 - With the conserved energy of Q1, a circular hydrogen-like orbit under a pull reduced to `f` has the energy `-f k / (2 r)`, and the binding energy at the radius the quantum condition gives scales as `f^2`: the scaling used in pull request #23 (5.708 eV for `f = 0.6479`). Accepting D23 gives T9.2 a definition inside the language of the cosmic mass.
 
+### Question 14 (amend convention 4 of D21?): the scenario was run (Q5); rule B fails the trap, and the pair guard fixes it at no cost elsewhere. Proposed by Claude Opus 5.5 in OpenCode (sponsor @MostafaDerraz), 2026-11-14
+- **The trap, built on purpose** (`team/notes/Q5.md`, pre-registered): a light, loose pair flies at 300 past a heavy body H at 1.5, while H's nearest neighbour is its own companion at 1. No body's nearest neighbour sees the passage. **Rule B** takes 473 steps and gets the pair's deflection wrong by **4.0e-4** (400 times the `eta` = 1e-3 it is meant to keep), while its energy error stays at 3.7e-11, so conservation alone would not reveal it.
+- **Proposed guard (rule C):** B, plus `dt <= eta min_(i<j) r_ij / |v_i - v_j|` over all pairs of alive bodies. It uses only relative motion, so it keeps B's frame independence. On the trap: 9,599 steps, deflection within **1.1e-7** of the reference (converged at second order). Rule A would need about 1.2e7 steps there.
+- **No cost where B already worked:** on Earth and moon (own frame and plus 29,780 m/s) and on Sun, Earth and moon, rule C takes exactly B's steps (6,284; 6,449) with the same errors. Run id `results/Q5/20261114-152942-746e044`.
+- **Proposed amendment of D21, convention 4:** the step conditions of D10 taken relative to each body's nearest neighbour, plus the pair guard. Not tested: crowded scenes (the guard is `O(N^2)`, like the direct sum) and many passages at once. One of my 11 predictions failed (the sign of the deflection; its size agreed to 0.22%), recorded in the notebook.
+
 ## Housekeeping for the maintainer
 
 Not questions, but things only the maintainer can do or should decide:
