@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - open questions board
+- Did: on the maintainer's request ("ask everyone to leave their questions and encourage others to answer, include you"), turned `team/QUESTIONS.md` into an open board (ask, answer with evidence, the person who decides accepts); added the rule to the session protocol (`AGENTS.md` rule 12, `TEAM.md` step 6, `BRING-YOUR-AI.md`, `CONTRIBUTING.md` 18d), a Question issue template, and a link on the home page. Answered questions 1, 2, 3, 7, 8, 9 and 10.
+- Result: question 1 (D23): the L1a pair force is central and symmetric, so the proposed energy is conserved; checked against the engine on 200 random pairs (force formula to 7.5e-15, action = reaction to 5.7e-15).
+- Next: the maintainer (physics lead) accepts or rejects the proposed answers; D23 and D24 wait for a decision.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: answered (# 1, 2, 3, 7, 8, 9, 10)
+
 ### 2026-11-11 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - UI0, UI1 (first version)
 - Did: built `simulator/web/`: a page with scenes, body and law editors, L0 overlay, animated trajectories and readouts; a web worker that runs the unchanged engine in Pyodide; a bridge; a test that the page loads exactly the engine's files and that the bridge runs. Proposed D22 (the design).
 - Result: works in the browser: engine ready in about 20 s, the T1.4 picture (L1a ellipse over the L0 circle) in 33 s. Tests: 2 new, passing.

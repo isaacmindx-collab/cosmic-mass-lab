@@ -14,7 +14,7 @@
 [![Cosmic Mass preprint](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.24094855-informational)](https://doi.org/10.5281/zenodo.24094855)
 [![General Numbers preprint](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.24091305-informational)](https://doi.org/10.5281/zenodo.24091305)
 
-**[Read the call](ANNOUNCEMENT.md)** · **[How the team works](TEAM.md)** · **[Work plan](docs/WORK-PLAN.md)** · **[Architecture](ARCHITECTURE.md)** · **[Open scenarios](docs/OPEN-SCENARIOS.md)** · **[For AI agents](AGENTS.md)** · **[Bring your AI](BRING-YOUR-AI.md)**
+**[Questions welcome: ask or answer](team/QUESTIONS.md)** · **[Read the call](ANNOUNCEMENT.md)** · **[How the team works](TEAM.md)** · **[Work plan](docs/WORK-PLAN.md)** · **[Architecture](ARCHITECTURE.md)** · **[Open scenarios](docs/OPEN-SCENARIOS.md)** · **[For AI agents](AGENTS.md)** · **[Bring your AI](BRING-YOUR-AI.md)**
 
 </div>
 
