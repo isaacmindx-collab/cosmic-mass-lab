@@ -19,13 +19,13 @@ dependencies = [
     "sympy==1.14.0",
     "mpmath==1.3.0",
     "numpy==1.26.4",
-    "jsonschema==4.26.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
+    "jsonschema==4.26.0",  # P4: tools/validate_results.py and its tests (decision D24)
 ]
 
 [project.urls]

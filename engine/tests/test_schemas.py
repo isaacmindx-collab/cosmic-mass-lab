@@ -18,7 +18,7 @@ import validate_results as vr  # noqa: E402
 # Committed summaries that do not follow section 4: their verdict is a sentence, not
 # pass / fail / finding. Reported in issue #24; results are never edited by hand, so they
 # stay until their producer re-runs them. Nothing else may be wrong with them.
-KNOWN_NONCONFORMING = {"D21.1", "D21.2", "D21.3", "D21.4"}
+KNOWN_NONCONFORMING = set()  # the D21 verdicts were fixed in #27 (issue #24)
 
 
 def _settings():
