@@ -138,3 +138,35 @@ def test_bad_populations_are_refused(population, message):
 def test_bodies_or_populations_are_needed():
     with pytest.raises(SettingsError, match="bodies"):
         load_settings(settings([]))
+
+
+def test_super_particles_and_temperature_review_of_66():
+    # a super-particle moves at the real particle's thermal speeds but carries `weight` times its mass,
+    # so the temperature from the bodies' own masses is `weight` times the population's (review of #66)
+    box = {"shape": "box", "lower": [0.0, 0.0, 0.0], "upper": [1.0, 1.0, 1.0], "temperature": 1e4}
+    plain = load_settings(settings([{"preset": "neutron", "n": 4000, **box}]))
+    heavy = load_settings(settings([{"preset": "neutron", "n": 4000, "weight": 1e6, **box}]))
+    t_plain, t_heavy = (kinetic_temperature(s.state, K_B["SI"]) for s in (plain, heavy))
+    assert t_heavy == pytest.approx(1e6 * t_plain, rel=1e-12)  # the same draws, a million times the mass
+    # a heat bath would drive them to the wrong speeds: refused
+    bath = {"heat_bath": {"temperature": 1e4, "collision_rate": 1.0}}
+    with pytest.raises(SettingsError, match="heat_bath"):
+        load_settings(settings([{"preset": "neutron", "n": 10, "weight": 2.0, **box}], **bath))
+    load_settings(settings([{"preset": "neutron", "n": 10, **box}], **bath))  # weight 1: allowed
+    # the summary says how to read the temperature, only when a population is weighted
+    labelled = run(settings([{"preset": "neutron", "n": 5, "weight": 3.0, **box}]), out_root=None)
+    assert labelled.summary["super_particles"]["weights"] == [3.0]
+    assert "divide by" in labelled.summary["super_particles"]["note"]
+    assert run(settings([{"preset": "neutron", "n": 5, **box}]), out_root=None).summary["super_particles"] is None
+
+
+def test_keplerian_speed_of_a_body_on_the_axis_is_zero_not_nan():
+    rng = np.random.default_rng(0)
+    spec = {"n": 3, "shape": "box", "lower": [-1.0, -1.0], "upper": [1.0, 1.0], "keplerian": {"mass": 1.0}}
+    from cosmicmass import populations
+
+    x = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 2.0]])
+    v = populations.velocities(spec, x, 1.0, SCALED, rng)
+    assert np.all(np.isfinite(v))
+    assert list(v[0]) == [0.0, 0.0]  # on the axis: no circular direction, no speed
+    assert v[1] == pytest.approx([0.0, 1.0]) and v[2] == pytest.approx([-math.sqrt(0.5), 0.0])

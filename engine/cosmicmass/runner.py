@@ -59,6 +59,20 @@ def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True
     return row
 
 
+def _super_particles(settings) -> dict | None:
+    """E5.4 (review of #66): for populations with a `weight` other than 1, the temperatures of this summary
+    are per super-particle (computed with its whole mass) and must be divided by the weight to give the
+    temperature of the real particles. None when no population is weighted."""
+    weights = [float(p.get("weight", 1.0)) for p in settings.meta.get("populations", [])]
+    if all(w == 1.0 for w in weights):
+        return None
+    return {
+        "weights": weights,
+        "note": "temperatures here use each super-particle's whole mass: divide by its population's weight "
+        "for the temperature of the real particles; motion and wall pressure are not affected",
+    }
+
+
 def wall_pressure(box: dict, load: dict, elapsed: float) -> dict | None:
     """E8.1: the pressure on the walls of a box, from the momentum they took over `elapsed`
     (`docs/05`, T6.1: "pressure from Re momentum flux on the walls"). Each wall: its momentum
@@ -169,6 +183,7 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
         "wall_hits": wall_hits,
         "wall_impulse": [float(p) for p in wall_impulse],
         "walls": wall_pressure(box, wall_load, last["t"] - first["t"]),
+        "super_particles": _super_particles(settings),
         "absorbed": {
             "bodies": environment.collected["bodies"],
             "m": environment.collected["m"],

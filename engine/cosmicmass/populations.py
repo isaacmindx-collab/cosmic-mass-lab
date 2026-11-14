@@ -88,9 +88,12 @@ def velocities(spec: dict, x: np.ndarray, real_mass: float, constants, rng) -> n
         centre = np.asarray(kepler.get("centre", spec.get("centre", [0.0] * d)), float)
         rel = x - centre
         r = np.hypot(rel[:, 0], rel[:, 1])
-        speed = np.sqrt(constants.G_N * float(kepler["mass"]) / r)
-        v[:, 0] += -speed * rel[:, 1] / r  # counter-clockwise in the plane
-        v[:, 1] += speed * rel[:, 0] / r
+        off = r > 0  # a body on the axis has no circular direction: it gets no Keplerian speed
+        speed = np.zeros(n)
+        speed[off] = np.sqrt(constants.G_N * float(kepler["mass"]) / r[off])
+        safe = np.where(off, r, 1.0)
+        v[:, 0] += -speed * rel[:, 1] / safe  # counter-clockwise in the plane
+        v[:, 1] += speed * rel[:, 0] / safe
     return v
 
 
