@@ -49,7 +49,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | state | `engine/cosmicmass/state.py` | E5.1 | implemented | `State`: structure-of-arrays `m, q, x, v, fixed, alive, t`; `mu(frame)`, `total_mu`, `copy`, `from_bodies` |
 | universe | `engine/cosmicmass/universe.py` | E5.2 | planned | `Universe`: settings U1-U8 (angle, dimension, units, boundary, backgrounds, sources, inflow, populations) |
 | settings | `engine/cosmicmass/settings.py` | E5.3 | in-progress | load and validate `settings.json`; build `Frame`, `State`, `LawSpec`, numerics (minimal MVP version; `Universe` and the P4 schemas come later) |
-| populations | `engine/cosmicmass/populations.py` | E5.4 | planned | seeded generators: shells, rings, boxes, velocity spread (temperature), super-particles |
+| populations | `engine/cosmicmass/populations.py` | E5.4 | implemented | seeded generators (`generate`): shapes `box`, `shell`, `ring`; bulk flow, thermal spread at a temperature (with the real particle's mass), Keplerian circular speeds; super-particles (`weight`); used by the settings key `populations` |
 | fieldsample | `engine/cosmicmass/fields/sample.py` | E4.2 | implemented | `FieldSample(g, e, B_g, b, screened=None)` with `E_cal(frame)` and `B_cal(frame)`; `screened` holds the screened field for option L8; the `FieldSolver` interface |
 | fields | `engine/cosmicmass/fields/direct.py` | E2.1 | in-progress | direct-sum field solver `DirectSum`: static `g`, `e` (F1-F2) with Plummer softening, no self-field, uniform backgrounds (U5); `at_bodies_screened` and `debye_length` (option L8: the kernel `exp(-r/L)(1 + r/L)/r^2` over the Debye length of the population); `B_g`, `b` from moving bodies (F3-F4, task E2.2) not yet |
 | fieldsfast | `engine/cosmicmass/fields/tree.py` | E2.5 | planned | fast solver for large N (tree or grid), same interface |
@@ -185,7 +185,7 @@ flowchart TB
         l1["laws/l1.py"]:::planned
         modifiers["laws/modifiers.py"]:::planned
         universe["universe.py"]:::planned
-        populations["populations.py"]:::planned
+        populations["populations.py"]
     end
 
     subgraph L1["Layer 1: algebra and data"]
@@ -265,6 +265,7 @@ flowchart TB
     universe --> frame
     populations --> matter
     populations --> state
+    populations --> environment
     gnarray --> gn
     gn --> frame
     readings --> gn
@@ -691,6 +692,10 @@ def third_law_residual(law: Law, state: State, solver, frame: Frame) -> dict: ..
 # settings.py
 def load_settings(source: Path | str | dict) -> Settings: ...
 # Settings: scenario, frame, universe (dict), law_spec, state, bodies, numerics (dict), meta (dict)
+#   settings key "populations" (E5.4, addition): a list of seeded populations, generated after the listed
+#   bodies from numerics.seed; meta["populations"] and stamp["populations"] keep them as given (only when used)
+# populations.py (E5.4)
+def generate(spec: dict, d: int, constants, rng, real: tuple) -> dict: ...   # {"m", "q", "x", "v"} of one population
 
 # integrators.py
 class Integrator(Protocol):
@@ -782,6 +787,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E5.4 (`E5-populations`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `populations.py` (node no longer planned; new edge `populations --> environment` for `K_B`); `settings.py`: the key `populations` (seeded, after the listed bodies); `stamp.py` and `engine/schemas/stamp.schema.json`: `populations` when used; `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | E8 (`E8-diagnostics`, stacked on `E4-directions`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `analysis/convergence.py` (E8.2) and `analysis/plots.py` (E8.3), nodes no longer planned, edges `convergence --> runner`, `plots --> constants` (was a planned `plots --> diagnostics`); `diagnostics.py` implemented: the temperature (edge `diagnostics --> environment`); `runner.py`: `wall_pressure`, summary `walls` (E8.1). `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |
 | 2026-11-14 | Co-exist Journal (`coexist-journal`, stacked on `co-exist-initiative`; D34, D35) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **new** `tools/build_journal.py` (node `journal`, section 4, used by `tests`); section 10: its signatures; `markdown==3.8.2`, `pymdown-extensions==10.16.1`, `pyyaml==6.0.2` added to the dev extras. No engine module or contract changed |

@@ -55,7 +55,7 @@ def build_stamp(settings, softening: float, run_id: str, commit: str, t0_status:
     for key in ("box", "inflow", "heat_bath"):
         if settings.universe.get(key) is not None:
             universe[key] = settings.universe[key]
-    return {
+    stamp = {
         "scenario": settings.scenario,
         "run_id": run_id,
         "engine_commit": commit,
@@ -74,6 +74,9 @@ def build_stamp(settings, softening: float, run_id: str, commit: str, t0_status:
         "preregistered": settings.meta["preregistered"],
         "producer": settings.meta["producer"],
     }
+    if settings.meta.get("populations"):  # E5.4: with numerics.seed, they rebuild the same bodies
+        stamp["populations"] = settings.meta["populations"]
+    return stamp
 
 
 def write_results(folder: Path, stamp: dict, summary: dict, rows: list) -> None:
