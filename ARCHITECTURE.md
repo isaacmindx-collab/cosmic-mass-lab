@@ -77,6 +77,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | - | `scenarios/T9.4/` | T9.4 | implemented | a proton and an antiproton (`m_p - e G`) near the neutral Earth under L1a: opposite Composer pushes |
 | - | `scenarios/Q/` | Q1-Q3 | implemented | open questions run against their alternatives: third law under L1a, energy candidates of L1a, value of `K` |
 | - | `scenarios/Q4/` | Q4 | implemented | the adaptive step and the frame of description: the current rule against a rule relative to the nearest neighbour |
+| - | `scenarios/Q5/` | Q5 | implemented | the nearest-neighbour step (rule B of Q4) on a fast passage, and a pair guard (rule C, written in the script, not in the engine); answers question 14 |
 | - | `scenarios/T0.1/` | T0.1 | implemented | Earth-moon, hydrogen-like orbit, two protons under L0 |
 | - | `scenarios/T0.2/` | T0.2 | implemented | conservation of `rho_mu`, energy and momentum, 200 bodies in a reflecting box |
 | - | `scenarios/T0.3/` | T0.3 | implemented | angle invariance under L0, six frame angles |
@@ -730,6 +731,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | Q5 (`Q5-step-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | scenario row `scenarios/Q5/` (its own time loop around `VelocityVerlet.step`, with the candidate rule C); test `engine/tests/test_q5_step_guard.py`. No engine module, edge or contract changed |
 | 2026-11-14 | E6b (`E6b-inflow-heat-bath`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `environment.py`: `Inflow`, `HeatBath`, `kinetic_temperature`, `K_B`; `Environment` takes them as optional arguments (addition, no existing call changed); settings: `universe.inflow` and `universe.heat_bath`; runner: one seeded generator for the environment, summary `inflow` and `heat_bath`, a `temperature` column with a bath, no per-body columns with an inflow; stamp and `engine/schemas/stamp.schema.json`: the two blocks. Section 5: the two classes; section 10: their signatures |
 | 2026-11-14 | P7 (`P7-ruff-devcontainer`, stacked on `P5-scenario-scaffold`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | section 9: new CI job `lint` (`ruff check`); lint fixes without change of behaviour: unused imports in `gates/t9.py`, `engine/tests/test_runner.py`, `scenarios/D21/run.py`, a variable name in `tools/check_architecture.py`. No module, edge or contract changed |
 | 2026-11-14 | P5 (`P5-scenario-scaffold`, stacked on `P4-result-schemas`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `tools/new_scenario.py` implemented (node `scaffold` no longer planned); section 4: the scaffold writes files that use `settings` and become a `scen` (dotted edges: it does not import them); section 10: its signatures (additions) |
