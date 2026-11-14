@@ -12,6 +12,21 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the team chat adopted (D30)
+- Did: recorded the maintainer's decision "Merge and adopt" (question 23): decision D30; reading the inbox is now step 1 of the session protocol (`AGENTS.md`), and is in `TEAM.md`, `BRING-YOUR-AI.md`, `llms.txt` and `team/chat/README.md`.
+- Result: documentation only.
+- Next: everyone reads their inbox at the start of a session.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: answered (# 23, by the maintainer's decision)
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the team chat (branch `team-chat`)
+- Did: brought the branch onto the format pass (#38) so it arrives formatted; resolved the records (question 14, now answered by D29, dropped from the open table; question 23 kept). Tried `tools/chat.py`: `read` shows the first message; posted the first reply (`--re`), and `thread` shows both.
+- Result: 7 chat tests pass; ruff clean; architecture check PASS.
+- Next: the maintainer decides question 23 (adopt the chat).
+- Blocked by / questions: none.
+- Architecture: updated by the branch (`tools/chat.py`, node and row); no change by the review
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - review: reproduction of Q1-Q4
 - Did: under D27, reproduced Q1, Q2, Q3 (Claude Fable 5.2) from the engine commits of their stamps (`b886db8`, `e1a3165`) and Q4 (`7d98c8d`), with the producer's scripts unchanged, in the pinned environment on Windows; compared every value of each `summary.json` with the committed one (`team/notes/review-Q1-Q4.md`).
 - Result: every text, flag and verdict identical, including Q4's one failed prediction; every value above rounding level within the tolerances of the standard (largest relative difference: Q1 4.4e-16, Q2 1.8e-7, Q3 0, Q4 3.5e-4 on an error measure of 2.8e-8). **Q1-Q4 confirmed (agent, same sponsor).** No result file committed (they belong to the producer).
@@ -52,6 +67,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Blocked by / questions: rule C belongs in `integrators.py` (E3, claimed under the MVP sprint).
 - Architecture: updated (section 2 row `scenarios/Q5/`; section 11)
 - Questions: answered (14)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - team chat (question 23)
+- Did: on the sponsor's request ("add a chat or message option for the team inside the repo"), wrote `tools/chat.py` (post, inbox, threads; standard library only), `team/chat/README.md` (format, what goes where, manners, how to post without the tool), 7 tests, and the first message (to all and to the maintainer: the chat, and my answer to the maintainer's decisions of today). Proposed it as question 23; `AGENTS.md` and `TEAM.md` are not changed until it is decided.
+- Result: one message is one file, so concurrent posts never conflict. Software only; no finding.
+- Next: the pull request is opened **after** the `ruff format .` pass of D25 (the maintainer asked for no new pull request until then); meanwhile the branch `team-chat` is pushed.
+- Blocked by / questions: question 23 (maintainer).
+- Architecture: updated (section 2 row `chat`; section 4 node and edge; section 10; section 11)
+- Questions: asked (23)
 
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - P6, stage S1 complete
 - Did: on the maintainer's request ("focus now to finish S1"): created the 8 project labels (`claim`, `result`, `decision`, `urgent`, `agent`, `engine`, `scenario`, `architecture`; `question` and `good first issue` already existed); set 9 repository topics; switched on branch protection for `main` with the rule the maintainer chose: pull request required, the CI checks `verify`, `tests`, `architecture`, `lint` required, no approval required yet, admin bypass (decision D26).

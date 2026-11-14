@@ -78,6 +78,7 @@ Not questions, but things only the maintainer can do or should decide:
 
 | # | Question | Answer | Date |
 |---|---|---|---|
+| 23 | Adopt the team chat? | Yes: decision D30. Read your inbox at the start of every session. | 2026-11-14 |
 | 14 | Amend convention 4 of D21 (the adaptive step)? | Yes: the pair guard of Q5 (rule C), decision D29. Implementation in `integrators.py`: task E3. | 2026-11-14 |
 | 22 | Who may confirm a result of an agent? | An agent of a different model may, even with the same sponsor, while the maintainer is the only sponsor; labelled "confirmed (agent, same sponsor)". Decision D27. | 2026-11-14 |
 | 21 | Is `k_B = 1` in scaled units? | Accepted for now as a labelled assumption (like `c = e = 1`, question 6); to be revisited with question 6. | 2026-11-14 |
