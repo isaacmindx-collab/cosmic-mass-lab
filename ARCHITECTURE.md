@@ -59,13 +59,13 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
 | integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); the inertia readings (E3.4) not yet; the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
-| diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | in-progress | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined yet), momentum; pressure and temperature not yet |
+| diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | implemented | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined until E9), momentum, and the temperature of the moving bodies; the pressure on the walls is `runner.wall_pressure` |
 | energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
 | runner | `engine/cosmicmass/runner.py` | E7.1 | in-progress | `run(settings) -> RunResult`: the time loop, stop conditions, outputs; `main(argv)` for the command line (E7.3); checkpoints and resuming not yet |
 | cli | `engine/cosmicmass/__main__.py` | E7.3 | implemented | `python -m cosmicmass run <settings.json>`: calls `runner.main` |
 | stamp | `engine/cosmicmass/stamp.py` | E7.2 | in-progress | run id, engine commit, `stamp.json`, `summary.json`, `timeseries.csv`; the T0 status lookup (after G1) and validation against the P4 schemas not yet |
-| convergence | `engine/cosmicmass/analysis/convergence.py` | E8.2 | planned | re-run at `dt/2`, `dt/4` and other particle counts; relative changes |
-| plots | `engine/cosmicmass/analysis/plots.py` | E8.3 | planned | standard figures: Real and Composer planes, drifts, sweeps |
+| convergence | `engine/cosmicmass/analysis/convergence.py` | E8.2 | implemented | `convergence(settings, measure, counts=(), resize=None)`: re-run at the step (eta or dt) / 2 and / 4, and at other body counts through the scenario's `resize`; the convergence block of the results standard with relative changes and `converged` (change < 1%) |
+| plots | `engine/cosmicmass/analysis/plots.py` | E8.3 | implemented | standard figures in plain SVG (standard library), made from one results folder alone, byte for byte: drifts against time, trails in the Real plane, the cosmic masses in the General Number plane; `line_plot`, `scatter_plot` for sweeps |
 | tests | `engine/tests/` | P1 | implemented | unit tests for every module (pytest), run in CI with coverage (P2); so far `test_pins.py` (pins of `pyproject.toml` equal `requirements.txt`), `test_import.py`, `test_constants_frame.py` (E1.1), `test_gn.py` (E1.2), `test_gnarray.py` (E1.3), `test_readings_matter.py` (E1.4, E1.5), `test_compendium.py` (E1.6), `test_state_laws.py` (E5.1, E4.1, E4.2), `test_settings.py` (E5.3), `test_fields.py` (E2.1, E2.3, E2.4), `test_integrators.py` (E3.1, E3.3, E6a; one test marked `slow`), `test_runner.py` (E7.1 to E7.3, E8.1, E9), `test_l1a.py` (E4.3, L1a) |
 | gate | `engine/cosmicmass/gates/t0.py` | T0, G1 | implemented | the consistency gate T0.1 to T0.5 as functions (`t0_1` ... `t0_5`, `run_gate`), and `write_gate_result` |
 | limits | `engine/cosmicmass/gates/t9.py` | T9.1-T9.4 | implemented | the measured limits T9.1 to T9.4 under L1a as functions (`t9_1`, `t9_2`, `t9_3`, `t9_4`); `t9_2` also integrates one orbit with the runner |
@@ -163,15 +163,15 @@ flowchart TB
         runner["runner.py"]:::planned
         stamp["stamp.py"]:::planned
         settings["settings.py"]:::planned
-        convergence["analysis/convergence.py"]:::planned
-        plots["analysis/plots.py"]:::planned
+        convergence["analysis/convergence.py"]
+        plots["analysis/plots.py"]
     end
 
     subgraph L3["Layer 3: dynamics"]
         direction LR
         integrators["integrators.py"]:::planned
         environment["environment.py"]:::planned
-        diagnostics["diagnostics.py"]:::planned
+        diagnostics["diagnostics.py"]
         energy["energy.py"]:::planned
     end
 
@@ -236,7 +236,8 @@ flowchart TB
     settings --> state
     settings --> matter
     convergence --> runner
-    plots --> diagnostics
+    plots --> constants
+    diagnostics --> environment
     integrators --> fields
     integrators --> environment
     integrators --> lawbase
@@ -724,11 +725,23 @@ def run(settings: Settings, out_root: Path = Path("results")) -> RunResult: ...
 # `settings` may also be a path or a dictionary; out_root=None writes nothing.
 # RunResult: stamp, summary, folder (results/<scenario>/<run-id>/ or None), state (final), timeseries (rows)
 def main(argv=None) -> int: ...     # python -m cosmicmass run <settings.json> [--out results]
+def wall_pressure(box, load, elapsed) -> dict | None: ...   # E8.1: summary["walls"]: momentum and pressure of
+#   each wall ("<axis>-<side>"), "pressure_mean" over the boundary (2D: per unit length), "elapsed"; None without a box
 
 # diagnostics.py
 class Diagnostics:      # Diagnostics(frame, constants, softening=0.0, background=None)
     def measure(self, state: State, fields=None) -> dict: ...
-    # keys: t, mass, charge, kinetic, energy_re, energy_com (None: not defined), momentum, momentum_scale
+    # keys: t, temperature (E8.1, addition), mass, charge, kinetic, energy_re, energy_com (None: not defined),
+    #   momentum, momentum_scale
+
+# analysis/convergence.py (E8.2)
+def convergence(settings, measure, counts=(), resize=None, tolerance=0.01) -> dict: ...
+#   block: step {step, step/2, step/4}, change_step_half_to_quarter, change_step_to_half, [counts, change_with_count],
+#   largest_change, tolerance, converged
+# analysis/plots.py (E8.3)
+def figures(folder) -> list[Path]: ...   # folder/figures/drifts.svg, trails.svg, mu_plane.svg, from the folder alone
+def line_plot(path, curves, x_label, y_label, caption, square=False) -> Path: ...
+def scatter_plot(path, points, x_label, y_label, caption, axes=()) -> Path: ...
 def drifts(first: dict, last: dict) -> dict: ...   # relative drifts of mass, charge, energy_re, momentum
 
 # energy.py (reference law L0, Real coordinate only)
@@ -769,6 +782,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E8 (`E8-diagnostics`, stacked on `E4-directions`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `analysis/convergence.py` (E8.2) and `analysis/plots.py` (E8.3), nodes no longer planned, edges `convergence --> runner`, `plots --> constants` (was a planned `plots --> diagnostics`); `diagnostics.py` implemented: the temperature (edge `diagnostics --> environment`); `runner.py`: `wall_pressure`, summary `walls` (E8.1). `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |
 | 2026-11-14 | Co-exist Journal (`coexist-journal`, stacked on `co-exist-initiative`; D34, D35) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **new** `tools/build_journal.py` (node `journal`, section 4, used by `tests`); section 10: its signatures; `markdown==3.8.2`, `pymdown-extensions==10.16.1`, `pyyaml==6.0.2` added to the dev extras. No engine module or contract changed |
 | 2026-11-14 | E4.4 part B: L4, L6, L8 (`E4-directions`, stacked on `E4-readings`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `laws/l1.py`: directions (L4: radial, perpendicular, velocity), the moving-body term (L6: on, only), the screened range (L8); `fields/direct.py`: `at_bodies_screened`, `debye_length`; `fields/sample.py`: `FieldSample.screened` (addition); `integrators.py`: the `StepContext` fills the screened field for L8 (new edge `integrators --> environment`, for `K_B`). Section 10: additions. Review fix (Claude Opus 5.5 in Claude Code): `settings.py` picks velocity Verlet when L6 is on (`law.B_cal`), and refuses an explicit `boris` with it |

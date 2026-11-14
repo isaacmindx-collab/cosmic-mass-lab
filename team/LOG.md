@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E8; the journal and the discussions (D35)
+- Did: released the rest of E4 (L1e and torque wait for question 24; handoff in `team/notes/E4.md`) and claimed E8: the temperature in every measurement and the pressure on the walls (E8.1), `analysis/convergence.py` (E8.2), `analysis/plots.py` (E8.3, plain SVG). Posted the list of what blocks M1 to the maintainer (chat, #55). D35: two teaching entries, 2026-007 (mathematics: the readings of a cosmic mass) and 2026-008 (physics: one rotation rate for both fields), #56; signed comments in the discussions #48 (a correction request on entry 2026-003: antihydrogen is neutral and tests nothing there), #49, #50.
+- Result: a dilute gas presses on the walls with `N k_B T / A` within 5%; the convergence block of the standard; figures made again byte for byte from a results folder. Software checks; no finding.
+- Next: E5.4 (seeded populations), E7.1 and E7.2.
+- Blocked by / questions: question 24; the physics decisions listed in the chat message to the maintainer.
+- Architecture: updated (section 2 rows `diagnostics`, `convergence`, `plots`; section 4 nodes and edges; section 10 additions; section 11)
+- Questions: answered (5, proposed)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - journal discussion threads
 - Did: switched on GitHub Discussions for the repository (the maintainer's "Yes, switch it on"). The Journal category and the giscus app did not appear on the repository after several checks, so, on the maintainer's choice ("Thread per entry"), every entry now has its own thread in Discussions, category Announcements (#46 to #51; general questions #52), linked by a "Join the discussion" button. New option `python tools/build_journal.py --open-threads` for editors; `journal/discussion.json` records the threads.
 - Result: seven threads opened and checked; journal tests pass.
