@@ -35,3 +35,12 @@ def test_results_are_written_as_measurement_checks(tmp_path):
         assert stamp["kind"] == "measurement-check" and "hypothesis L1a" in summary["explanation"]
         assert all(s["law"]["id"] == "L1a" and s["kind"] == "measurement-check" for s in stamp["cases"].values())
     assert stamp["cases"]["electron"]["law"]["terms"] == "s q g"
+
+
+def test_t9_4_particle_against_antiparticle():
+    outcome = t9.t9_4()
+    proton, anti, pair = (outcome["cases"][k] for k in ("proton", "antiproton", "pair"))
+    assert outcome["pass"] and proton["push"] == "towards the Earth" and anti["push"] == "away from the Earth"
+    assert proton["composer_force"][0] == pytest.approx(-1.5124e-8, rel=1e-4)  # s e g, in N
+    assert pair["sum_of_the_two_pushes_relative"] < 1e-12 and proton["real_force"] == anti["real_force"]  # same weight
+    assert proton["composer_over_real"] == pytest.approx(1.1116e18, rel=1e-4)  # s e / m_p

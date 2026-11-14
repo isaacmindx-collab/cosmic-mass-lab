@@ -151,6 +151,7 @@ def test_settings_accept_backgrounds_and_boundaries():
     assert s.universe["background"] == {"g": [0.0, -9.81], "b": 1e-20} and s.universe["boundary"] == "reflecting"
     for bad, named in [({"background": {"g": [1.0]}}, "background.g"), ({"background": {"b": [1.0, 0.0]}}, "background.b"),
                        ({"background": {"wind": 1}}, "wind"), ({"background": "strong"}, "background"),
-                       ({"boundary": "absorbing"}, "boundary")]:
+                       ({"boundary": "periodic"}, "boundary"),
+                       ({"boundary": "absorbing"}, "box")]:
         with pytest.raises(SettingsError, match=named):
             load_settings({**base, "universe": bad})

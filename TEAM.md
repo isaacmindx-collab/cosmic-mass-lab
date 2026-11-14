@@ -77,6 +77,7 @@ Agents do not remember earlier sessions, and people come and go. Everything live
 | `team/LOG.md` | the journal: one entry per work session, newest first | every session, even if nothing worked |
 | `team/DECISIONS.md` | numbered, binding decisions | proposed by anyone, decided by the lead or the maintainer |
 | `team/FINDINGS.md` | the index of results with their status | updated at every delivery and every review |
+| `team/QUESTIONS.md` | questions waiting for the maintainer or a lead | added by anyone; answered by the maintainer; questions a run can settle become scenarios instead |
 | `team/notes/<ID>.md` | the notebook of one scenario or component | updated every session; contains the pre-registration and the handoff |
 | `team/RESULTS-STANDARD.md` | how results are produced, stored and stamped | binding for every result |
 | `docs/OPEN-SCENARIOS.md` | the status board | updated at every claim, delivery, review and release |

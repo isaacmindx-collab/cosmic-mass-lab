@@ -12,12 +12,34 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-11 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - Q4 (the step rule and the frame)
+- Did: merged `main` (UI1, pull request #19) into my two open branches, renumbering my proposed decisions to D23 and D24 because `main` took D22; my first merge commit left conflict markers in the change log of `ARCHITECTURE.md`, which I removed in a following commit on both branches. Then took up the remark of `team/notes/UI1.md` as a scenario: pre-registered Q4 (`team/notes/Q4.md`, commit `7cd44e0`), added the option `speed_reference` to the step rule (default unchanged), wrote `scenarios/Q4/run.py`, ran it on the clean commit `7d98c8d`.
+- Result: the current step rule depends on the frame (29 times more steps for a system moving at the Earth's orbital speed, without loss of accuracy); a rule relative to the nearest neighbour does not, and is as accurate on four setups (Sun, Earth and moon over a month: 6,449 steps instead of 186,692, within 2.8e-8 of a fine reference). Seven of my eight prediction flags hold; the one that fails, and one prediction that was wrong in its value, are described in the notebook. `pytest`: 179 passed, 1 deselected.
+- Next: the guard scenario (a fast close pair near a third body) before any proposal to amend D21; then E5.2, E5.4, E8.2.
+- Blocked by / questions: question 14 of `team/QUESTIONS.md`. The first run failed while writing its files (a `/` in two case names); nothing had been seen; recorded as a change to the plan.
+- Architecture: updated (sections 2, 10, 11)
+
+### 2026-11-11 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - E6a (absorbing walls), milestone check
+- Did: on the sponsor's request, checked the milestones and took the next task that needs no decision. Wrote absorbing walls with a collector (`engine/cosmicmass/environment.py`), connected them to the settings and the runner, 2 new tests; notebook `team/notes/E6a.md`; two new questions (12, 13) in `team/QUESTIONS.md`.
+- Result: absorbing walls conserve total mass and charge exactly, counting the collector; the momentum of the bodies plus the walls' share is conserved to 1e-9. `pytest`: 176 passed, 1 deselected.
+- Milestones (`docs/WORK-PLAN.md`): S0 done. Version 0.1.0 is tagged. **M1 is not reached.** S1: P1, P2, P3 done; P4, P5, P7 wait for decision D23; P6 is the maintainer's. S2: 16 of 33 sub-tasks complete (E1.1-E1.6, E2.1, E2.3, E2.4, E3.1, E3.3, E4.1, E4.2, E4.5, E5.1, E7.3), 7 partly (E4.3, E5.3, E6a, E7.1, E7.2, E8.1, E9), 10 not started (E2.2, E2.5, E3.2, E3.4, E4.4, E5.2, E5.4, E6b, E8.2, E8.3). S3: T0.1-T0.5 and G1 done, T9.1, T9.3, T9.4 done, T9.2 and the milestone review open.
+- Next: tasks that need no decision: E5.2 (`Universe`), E5.4 (populations), E8.2 (convergence helper), the checkpoints of E7.1, E3.4 with E4.4 (the options L2 to L8 as defined in `docs/05`).
+- Blocked by / questions: the eleven questions of `team/QUESTIONS.md` are unanswered; wrap-around waits for question 12.
+- Architecture: updated (sections 2, 10, 11)
+
 ### 2026-11-11 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - UI0, UI1 (first version)
 - Did: built `simulator/web/`: a page with scenes, body and law editors, L0 overlay, animated trajectories and readouts; a web worker that runs the unchanged engine in Pyodide; a bridge; a test that the page loads exactly the engine's files and that the bridge runs. Proposed D22 (the design).
 - Result: works in the browser: engine ready in about 20 s, the T1.4 picture (L1a ellipse over the L0 circle) in 33 s. Tests: 2 new, passing.
 - Next: maintainer review and D22; GitHub Pages; the Composer plane (UI1 second part).
 - Blocked by / questions: none. Found while testing: the adaptive step uses absolute speeds, which makes moving scenes slow (in `team/notes/UI1.md`).
 - Architecture: updated (section 2 row `simulator/web/`, sections 3 and 4 nodes, section 11)
+
+### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - T9.4, E4.5, Q1 to Q3
+- Did: after the merge of the MVP (pull request #14), on the sponsor's instruction to do the tasks that need no decision and to turn the open questions into scenarios: pre-registered T9.4 and three question scenarios in `team/notes/Q.md` (commit `0fe33a2`, before any code); wrote `third_law_residual` (E4.5), `t9_4`, `scenarios/T9.4/run.py`, `scenarios/Q/run.py`; ran them and committed the stamped results.
+- Result: **T9.4 passes** (proton pulled, antiproton pushed, exactly opposite). **Q1:** L1a with all its terms obeys Newton's third law; each half of the Coupling term alone does not. This corrects a sentence of mine in `team/notes/T1.4.md`. **Q2:** under L1a the L0 energy is not conserved but the same sum read with L1a is, to 4.1e-7 on four runs; it is a candidate for the physics lead, not added to the engine. **Q3:** CODATA 2018 or 2022 for `K` changes nothing above 3.5e-10. `pytest`: 174 passed, 1 deselected.
+- Next: P4, P5, P7 (asked for, not done yet).
+- Blocked by / questions: every open question for the maintainer is now collected in **`team/QUESTIONS.md`** (eleven questions and a housekeeping list); two of them are proposed as decisions D23 (energy of L1a) and D24 (dev dependencies). One flaw of my own Q1 script (a pass tolerance that could not see a tiny residual) was found on the first run and corrected before anything was committed as a result; it is recorded as a change to the plan.
+- Architecture: updated (sections 2, 10, 11)
 
 ### 2026-11-10 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D21.1-D21.4
 - Did: on the maintainer's request, turned the four conventions of D21 into scenarios; pre-registered them (`team/notes/D21.md`, committed before any run); ran them from commit `7ccf3aa` (`scenarios/D21/run.py`); also reviewed MVP-1 to MVP-8 and reproduced T0 on Windows (identical verdicts, differences at rounding).

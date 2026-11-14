@@ -1,0 +1,75 @@
+{
+  "cases": {
+    "i: pair, lambda = 1": {
+      "A_L0_energy": {
+        "end_drift": 0.44297975400511413,
+        "largest_excursion": 0.49592029984861785
+      },
+      "A_agrees_with_the_engine_energy": 0.0,
+      "A_conserved": false,
+      "B_conserved": true,
+      "B_energy_read_with_L1a": {
+        "end_drift": 3.2577674435874115e-07,
+        "largest_excursion": 4.045672700181413e-07
+      },
+      "momentum_drift": 3.3233374428302635e-15,
+      "pass": true,
+      "signed_strength": 1.0,
+      "steps": 10823
+    },
+    "ii: pair, lambda = 0.3, sign -": {
+      "A_L0_energy": {
+        "end_drift": 0.0002480811216561962,
+        "largest_excursion": 0.04463258591475927
+      },
+      "A_agrees_with_the_engine_energy": 0.0,
+      "A_conserved": false,
+      "B_conserved": true,
+      "B_energy_read_with_L1a": {
+        "end_drift": 4.711342427299314e-10,
+        "largest_excursion": 9.096204833802801e-08
+      },
+      "momentum_drift": 1.6997174557113395e-14,
+      "pass": true,
+      "signed_strength": -0.3,
+      "steps": 39090
+    },
+    "iii: pair, lambda = 1, 120 deg": {
+      "A_L0_energy": {
+        "end_drift": 0.000541478087296432,
+        "largest_excursion": 3.99999813621519
+      },
+      "A_agrees_with_the_engine_energy": 0.0,
+      "A_conserved": false,
+      "B_conserved": true,
+      "B_energy_read_with_L1a": {
+        "end_drift": 4.020780153268788e-09,
+        "largest_excursion": 3.0610437140587976e-07
+      },
+      "momentum_drift": 1.9065676393929586e-14,
+      "pass": true,
+      "signed_strength": 1.0,
+      "steps": 101863
+    },
+    "iv: 12 bodies, lambda = 0.2": {
+      "A_L0_energy": {
+        "end_drift": 0.0011345501952501058,
+        "largest_excursion": 0.0011345501952501058
+      },
+      "A_agrees_with_the_engine_energy": 0.0,
+      "A_conserved": false,
+      "B_conserved": true,
+      "B_energy_read_with_L1a": {
+        "end_drift": 9.772015308051607e-09,
+        "largest_excursion": 9.772015308051607e-09
+      },
+      "momentum_drift": 1.5270895327753371e-16,
+      "pass": true,
+      "signed_strength": 0.2,
+      "steps": 3000
+    }
+  },
+  "explanation": "Q2 under L0 and the hypothesis L1a: every case meets its criterion.",
+  "scenario": "Q2",
+  "verdict": "pass"
+}

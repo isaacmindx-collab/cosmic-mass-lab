@@ -15,7 +15,7 @@ from ..laws import LawSpec, make_law
 from ..matter import preset
 from ..settings import load_settings
 
-__all__ = ["t9_1", "t9_3", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY"]
+__all__ = ["t9_1", "t9_3", "t9_4", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY"]
 
 NEUTRON_CHARGE_MEASURED = (-0.2e-21, 0.8e-21)  # value and standard error, in units of e (as cited by the book)
 STANDARD_GRAVITY = 9.80665  # m/s^2, the conventional standard acceleration of gravity
@@ -80,3 +80,30 @@ def t9_3(phi_bar_deg: float = 79.86) -> dict:
     }
     case["pass"] = bool(abs(size - 1.14e11) < 0.005e11 and case["relative_error_vs_s_g"] < 1e-12)
     return {"id": "T9.3", "pass": case["pass"], "cases": {"electron": case}, "runs": {"electron": settings}}
+
+
+def t9_4(phi_bar_deg: float = 79.86) -> dict:
+    """T9.4: a proton, then an antiproton (`m_p - e G`), at 7e6 m from a neutral Earth, under L1a.
+    The Earth has no charge, so the Composer force is `s q g`: opposite for the two bodies."""
+    cases, runs, forces = {}, {}, {}
+    proton = preset("proton")
+    for name, charge in (("proton", proton.q), ("antiproton", -proton.q)):
+        settings = _settings("T9.4", LawSpec(reading="L1a").to_dict(),
+                             [{"preset": "Earth", "x": [0.0, 0.0], "fixed": True},
+                              {"name": name, "m": proton.m, "q": charge, "x": [7e6, 0.0]}], phi_bar_deg=phi_bar_deg)
+        s, fields, pair = _forces(settings)
+        expected = s.frame.s * charge * fields.g[1]  # s q g
+        forces[name] = pair.composer[1]
+        cases[name] = {"composer_force": [float(c) for c in pair.composer[1]], "real_force": [float(c) for c in pair.real[1]],
+                       "expected_s_q_g": [float(c) for c in expected], "g": [float(c) for c in fields.g[1]],
+                       "relative_error_vs_s_q_g": float(np.linalg.norm(pair.composer[1] - expected) / np.linalg.norm(expected)),
+                       "composer_over_real": float(np.linalg.norm(pair.composer[1]) / np.linalg.norm(pair.real[1])),
+                       "push": "towards the Earth" if pair.composer[1][0] < 0 else "away from the Earth"}
+        cases[name]["pass"] = bool(cases[name]["relative_error_vs_s_q_g"] < 1e-12)
+        runs[name] = settings
+    size = float(np.linalg.norm(forces["proton"]))
+    opposite = float(np.linalg.norm(forces["proton"] + forces["antiproton"]) / size)
+    cases["pair"] = {"sum_of_the_two_pushes_relative": opposite, "tolerance": 1e-12,
+                     "pass": bool(opposite < 1e-12 and cases["proton"]["push"] == "towards the Earth"
+                                  and cases["antiproton"]["push"] == "away from the Earth")}
+    return {"id": "T9.4", "pass": all(c["pass"] for c in cases.values()), "cases": cases, "runs": runs}

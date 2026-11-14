@@ -21,6 +21,7 @@ __all__ = ["Settings", "SettingsError", "load_settings"]
 # decision D10: velocity Verlet, adaptive step, softening 1e-3 of the smallest separation
 _NUMERICS = {"integrator": "verlet", "adaptive": True, "dt_initial": None, "softening": None,
              "softening_fraction": 1e-3, "eta": 1e-3, "dt_min": 0.0, "dt_max": None,
+             "speed_reference": "absolute",
              "steps": None, "t_end": None, "record_every": None, "seed": 0}
 _UNIVERSE = {"phi_bar_deg": None, "dimension": 2, "units": "SI", "boundary": "open", "background": "none",
              "box": None}
@@ -117,13 +118,13 @@ def load_settings(source) -> Settings:
             if not ok:
                 shape = "a number" if second_2d else f"a list of {universe['dimension']} numbers"
                 raise SettingsError(f"'universe.background.{key}' must be {shape}")
-    if universe["boundary"] not in ("open", "reflecting"):
-        raise SettingsError("'universe.boundary' must be 'open' or 'reflecting' in the MVP")
-    if universe["boundary"] == "reflecting":  # the box: its lower and upper corners
+    if universe["boundary"] not in Environment.BOUNDARIES:
+        raise SettingsError(f"'universe.boundary' must be one of {list(Environment.BOUNDARIES)}")
+    if universe["boundary"] != "open":  # the box: its lower and upper corners
         box = universe["box"]
         _known(box if box is not None else 0, ("lower", "upper"), "universe.box")
         try:
-            Environment("reflecting", box.get("lower"), box.get("upper"))
+            Environment(universe["boundary"], box.get("lower"), box.get("upper"))
             assert len(box["lower"]) == universe["dimension"]
         except (ValueError, TypeError, AssertionError):
             raise SettingsError(f"'universe.box' needs 'lower' and 'upper', lists of {universe['dimension']} "
