@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pytest
 
-from cosmicmass.constants import SCALED, SI
+from cosmicmass.constants import SI
 from cosmicmass.diagnostics import Diagnostics, drifts
 from cosmicmass.energy import background_energy, energy_l0, interaction_energy, kinetic_energy
 from cosmicmass.frame import Frame
