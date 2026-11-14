@@ -12,6 +12,7 @@ from typing import ClassVar
 
 import numpy as np
 
+from .. import readings
 from ..fields.sample import FieldSample
 from ..frame import Frame
 from ..state import State
@@ -103,11 +104,16 @@ class Law:
         raise NotImplementedError
 
     def inertia(self, state: State, frame: Frame) -> np.ndarray:
-        """The inertia of each body. `Re(mu) = m` (L7 default); the readings `Sh(mu)` and
-        `abs(mu)` belong to the modifiers (task E4.4), which are outside the MVP."""
-        if self.spec.inertia != "Re":
-            raise NotImplementedError("inertia readings Sh and abs (L7) are not implemented yet")
-        return state.mu(frame).re
+        """The inertia of each body, a reading of its cosmic mass (option L7; tasks E3.4, E4.4):
+        `Re(mu) = m` (the default, and L0's), `Sh(mu) = m + q s cos(phi_bar)` or
+        `abs(mu) = sqrt(Sh^2 + Ht^2)`. `Sh(mu)` can be zero or negative (for an electron it is
+        negative): a hypothesis to explore (T8); a zero inertia is refused by the integrator."""
+        mu = state.mu(frame)
+        if self.spec.inertia == "Re":
+            return mu.re
+        if self.spec.inertia == "Sh":
+            return readings.Sh(mu)
+        return readings.abs(mu)
 
 
 _REGISTRY: dict[str, type[Law]] = {}

@@ -125,8 +125,14 @@ def test_registry_of_laws():
     class Other(Law):
         reading = "L1a"
 
-    with pytest.raises(NotImplementedError):
-        Other(LawSpec(reading="L1a", inertia="abs")).inertia(two_bodies(), Frame.si())
+    # L7 (E3.4): the inertia readings of the cosmic mass, available to every law but L0
+    state, frame = two_bodies(), Frame.si()
+    mu = state.mu(frame)
+    from cosmicmass import readings
+
+    assert np.array_equal(Other(LawSpec(reading="L1a", inertia="Sh")).inertia(state, frame), readings.Sh(mu))
+    assert np.array_equal(Other(LawSpec(reading="L1a", inertia="abs")).inertia(state, frame), readings.abs(mu))
+    assert np.array_equal(Other(LawSpec(reading="L1a")).inertia(state, frame), state.m)
 
 
 # ----------------------------------------------------------------- L0 (E4.2)
