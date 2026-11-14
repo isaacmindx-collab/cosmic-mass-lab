@@ -8,18 +8,25 @@ is the value the book cites (Baumann et al., Phys. Rev. D 37, 1988). Pre-registr
 `team/notes/T9.md`, `team/notes/T9.4.md`. The forces are evaluated once; nothing is integrated.
 """
 
+import math
+
 import numpy as np
 
 from ..constants import SI
 from ..fields import DirectSum
 from ..laws import LawSpec, make_law
 from ..matter import preset
+from ..runner import run
 from ..settings import load_settings
+from .t0 import _pair, _relative_track
 
-__all__ = ["t9_1", "t9_3", "t9_4", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY"]
+__all__ = ["t9_1", "t9_2", "t9_3", "t9_4", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY",
+           "HYDROGEN_BINDING_MEASURED", "BOHR_RADIUS"]
 
 NEUTRON_CHARGE_MEASURED = (-0.2e-21, 0.8e-21)  # value and standard error, in units of e (as cited by the book)
 STANDARD_GRAVITY = 9.80665  # m/s^2, the conventional standard acceleration of gravity
+HYDROGEN_BINDING_MEASURED = 13.598  # eV, as cited by the book (Sansonetti 2005)
+BOHR_RADIUS = 5.29177e-11  # m, as in T0.1b
 
 
 def _forces(settings: dict):
@@ -59,6 +66,83 @@ def t9_1(strength: float = 1.0, phi_bar_deg: float = 79.86) -> dict:
     case["pass"] = bool(abs(abs(q_eff / SI.e) - strength * 9.0e-19) < strength * 0.05e-19
                         and case["relative_error_vs_minus_m_over_s"] < 1e-12)
     return {"id": "T9.1", "pass": case["pass"], "cases": {"neutron": case}, "runs": {"neutron": settings}}
+
+
+def _share_factor(phi_bar_deg: float, strength: float, separations) -> tuple:
+    """The pull on the electron of a proton-electron pair, Real plus Composer, over the Real pull,
+    at each separation (forces once), under L1a with the charge share only."""
+    law = LawSpec(reading="L1a", strength=strength, terms="-2 cos q E").to_dict()
+    factors, pushes_back, runs = [], [], {}
+    for a in separations:
+        settings = _settings("T9.2", law, [{"preset": "proton", "x": [0.0, 0.0]},
+                                           {"preset": "electron", "x": [a, 0.0]}], phi_bar_deg=phi_bar_deg)
+        s, fields, pair = _forces(settings)
+        towards = np.array([-1.0, 0.0])  # from the electron to the proton
+        real = float(np.dot(pair.real[1], towards))
+        factors.append((real + float(np.dot(pair.composer[1], towards))) / real)
+        pushes_back.append(bool(float(np.dot(pair.composer[1], towards)) < 0))
+        runs[f"forces_at_{a / BOHR_RADIUS:g}_a0"] = settings
+    return factors, pushes_back, runs, s.frame
+
+
+def t9_2(phi_bar_deg: float = 79.86, strength: float = 1.0, eta: float = 1e-3, orbit: bool = True,
+         convergence: bool = True) -> dict:
+    """T9.2: hydrogen under the charge share only (L5c), against the measured binding energy.
+    (A) the pull is Coulomb's times `f = 1 - 2 lambda cos(phi_bar)` at every separation;
+    (B) a circular orbit with the speed of that pull keeps its predicted period;
+    (C) the book's scaling `f^2 x 13.598 eV` gives 5.71 eV."""
+    separations = [k * BOHR_RADIUS for k in (0.5, 1.0, 2.0, 5.0)]
+    factors, pushes_back, runs, frame = _share_factor(phi_bar_deg, strength, separations)
+    expected = 1.0 - 2.0 * strength * frame.cos_phi()
+    spread = max(abs(f / expected - 1) for f in factors)
+    cases = {"pull": {
+        "separations_in_a0": [a / BOHR_RADIUS for a in separations], "factor": factors, "expected": expected,
+        "largest_relative_error": spread, "share_pushes_back": pushes_back,
+        "tolerance": {"relative": 1e-12}}}
+    cases["pull"]["pass"] = bool(spread < 1e-12 and all(pushes_back))
+
+    f = float(np.mean(factors))
+    binding = f * f * HYDROGEN_BINDING_MEASURED
+    cases["binding"] = {
+        "factor": f, "binding_energy_eV": binding, "book_value_eV": 5.71,
+        "measured_eV": HYDROGEN_BINDING_MEASURED, "ratio_to_measured": binding / HYDROGEN_BINDING_MEASURED,
+        "gap_eV": HYDROGEN_BINDING_MEASURED - binding,
+        "method": "the book's scaling (binding energy grows with the square of the pull, Bohr 1913), with f "
+                  "from the engine; not a quantum calculation by the engine",
+        "tolerance": {"rounds_to_book_value_eV": 0.005}}
+    cases["binding"]["pass"] = bool(abs(binding - 5.71) < 0.005)
+
+    if orbit:
+        p, e = preset("proton"), preset("electron")
+        k = SI.G_N * p.m * e.m - expected * SI.K * p.q * e.q  # G_N m_p m_e + f K e^2: the weaker pull
+        reduced = p.m * e.m / (p.m + e.m)
+        period = 2 * math.pi * math.sqrt(reduced * BOHR_RADIUS**3 / k)
+        speed = math.sqrt(k / (reduced * BOHR_RADIUS))
+        law = LawSpec(reading="L1a", strength=strength, terms="-2 cos q E").to_dict()
+
+        def measure(eta_value):
+            settings = _pair("T9.2", p, e, BOHR_RADIUS, speed, phi_bar_deg,
+                             {"t_end": period, "eta": eta_value, "record_every": 1}, kind="measurement-check")
+            settings["law"] = law
+            result = run(settings, out_root=None)
+            t, r, angle = _relative_track(result)
+            return result, 2 * math.pi * t[-1] / abs(angle[-1] - angle[0]), float(np.max(np.abs(r / BOHR_RADIUS - 1)))
+
+        result, measured, radius_error = measure(eta)
+        case = {"period": measured, "period_predicted": period, "period_error": abs(measured / period - 1),
+                "speed": speed, "radius_largest_relative_change": radius_error,
+                "energy_re_drift_reported_not_judged": result.summary["conservation"]["energy_re"],
+                "steps": result.summary["steps"], "eta": eta,
+                "tolerance": {"period": 1e-3, "radius": 1e-3, "convergence": 1e-2}}
+        case["pass"] = bool(case["period_error"] < 1e-3 and radius_error < 1e-3)
+        if convergence:
+            half, quarter = measure(eta / 2)[1], measure(eta / 4)[1]
+            case["convergence"] = {"period_eta": measured, "period_eta_half": half, "period_eta_quarter": quarter,
+                                   "change_half_to_quarter": abs(half / quarter - 1)}
+            case["pass"] = bool(case["pass"] and case["convergence"]["change_half_to_quarter"] < 1e-2)
+        cases["orbit"] = case
+        runs["orbit"] = result
+    return {"id": "T9.2", "pass": all(c["pass"] for c in cases.values()), "cases": cases, "runs": runs}
 
 
 def t9_3(phi_bar_deg: float = 79.86) -> dict:

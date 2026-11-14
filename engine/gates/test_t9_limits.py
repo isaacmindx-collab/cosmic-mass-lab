@@ -21,6 +21,19 @@ def test_t9_1_neutron_effective_charge():
     assert t9.t9_1(phi_bar_deg=120.0)["cases"]["neutron"]["q_eff_coulomb"] == case["q_eff_coulomb"]  # no angle in it
 
 
+def test_t9_2_hydrogen_under_the_charge_share():
+    outcome = t9.t9_2(convergence=False)
+    pull, binding, orbit = (outcome["cases"][k] for k in ("pull", "binding", "orbit"))
+    assert outcome["pass"]
+    assert pull["expected"] == pytest.approx(0.647892, rel=1e-6)  # 1 - 2 cos(79.86 deg): "0.352 of Coulomb's pull"
+    assert binding["binding_energy_eV"] == pytest.approx(5.708, abs=5e-4)  # book: 5.71 eV
+    assert orbit["period_predicted"] == pytest.approx(1.88767e-16, rel=1e-5)
+    flat = t9.t9_2(phi_bar_deg=90.0, orbit=False)["cases"]["pull"]  # at 90 deg the share vanishes
+    assert flat["factor"][1] == pytest.approx(1.0, abs=1e-15)
+    off = t9.t9_2(strength=0.0, orbit=False)["cases"]
+    assert off["pull"]["factor"] == [1.0] * 4 and not off["binding"]["pass"]  # lambda = 0 is L0: 13.598 eV
+
+
 def test_t9_3_equivalent_field_of_gravity():
     case = t9.t9_3()["cases"]["electron"]
     assert case["pass"] and case["equivalent_field_size"] == pytest.approx(1.1380e11, rel=1e-4)  # book: 1.14e11 V/m
@@ -42,7 +55,7 @@ def test_t9_4_particle_and_antiparticle_pushed_opposite_ways():
 
 
 def test_results_are_written_as_measurement_checks(tmp_path):
-    for outcome in (t9.t9_4(), t9.t9_1(), t9.t9_3()):
+    for outcome in (t9.t9_2(orbit=False), t9.t9_4(), t9.t9_1(), t9.t9_3()):
         folder = write_gate_result(outcome, out_root=tmp_path, kind="measurement-check", law="the hypothesis L1a")
         stamp = json.loads((folder / "stamp.json").read_text())
         summary = json.loads((folder / "summary.json").read_text())
