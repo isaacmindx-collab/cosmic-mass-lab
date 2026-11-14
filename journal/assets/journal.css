@@ -102,6 +102,7 @@ div.arithmatex { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
 .soon { font: 15px var(--sans); }
 .button { display: inline-block; margin-top: 6px; background: var(--accent); color: #fff; text-decoration: none;
   padding: 7px 14px; border-radius: 7px; font: 600 14.5px var(--sans); }
+.hint { color: var(--muted); font-size: 13.5px; margin-left: 8px; }
 .side { color: var(--k-teaching); border-color: var(--k-teaching); }
 td.ok { color: var(--k-result); }
 td.missing { color: var(--k-open-question); font-style: italic; }
