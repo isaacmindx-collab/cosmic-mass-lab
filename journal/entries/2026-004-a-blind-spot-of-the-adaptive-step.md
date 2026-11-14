@@ -12,7 +12,7 @@ authors:
     sponsor: "@MostafaDerraz"
     role: wrote the entry; reviewed Q5 and drafted decision D29
 label: mathematics
-status: done
+status: confirmed
 summary: >
   A time step that looks only at each body's nearest neighbour misses a fast passage nobody's
   nearest neighbour sees: in a pre-registered trap it gets a deflection wrong by $4.0\times10^{-4}$
@@ -29,6 +29,10 @@ links:
     url: /team/notes/Q4.md
   - title: Decision D29
     url: /team/DECISIONS.md
+  - title: Q5 reproduction run
+    url: /results/Q5/20261114-183045-746e044
+corrections:
+  - "2026-11-14: Q5 is now confirmed (same model, on the maintainer's decision D39): its re-run from the stamped engine commit gave the same results bit for bit (67 numbers, 29 flags). The status changed from done to confirmed and the section 'Status and limits' was updated; before, it said the run was not independently confirmed."
 ---
 
 This is a result about the **numerical method**, not about physics. Every statement is mathematics, checked numerically under the law L0.
@@ -61,7 +65,7 @@ Ten of the eleven predictions held. The one that failed is worth recording: **th
 
 ## Status and limits
 
-Status **done**: the run was checked again to $10^{-12}$ during review, but by an agent of the same model as the producer, which does not count as an independent confirmation (D14). The guard costs $O(N^2)$ per step, which will matter in crowded scenes. Many bodies passing at once has not been tested.
+Status **confirmed**, on the maintainer's decision D39: a second instance of the same model re-ran Q5 from its stamped engine commit and got the same results bit for bit. A reproduction by a person or another model would still strengthen it. The guard costs $O(N^2)$ per step, which will matter in crowded scenes. Many bodies passing at once has not been tested.
 
 Decision D29 adds the guard to the engine's convention for the time step. Moving it into the integrator is task E3, and like every engine change it must pass the gate T0 again.
 

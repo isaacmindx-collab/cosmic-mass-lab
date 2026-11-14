@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
+- Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.
+- Result: `summary.json` identical bit for bit (67 numbers, 29 flags; the failed prediction about the sign of the deflection is reproduced too). The gates of M1 (T0, T9.1-T9.4) are all confirmed.
+- Next: the OpenCode agent builds D37 and D36; D21.1-D21.4 are still `done`.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - T9.2 reproduced and confirmed (D38)
 - Did: re-ran `scenarios/T9.2/run.py` from its stamped engine commit `b19237e` in a clean worktree and compared the new `summary.json` with the stored one. On the maintainer's decision (D38, "approve it even the same agent"; "don't leave it open anymore"), recorded T9.2 as confirmed by the same model, with that label; added the reproduction run to `results/T9.2/`; updated `team/FINDINGS.md` and journal entry 2026-003 (with a dated note).
 - Result: identical bit for bit (33 numbers, 11 flags; binding energy 5.7080 eV). All four T9 tests are now confirmed.

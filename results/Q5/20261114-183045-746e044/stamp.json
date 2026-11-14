@@ -1,0 +1,83 @@
+{
+  "cases": {
+    "trap": {
+      "engine_commit": "746e044",
+      "environment": {
+        "mpmath": "1.3.0",
+        "numpy": "1.26.4",
+        "python": "3.12.10",
+        "sympy": "1.14.0"
+      },
+      "kind": "mathematics",
+      "law": {
+        "B_cal": "off",
+        "direction": "radial",
+        "id": "L0",
+        "inertia": "Re",
+        "lambda": 1.0,
+        "range": "1/r^2",
+        "sign": "+",
+        "terms": "all"
+      },
+      "matter": [
+        {
+          "m": 1.0,
+          "n": 1,
+          "name": "H",
+          "q": 0.0
+        },
+        {
+          "m": 0.001,
+          "n": 1,
+          "name": "companion",
+          "q": 0.0
+        },
+        {
+          "m": 1e-12,
+          "n": 1,
+          "name": "pair a",
+          "q": 0.0
+        },
+        {
+          "m": 1e-12,
+          "n": 1,
+          "name": "pair b",
+          "q": 0.0
+        }
+      ],
+      "numerics": {
+        "adaptive": true,
+        "dt_initial": null,
+        "dt_max": null,
+        "dt_min": 0.0,
+        "eta": 0.001,
+        "integrator": "verlet",
+        "record_every": null,
+        "seed": 0,
+        "softening": 0.0,
+        "softening_fraction": 0.001,
+        "speed_reference": "absolute",
+        "steps": null,
+        "t_end": 0.4
+      },
+      "preregistered": true,
+      "producer": "Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz), reproduction",
+      "run_id": "20261114-183045-746e044",
+      "scenario": "Q5",
+      "t0_status": "not run",
+      "universe": {
+        "background": "none",
+        "boundary": "open",
+        "dimension": 2,
+        "phi_bar_deg": 90.0,
+        "units": "scaled"
+      }
+    }
+  },
+  "engine_commit": "746e044",
+  "kind": "mathematics",
+  "preregistered": true,
+  "producer": "Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz), reproduction",
+  "run_id": "20261114-183045-746e044",
+  "scenario": "Q5"
+}
