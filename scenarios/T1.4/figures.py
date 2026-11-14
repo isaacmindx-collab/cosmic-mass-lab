@@ -33,15 +33,19 @@ def _svg(curves, x_range, y_range, x_label, y_label, caption, equal=False) -> st
     plot = SIZE - 2 * MARGIN
     px = lambda v: MARGIN + (v - x0) / (x1 - x0) * plot  # noqa: E731
     py = lambda v: SIZE - MARGIN - (v - y0) / (y1 - y0) * plot  # noqa: E731
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{SIZE}" height="{SIZE + 70}" font-family="sans-serif" font-size="12">',
-           f'<rect width="{SIZE}" height="{SIZE + 70}" fill="white"/>',
-           f'<rect x="{MARGIN}" y="{MARGIN}" width="{plot}" height="{plot}" fill="none" stroke="#444"/>']
+    out = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{SIZE}" height="{SIZE + 70}" font-family="sans-serif" font-size="12">',
+        f'<rect width="{SIZE}" height="{SIZE + 70}" fill="white"/>',
+        f'<rect x="{MARGIN}" y="{MARGIN}" width="{plot}" height="{plot}" fill="none" stroke="#444"/>',
+    ]
     for i in range(5):
         vx, vy = x0 + i * (x1 - x0) / 4, y0 + i * (y1 - y0) / 4
         out.append(f'<text x="{px(vx):.1f}" y="{SIZE - MARGIN + 16}" text-anchor="middle">{vx:.3g}</text>')
         out.append(f'<text x="{MARGIN - 6}" y="{py(vy) + 4:.1f}" text-anchor="end">{vy:.3g}</text>')
     out.append(f'<text x="{SIZE / 2}" y="{SIZE - MARGIN + 36}" text-anchor="middle">{x_label}</text>')
-    out.append(f'<text x="16" y="{SIZE / 2}" text-anchor="middle" transform="rotate(-90 16 {SIZE / 2})">{y_label}</text>')
+    out.append(
+        f'<text x="16" y="{SIZE / 2}" text-anchor="middle" transform="rotate(-90 16 {SIZE / 2})">{y_label}</text>'
+    )
     for k, (name, xs, ys) in enumerate(curves):
         points = " ".join(f"{px(a):.1f},{py(b):.1f}" for a, b in zip(xs, ys))
         out.append(f'<polyline points="{points}" fill="none" stroke="{COLOURS[name]}" stroke-width="1.5"/>')
@@ -59,25 +63,50 @@ def make_figures(l0_folder, l1a_folder) -> list:
     lam = json.loads((Path(l1a_folder) / "stamp.json").read_text())["law"]["lambda"]
     scaled = {name: ([a / R0 for a in x], [b / R0 for b in y]) for name, (t, x, y) in data.items()}
     reach = 1.05 * max(max(map(abs, xs + ys)) for xs, ys in scaled.values())
-    note = ["EXPLORATORY. Position of the electron relative to the proton.",
-            f"L0: reference law. L1a: hypothesis (reading Re + lambda s Com, lambda = {lam:g}),",
-            "excluded by measurement at lambda = 1 (test T9.1)."]
+    note = [
+        "EXPLORATORY. Position of the electron relative to the proton.",
+        f"L0: reference law. L1a: hypothesis (reading Re + lambda s Com, lambda = {lam:g}),",
+        "excluded by measurement at lambda = 1 (test T9.1).",
+    ]
     figures = Path(l1a_folder) / "figures"
     figures.mkdir(exist_ok=True)
-    (figures / "orbit.svg").write_text(_svg([(n, *scaled[n]) for n in ("L0", "L1a")], (-reach, reach), (-reach, reach),
-                                            "x / r0   (r0 = 5.29177e-11 m)", "y / r0", note, equal=True), encoding="utf-8")
+    (figures / "orbit.svg").write_text(
+        _svg(
+            [(n, *scaled[n]) for n in ("L0", "L1a")],
+            (-reach, reach),
+            (-reach, reach),
+            "x / r0   (r0 = 5.29177e-11 m)",
+            "y / r0",
+            note,
+            equal=True,
+        ),
+        encoding="utf-8",
+    )
     period = data["L0"][0][-1] / 5.0
-    radial = {n: ([a / period for a in t], [math.hypot(a, b) / R0 for a, b in zip(x, y)]) for n, (t, x, y) in data.items()}
+    radial = {
+        n: ([a / period for a in t], [math.hypot(a, b) / R0 for a, b in zip(x, y)]) for n, (t, x, y) in data.items()
+    }
     top = 1.05 * max(max(r) for _, r in radial.values())
     note[0] = "EXPLORATORY. Separation of the pair against time."
-    (figures / "separation.svg").write_text(_svg([(n, *radial[n]) for n in ("L0", "L1a")], (0.0, 5.0), (0.0, top),
-                                                 "time / period of the L0 orbit", "separation / r0", note), encoding="utf-8")
+    (figures / "separation.svg").write_text(
+        _svg(
+            [(n, *radial[n]) for n in ("L0", "L1a")],
+            (0.0, 5.0),
+            (0.0, top),
+            "time / period of the L0 orbit",
+            "separation / r0",
+            note,
+        ),
+        encoding="utf-8",
+    )
     lines = []
     for name, (times, r) in radial.items():
         far = max(range(len(r)), key=r.__getitem__)
         back = min(range(far, len(r)), key=r.__getitem__)
-        lines.append(f"{name}: separation between {min(r):.4f} r0 and {max(r):.4f} r0; farthest at {times[far]:.3f} "
-                     f"L0 periods; nearest after that at {times[back]:.3f} L0 periods ({r[back]:.4f} r0)")
+        lines.append(
+            f"{name}: separation between {min(r):.4f} r0 and {max(r):.4f} r0; farthest at {times[far]:.3f} "
+            f"L0 periods; nearest after that at {times[back]:.3f} L0 periods ({r[back]:.4f} r0)"
+        )
     lines.append(f"figures: {figures / 'orbit.svg'}, {figures / 'separation.svg'}")
     return lines
 

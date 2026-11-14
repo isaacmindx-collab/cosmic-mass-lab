@@ -18,7 +18,7 @@ def frames():
 
 
 def bridge(z: GN) -> complex:
-    """"Turning Unit and the bridge to C": z -> Sh z + i Ht z is an isomorphism of
+    """ "Turning Unit and the bridge to C": z -> Sh z + i Ht z is an isomorphism of
     fields onto C, with Sh z = a + b s cos(phi_bar) and Ht z = b s sin(phi_bar)."""
     f = z.frame
     return complex(z.re + z.com * f.s * f.cos_phi(), z.com * f.s * f.sin_phi())
@@ -37,7 +37,7 @@ def test_rule_of_the_square_exact_at_50_digits():
                 f = Frame.from_degrees(mpmath.mpf(s), deg)
                 G = GN.unit(f)
                 assert G * G == 2 * f.s * mpmath.cos(f.phi_bar) * G - f.s**2
-                assert (G * G).re == -mpmath.mpf(s) ** 2
+                assert (G * G).re == -(mpmath.mpf(s) ** 2)
 
 
 def test_product_formula_term_by_term():
@@ -111,8 +111,9 @@ def test_real_scalars_mix_with_general_numbers():
 def test_real_part_of_the_product_does_not_depend_on_the_angle():
     # "Cosmic Interaction Law and its reading": Re[(a+bG)(c+dG)] = ac - s^2 bd at every angle
     s = Frame.si().s
-    reals = {(GN(2.0, 3e-10, f) * GN(5.0, -7e-10, f)).re
-             for f in (Frame.from_degrees(s, deg) for deg in range(10, 171, 5))}
+    reals = {
+        (GN(2.0, 3e-10, f) * GN(5.0, -7e-10, f)).re for f in (Frame.from_degrees(s, deg) for deg in range(10, 171, 5))
+    }
     assert reals == {2.0 * 5.0 - s * s * 3e-10 * -7e-10}
 
 

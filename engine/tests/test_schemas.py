@@ -22,11 +22,16 @@ KNOWN_NONCONFORMING = set()  # the D21 verdicts were fixed in #27 (issue #24)
 
 
 def _settings():
-    return {"scenario": "schema-test", "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"},
-            "law": {"id": "L0"}, "bodies": [{"preset": "proton", "x": [0.0, 0.0]},
-                                            {"preset": "electron", "x": [1e-10, 0.0]}],
-            "numerics": {"steps": 5, "softening": 0.0}, "kind": "mathematics", "preregistered": False,
-            "producer": "test"}
+    return {
+        "scenario": "schema-test",
+        "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"},
+        "law": {"id": "L0"},
+        "bodies": [{"preset": "proton", "x": [0.0, 0.0]}, {"preset": "electron", "x": [1e-10, 0.0]}],
+        "numerics": {"steps": 5, "softening": 0.0},
+        "kind": "mathematics",
+        "preregistered": False,
+        "producer": "test",
+    }
 
 
 @pytest.mark.parametrize("folder", vr.run_folders(ROOT / "results"), ids=lambda f: f.relative_to(ROOT).as_posix())
@@ -65,8 +70,15 @@ def test_an_invalid_stamp_fails_with_a_readable_message():
 
 def test_an_invalid_case_stamp_names_the_case():
     stamp = run(_settings(), out_root=None).stamp
-    gate = {"scenario": "T9.9", "run_id": stamp["run_id"], "engine_commit": stamp["engine_commit"],
-            "kind": "mathematics", "preregistered": True, "producer": "test", "cases": {"a": stamp}}
+    gate = {
+        "scenario": "T9.9",
+        "run_id": stamp["run_id"],
+        "engine_commit": stamp["engine_commit"],
+        "kind": "mathematics",
+        "preregistered": True,
+        "producer": "test",
+        "cases": {"a": stamp},
+    }
     assert vr.validate(gate, "stamp") == []
     gate["cases"]["a"] = dict(stamp, universe=dict(stamp["universe"], dimension=4))
     assert vr.validate(gate, "stamp") == ["cases.a.universe.dimension: 4 is not one of [2, 3]"]
@@ -76,7 +88,8 @@ def test_an_invalid_summary_fails():
     summary = run(_settings(), out_root=None).summary
     assert vr.validate(summary, "summary") == []
     assert vr.validate(dict(summary, verdict="maybe"), "summary") == [
-        "verdict: 'maybe' is not one of ['pass', 'fail', 'finding', 'none']"]
+        "verdict: 'maybe' is not one of ['pass', 'fail', 'finding', 'none']"
+    ]
     cases = {"scenario": "T9.9", "verdict": "none", "explanation": "x", "cases": {"a": {}}}
     assert vr.validate(cases, "summary") == ["verdict: 'none' is not one of ['pass', 'fail', 'finding']"]
 

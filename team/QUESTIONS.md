@@ -27,7 +27,6 @@
 | 11 | **E2.2 needs a derivation:** the second field `B_cal` of a moving point body in the slow-body form. The compendium gives the field equations F3-F4, not the field of a moving point source. | Blocks E2.2, the Boris push (E3.2), option L6, and the tests T5. | physics lead | `docs/WORK-PLAN.md`, E2.2 | 2026-11-10 |
 | 12 | **What does the field do across a wrap-around boundary (U4)?** Three candidates: positions wrap and forces are those of open space; each pair interacts through its nearest image; a full periodic sum. | Wrap-around is the one wall of E6a not delivered. The first candidate breaks energy conservation at every crossing; the choice changes every result in a periodic box. A run can compare the candidates, so this should become a scenario once the alternatives are agreed. | physics lead, numerics lead | `team/notes/E6a.md` | 2026-11-11 |
 | 13 | **Absorbing surfaces of bodies (T4.3):** a planet that collects what falls on it needs a radius, which a body does not have (`State` holds `m`, `q`, `x`, `v`). Should `State` gain a `radius` column, and should the collected momentum move the planet? | Needed by T4.3 (self-charging planets). It changes the `State` contract of `ARCHITECTURE.md`, section 10. | engine lead | `team/notes/E6a.md` | 2026-11-11 |
-| 14 | **Amend convention 4 of D21 (the adaptive step)?** Scenario Q4 shows that the current rule depends on the frame: a scene moving as a whole costs 29 times more steps (186,692 against 6,449 for Sun, Earth and moon over a month), with no gain that was asked for. A rule relative to the nearest neighbour removes this and is as accurate on four setups. It is available as an option, not as the default. | The web universe and every scenario with a moving system (T4, T5) pay this cost. Before adopting the new rule, one more scenario is needed: a close pair passing fast near a third body, where the new rule could step too far. Should that scenario be run, and with which guard? | numerics lead, maintainer | `team/notes/Q4.md`; `team/notes/UI1.md` | 2026-11-11 |
 
 ## Proposed answers
 
@@ -79,6 +78,7 @@ Not questions, but things only the maintainer can do or should decide:
 
 | # | Question | Answer | Date |
 |---|---|---|---|
+| 14 | Amend convention 4 of D21 (the adaptive step)? | Yes: the pair guard of Q5 (rule C), decision D29. Implementation in `integrators.py`: task E3. | 2026-11-14 |
 | 22 | Who may confirm a result of an agent? | An agent of a different model may, even with the same sponsor, while the maintainer is the only sponsor; labelled "confirmed (agent, same sponsor)". Decision D27. | 2026-11-14 |
 | 21 | Is `k_B = 1` in scaled units? | Accepted for now as a labelled assumption (like `c = e = 1`, question 6); to be revisited with question 6. | 2026-11-14 |
 | 20 | Accept two choices of E6b (deterministic inflow count; the bath judged on the time average)? | Accepted for now as labelled assumptions. The independent review of #33 found both sound (inflow exactly `floor(rate t)`; the bath reaches its temperature from below and from above). | 2026-11-14 |

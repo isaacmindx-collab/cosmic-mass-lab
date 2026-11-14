@@ -45,10 +45,13 @@ class State:
         x = np.array(x, dtype=float)
         n = len(bodies)
         return cls(
-            m=[b.m for b in bodies], q=[b.q for b in bodies], x=x,
+            m=[b.m for b in bodies],
+            q=[b.q for b in bodies],
+            x=x,
             v=np.zeros_like(x) if v is None else v,
             fixed=np.zeros(n, dtype=bool) if fixed is None else fixed,
-            alive=np.ones(n, dtype=bool), t=t,
+            alive=np.ones(n, dtype=bool),
+            t=t,
         )
 
     @property
@@ -72,5 +75,6 @@ class State:
 
     def copy(self) -> "State":
         """An independent copy: changing it never changes the original."""
-        return State(self.m.copy(), self.q.copy(), self.x.copy(), self.v.copy(),
-                     self.fixed.copy(), self.alive.copy(), self.t)
+        return State(
+            self.m.copy(), self.q.copy(), self.x.copy(), self.v.copy(), self.fixed.copy(), self.alive.copy(), self.t
+        )

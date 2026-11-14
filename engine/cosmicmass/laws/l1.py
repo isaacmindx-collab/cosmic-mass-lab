@@ -42,7 +42,9 @@ class L1a(Law):
         super().__init__(spec)
         for option, default in (("direction", "radial"), ("moving", "off"), ("range", "1/r^2")):
             if getattr(self.spec, option) != default:
-                raise NotImplementedError(f"L1a: the option {option} = {getattr(self.spec, option)!r} is not implemented yet")
+                raise NotImplementedError(
+                    f"L1a: the option {option} = {getattr(self.spec, option)!r} is not implemented yet"
+                )
 
     def strength(self, frame: Frame) -> float:
         """The signed strength: `+/- lambda`, with lambda a number or `cos(phi_bar)` (L3)."""
@@ -52,8 +54,11 @@ class L1a(Law):
     def composer_coordinate(self, state: State, fields: FieldSample, frame: Frame) -> np.ndarray:
         """The selected terms of `Com(mu E_cal)`, shape `(N, d)`."""
         m, q = state.m[:, None], state.q[:, None]
-        parts = {"s q g": q * fields.g, "-m E/s": m * fields.e,
-                 "-2 cos q E": (2 * frame.s * frame.cos_phi()) * (q * fields.e)}
+        parts = {
+            "s q g": q * fields.g,
+            "-m E/s": m * fields.e,
+            "-2 cos q E": (2 * frame.s * frame.cos_phi()) * (q * fields.e),
+        }
         if self.spec.terms == "all":
             return (parts["s q g"] + parts["-m E/s"]) + parts["-2 cos q E"]
         return parts[self.spec.terms]

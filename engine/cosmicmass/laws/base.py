@@ -142,9 +142,11 @@ def third_law_residual(law: Law, state: State, solver, frame: Frame) -> dict:
     worst = {"pair": None, "residual": 0.0, "force": 0.0, "relative": None}
     alive = np.flatnonzero(state.alive)
     for position, i in enumerate(alive):
-        for j in alive[position + 1:]:
+        for j in alive[position + 1 :]:
             pick = [i, j]
-            pair = State(state.m[pick], state.q[pick], state.x[pick], state.v[pick], [False, False], [True, True], state.t)
+            pair = State(
+                state.m[pick], state.q[pick], state.x[pick], state.v[pick], [False, False], [True, True], state.t
+            )
             force = law.forces(pair, solver.at_bodies(pair), frame).total()
             size = float(max(np.linalg.norm(force[0]), np.linalg.norm(force[1])))
             if size == 0.0:

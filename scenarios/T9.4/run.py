@@ -16,8 +16,12 @@ PRODUCER = "Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz)"
 
 if __name__ == "__main__":
     outcome = t9_4()
-    folder = write_gate_result(outcome, producer=sys.argv[1] if len(sys.argv) > 1 else PRODUCER,
-                               kind="measurement-check", law="the hypothesis L1a")
+    folder = write_gate_result(
+        outcome,
+        producer=sys.argv[1] if len(sys.argv) > 1 else PRODUCER,
+        kind="measurement-check",
+        law="the hypothesis L1a",
+    )
     for name, case in outcome["cases"].items():
         print(f"{'pass' if case['pass'] else 'FAIL'}  T9.4 {name}")
     print(f"T9.4: {'pass' if outcome['pass'] else 'FAIL'}; results in {folder}")

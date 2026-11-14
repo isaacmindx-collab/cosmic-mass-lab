@@ -40,6 +40,11 @@ def test_every_run_sits_in_a_folder_named_after_its_run_id():
 
 
 def test_no_loose_files_beside_run_folders():
-    loose = [p.relative_to(ROOT) for scenario in RESULTS.iterdir() if scenario.is_dir()
-             for p in scenario.iterdir() if p.is_file()]
+    loose = [
+        p.relative_to(ROOT)
+        for scenario in RESULTS.iterdir()
+        if scenario.is_dir()
+        for p in scenario.iterdir()
+        if p.is_file()
+    ]
     assert loose == []

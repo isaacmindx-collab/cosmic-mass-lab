@@ -40,8 +40,7 @@ class FieldSample:
     @classmethod
     def zeros(cls, points: int, dimension: int) -> "FieldSample":
         second = (points, 3) if dimension == 3 else (points,)
-        return cls(np.zeros((points, dimension)), np.zeros((points, dimension)),
-                   np.zeros(second), np.zeros(second))
+        return cls(np.zeros((points, dimension)), np.zeros((points, dimension)), np.zeros(second), np.zeros(second))
 
     def E_cal(self, frame: Frame) -> GNArray:
         """The cosmic field `E_cal = g + e G`."""

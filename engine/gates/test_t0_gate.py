@@ -42,7 +42,9 @@ def test_the_closed_form_of_the_coulomb_escape():
 
 def test_convergence_blocks_and_written_results(tmp_path):
     one = t0.t0_1(periods=0.02, convergence=True)
-    assert {"period_eta", "period_eta_half", "period_eta_quarter", "change_half_to_quarter"} == set(one["cases"]["a"]["convergence"])
+    assert {"period_eta", "period_eta_half", "period_eta_quarter", "change_half_to_quarter"} == set(
+        one["cases"]["a"]["convergence"]
+    )
     assert one["cases"]["c"]["convergence"]["change_half_to_quarter"] < 1e-6
     two = t0.t0_2(n=12, steps=30, convergence=True)
     assert set(two["cases"]["cloud"]["convergence"]) == {"eta_half", "eta_quarter", "n_half", "n_double"}
@@ -50,10 +52,15 @@ def test_convergence_blocks_and_written_results(tmp_path):
         folder = t0.write_gate_result(outcome, out_root=tmp_path, producer="unit test")
         summary = json.loads((folder / "summary.json").read_text())
         stamp = json.loads((folder / "stamp.json").read_text())
-        assert summary["scenario"] == outcome["id"] == stamp["scenario"] and summary["cases"].keys() == outcome["cases"].keys()
+        assert (
+            summary["scenario"] == outcome["id"] == stamp["scenario"]
+            and summary["cases"].keys() == outcome["cases"].keys()
+        )
         assert stamp["producer"] == "unit test" and all(s["law"]["id"] == "L0" for s in stamp["cases"].values())
     assert summary["verdict"] == "pass" and (tmp_path / "T0.1").exists()
     assert len(list((tmp_path / "T0.2").glob("*/timeseries-cloud.csv"))) == 1
     failing = dict(t0.t0_5(points_per_side=5), id="T0.5-fail")
     failing["pass"] = False
-    assert json.loads((t0.write_gate_result(failing, out_root=tmp_path) / "summary.json").read_text())["verdict"] == "fail"
+    assert (
+        json.loads((t0.write_gate_result(failing, out_root=tmp_path) / "summary.json").read_text())["verdict"] == "fail"
+    )

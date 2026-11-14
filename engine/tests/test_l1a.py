@@ -16,10 +16,17 @@ def random_case(d, seed=21, n=30, s=None):
     rng = np.random.default_rng(seed)
     f = Frame.si() if s is None else Frame.from_degrees(s, 60.0)
     second = (n, 3) if d == 3 else (n,)
-    fields = FieldSample(rng.normal(size=(n, d)), rng.normal(size=(n, d)) / f.s,
-                         rng.normal(size=second), rng.normal(size=second) / f.s)
-    state = State(m=rng.uniform(1, 2, n), q=rng.normal(size=n) / f.s, x=rng.normal(size=(n, d)),
-                  v=rng.normal(size=(n, d)), fixed=np.zeros(n, bool), alive=np.ones(n, bool))
+    fields = FieldSample(
+        rng.normal(size=(n, d)), rng.normal(size=(n, d)) / f.s, rng.normal(size=second), rng.normal(size=second) / f.s
+    )
+    state = State(
+        m=rng.uniform(1, 2, n),
+        q=rng.normal(size=n) / f.s,
+        x=rng.normal(size=(n, d)),
+        v=rng.normal(size=(n, d)),
+        fixed=np.zeros(n, bool),
+        alive=np.ones(n, bool),
+    )
     return f, state, fields
 
 
@@ -92,7 +99,9 @@ def test_third_law_residual_utility():
     assert out["relative"] < 1e-12 and out["force"] > 0 and out["pair"] in ((0, 1), (0, 2), (1, 2))
     # one half of the Coupling term alone does not obey the law; the residual is s G |q_a m_b - q_b m_a| / r^2
     half = third_law_residual(make_law(LawSpec(reading="L1a", terms="s q g")), state, solver, f)
-    assert half["pair"] in ((0, 2), (1, 2)) and half["relative"] == pytest.approx(1.0)  # a charge and a neutron: one-sided
+    assert half["pair"] in ((0, 2), (1, 2)) and half["relative"] == pytest.approx(
+        1.0
+    )  # a charge and a neutron: one-sided
     pair = State.from_bodies([p, e], [[0.0, 0.0], [1e-10, 0.0]])
     one = third_law_residual(make_law(LawSpec(reading="L1a", terms="s q g")), pair, solver, f)
     expected = f.s * SI.G_N * abs(p.q * e.m - e.q * p.m) / 1e-10**2
@@ -100,6 +109,13 @@ def test_third_law_residual_utility():
     assert composer_only == pytest.approx(expected, rel=1e-9)
     # absorbed bodies are left out; a state whose bodies exert no force gives relative None
     state.alive[:] = [True, False, False]
-    assert third_law_residual(make_law("L0"), state, solver, f) == {"pair": None, "residual": 0.0, "force": 0.0, "relative": None}
-    weightless = State(m=[0.0, 0.0], q=[0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0]], v=[[0.0, 0.0]] * 2, fixed=[False] * 2, alive=[True] * 2)
+    assert third_law_residual(make_law("L0"), state, solver, f) == {
+        "pair": None,
+        "residual": 0.0,
+        "force": 0.0,
+        "relative": None,
+    }
+    weightless = State(
+        m=[0.0, 0.0], q=[0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0]], v=[[0.0, 0.0]] * 2, fixed=[False] * 2, alive=[True] * 2
+    )
     assert third_law_residual(make_law("L0"), weightless, solver, f)["relative"] is None

@@ -28,8 +28,11 @@ class Diagnostics:
         energy = energy_l0(state, self.frame, self.constants, self.softening, self.background)
         return {
             "t": float(state.t),
-            "mass": float(total.re), "charge": float(total.com),
-            "kinetic": energy["kinetic"], "energy_re": energy["total"], "energy_com": None,
+            "mass": float(total.re),
+            "charge": float(total.com),
+            "kinetic": energy["kinetic"],
+            "energy_re": energy["total"],
+            "energy_com": None,
             "momentum": [float(p) for p in momentum],
             "momentum_scale": float(np.sum(state.m[moving] * np.linalg.norm(state.v[moving], axis=1))),
         }

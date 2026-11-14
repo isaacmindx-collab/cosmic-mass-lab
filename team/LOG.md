@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D25: the format pass
+- Did: decision D25, approved by the maintainer: one `ruff format .` over the code, made alone after #37, so that no open pull request conflicts. 45 Python files reformatted (layout only). Markdown is excluded (`[tool.ruff.format] exclude = ["*.md"]`): ruff also reformats Python blocks inside Markdown and had undone the hand-aligned contracts of `ARCHITECTURE.md`. One lambda in `gates/t0.py` became a small `def`, because the formatter moved its `noqa` comment off its line. CI job `lint` now also runs `ruff format --check .`.
+- Result: `ruff check .` and `ruff format --check .` clean; the full test suite passes (no behaviour changed).
+- Next: from now on every pull request must be formatted (`ruff format .` before committing). Contributors: see `CONTRIBUTING.md`.
+- Blocked by / questions: none.
+- Architecture: no module changed (layout only); section 9 unchanged in substance (the format check is part of the job `lint`)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of Q5 (#35)
 - Did: read the pre-registration of Q5 (predictions with their arithmetic, committed before any code), the script and the fast test; re-ran `scenarios/Q5/run.py` on the branch and compared with the committed summary; brought #35 onto `main` (record conflicts only).
 - Result: all 92 numbers of the summary reproduced to better than 1e-12, same verdict (`fail`, on the sign of one estimate, as the producer reported). On the trap, rule B errs by 4.0e-4 on the deflection; the pair guard C by 1.1e-7, converging as the step squared (2.7e-8, 5.3e-9 at eta/2, eta/4); on Earth-moon (also moving at 29,780 m/s) and Sun-Earth-moon, C takes exactly B's steps (6,284; 6,449) with the same errors. This is a consistency check by the same model as the producer, not a confirmation (D27).

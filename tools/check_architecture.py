@@ -16,6 +16,7 @@ Usage:
 
 Exit code 0 when everything passes, 1 otherwise.
 """
+
 import argparse
 import re
 import subprocess
@@ -25,8 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 ARCH = ROOT / "ARCHITECTURE.md"
 CODE_DIRS = ("engine/", "scenarios/", "simulator/", "tools/")
-CODE_EXT = {".py", ".js", ".mjs", ".ts", ".tsx", ".jsx", ".html", ".ipynb",
-            ".c", ".cpp", ".h", ".rs", ".jl", ".go"}
+CODE_EXT = {".py", ".js", ".mjs", ".ts", ".tsx", ".jsx", ".html", ".ipynb", ".c", ".cpp", ".h", ".rs", ".jl", ".go"}
 STATUSES = {"planned", "in-progress", "implemented", "deprecated"}
 TOO_COARSE = {"engine/", "scenarios/", "simulator/", "tools/", "engine/cosmicmass/"}
 
@@ -92,11 +92,9 @@ def covered(path: str, rows) -> bool:
 
 
 def changed_files(base: str):
-    out = subprocess.run(["git", "diff", "--name-only", f"{base}...HEAD"],
-                         cwd=ROOT, capture_output=True, text=True)
+    out = subprocess.run(["git", "diff", "--name-only", f"{base}...HEAD"], cwd=ROOT, capture_output=True, text=True)
     if out.returncode != 0:
-        out = subprocess.run(["git", "diff", "--name-only", base, "HEAD"],
-                             cwd=ROOT, capture_output=True, text=True)
+        out = subprocess.run(["git", "diff", "--name-only", base, "HEAD"], cwd=ROOT, capture_output=True, text=True)
     if out.returncode != 0:
         raise RuntimeError(out.stderr.strip())
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
@@ -152,11 +150,12 @@ def main() -> int:
             changed = []
         code_changed = [c for c in changed if is_code(c)]
         if code_changed and "ARCHITECTURE.md" not in changed:
-            errors.append("code changed but ARCHITECTURE.md did not (rule D18): "
-                          + ", ".join(code_changed[:10]))
+            errors.append("code changed but ARCHITECTURE.md did not (rule D18): " + ", ".join(code_changed[:10]))
 
-    print(f"Architecture check: {len(rows)} registry rows, {len(files)} code files, "
-          f"{len(re.findall(r'```mermaid', text))} diagrams")
+    print(
+        f"Architecture check: {len(rows)} registry rows, {len(files)} code files, "
+        f"{len(re.findall(r'```mermaid', text))} diagrams"
+    )
     if errors:
         for e in errors:
             print("FAIL:", e)

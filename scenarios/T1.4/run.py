@@ -30,11 +30,20 @@ def settings(law: dict, producer: str) -> dict:
     total, reduced = p.m + e.m, p.m * e.m / (p.m + e.m)
     speed = math.sqrt(strength / (reduced * R0))  # circular speed of L0
     period = 2 * math.pi * math.sqrt(reduced * R0**3 / strength)
-    bodies = [{"preset": "proton", "x": [-e.m / total * R0, 0.0], "v": [0.0, -e.m / total * speed]},
-              {"preset": "electron", "x": [p.m / total * R0, 0.0], "v": [0.0, p.m / total * speed]}]
-    return {"scenario": law["id"], "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"}, "law": law,
-            "bodies": bodies, "numerics": {"softening": 0.0, "t_end": PERIODS * period, "record_every": 25},
-            "kind": "finding", "preregistered": False, "producer": producer}
+    bodies = [
+        {"preset": "proton", "x": [-e.m / total * R0, 0.0], "v": [0.0, -e.m / total * speed]},
+        {"preset": "electron", "x": [p.m / total * R0, 0.0], "v": [0.0, p.m / total * speed]},
+    ]
+    return {
+        "scenario": law["id"],
+        "universe": {"phi_bar_deg": 79.86, "dimension": 2, "units": "SI"},
+        "law": law,
+        "bodies": bodies,
+        "numerics": {"softening": 0.0, "t_end": PERIODS * period, "record_every": 25},
+        "kind": "finding",
+        "preregistered": False,
+        "producer": producer,
+    }
 
 
 if __name__ == "__main__":
@@ -44,8 +53,10 @@ if __name__ == "__main__":
         result = run(settings(law, producer), out_root=Path("results") / "T1.4")
         folders[law["id"]] = result.folder
         drift = result.summary["conservation"]
-        print(f"{law['id']}: {result.summary['steps']} steps; L0 energy drift {drift['energy_re']:.3e}, "
-              f"momentum drift {drift['momentum']:.3e}; results in {result.folder}")
+        print(
+            f"{law['id']}: {result.summary['steps']} steps; L0 energy drift {drift['energy_re']:.3e}, "
+            f"momentum drift {drift['momentum']:.3e}; results in {result.folder}"
+        )
     for line in make_figures(folders["L0"], folders["L1a"]):
         print(line)
     print("EXPLORATORY demo: L1a is a hypothesis, excluded at lambda = 1 by the neutron (T9.1). Not a result.")

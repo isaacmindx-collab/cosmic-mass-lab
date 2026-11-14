@@ -43,14 +43,16 @@ def test_scaffold_passes_the_architecture_check_and_a_dry_run(repo, monkeypatch,
     notebook = (repo / "team" / "notes" / "T7.9.md").read_text(encoding="utf-8")
     assert notebook.startswith("# T7.9: A scaffolded test | with a bar") and "<ID>" not in notebook
     assert "`scenarios/T7.9/` | T7.9 | in-progress | A scaffolded test / with a bar |" in (
-        repo / "ARCHITECTURE.md").read_text(encoding="utf-8")
+        repo / "ARCHITECTURE.md"
+    ).read_text(encoding="utf-8")
     capsys.readouterr()
     assert _archcheck(repo, monkeypatch) == 0 and "PASS" in capsys.readouterr().out
 
     settings = load_settings(folder / "settings.json")
     assert settings.law_spec.reading == "L0" and settings.meta["preregistered"] is False
-    out = subprocess.run([sys.executable, str(folder / "run.py"), "--dry-run"], cwd=repo,
-                         capture_output=True, text=True, timeout=120)
+    out = subprocess.run(
+        [sys.executable, str(folder / "run.py"), "--dry-run"], cwd=repo, capture_output=True, text=True, timeout=120
+    )
     assert out.returncode == 0, out.stderr
     assert "T7.9, law L0: 10 steps" in out.stdout and "nothing written" in out.stdout
     assert not (repo / "results" / "T7.9").exists()
@@ -66,8 +68,13 @@ def test_the_full_run_writes_stamped_results_that_follow_the_schemas(repo):
     import validate_results
 
     new_scenario.scaffold("T7.8", "Stamped", repo)
-    out = subprocess.run([sys.executable, str(repo / "scenarios" / "T7.8" / "run.py"), "tester"], cwd=repo,
-                         capture_output=True, text=True, timeout=120)
+    out = subprocess.run(
+        [sys.executable, str(repo / "scenarios" / "T7.8" / "run.py"), "tester"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
     assert out.returncode == 0, out.stderr
     (folder,) = (repo / "results" / "T7.8").iterdir()
     assert json.loads((folder / "stamp.json").read_text(encoding="utf-8"))["producer"] == "tester"

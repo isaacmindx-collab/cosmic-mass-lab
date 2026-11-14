@@ -70,9 +70,13 @@ def test_vector_fields_broadcast():
 def test_refusals():
     f, g = Frame.from_degrees(1.0, 60.0), Frame.from_degrees(1.0, 90.0)
     z = GNArray([1.0], [1.0], f)
-    for op in (lambda: z + GNArray([1.0], [1.0], g), lambda: z * GN(1.0, 1.0, g),
-               lambda: z - GNArray([1.0], [1.0], g), lambda: z / GN(1.0, 1.0, g),
-               lambda: GNArray.from_scalars([GN(1.0, 1.0, f), GN(1.0, 1.0, g)])):
+    for op in (
+        lambda: z + GNArray([1.0], [1.0], g),
+        lambda: z * GN(1.0, 1.0, g),
+        lambda: z - GNArray([1.0], [1.0], g),
+        lambda: z / GN(1.0, 1.0, g),
+        lambda: GNArray.from_scalars([GN(1.0, 1.0, f), GN(1.0, 1.0, g)]),
+    ):
         with pytest.raises(ValueError):
             op()
     for op in (lambda: z + "1", lambda: z * True, lambda: z - "1", lambda: z / "1", lambda: z.allclose("1")):
@@ -81,6 +85,7 @@ def test_refusals():
     with pytest.raises(ZeroDivisionError):
         GNArray([0.0, 1.0], [0.0, 1.0], f).inverse()
     import mpmath
+
     with pytest.raises(TypeError):
         GNArray([1.0], [1.0], Frame.from_degrees(mpmath.mpf(1), 60))
     assert (z == GNArray([1.0], [1.0], g)) is False and (z != "1") and "GNArray(shape=(1,)" in repr(z)

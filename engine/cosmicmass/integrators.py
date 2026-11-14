@@ -52,12 +52,12 @@ def nearest_neighbours(state: State) -> tuple:
         x = state.x[idx]
         step = max(1, 2_000_000 // len(idx))
         for start in range(0, len(idx), step):
-            diff = x[start:start + step, None, :] - x[None, :, :]
+            diff = x[start : start + step, None, :] - x[None, :, :]
             dist = np.sqrt(np.einsum("pnd,pnd->pn", diff, diff))
             rows = np.arange(dist.shape[0])
             dist[rows, start + rows] = np.inf
-            out[idx[start:start + step]] = dist.min(axis=1)
-            partner[idx[start:start + step]] = idx[dist.argmin(axis=1)]
+            out[idx[start : start + step]] = dist.min(axis=1)
+            partner[idx[start : start + step]] = idx[dist.argmin(axis=1)]
     return out, partner
 
 

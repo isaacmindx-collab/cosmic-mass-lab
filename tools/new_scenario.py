@@ -120,8 +120,9 @@ def scaffold(scenario: str, title: str, root: Path = ROOT) -> list[Path]:
     (folder / "settings.json").write_text(json.dumps(default_settings(scenario), indent=2) + "\n", encoding="utf-8")
     (folder / "run.py").write_text(RUN_TEMPLATE.format(scenario=scenario, title=title.strip()), encoding="utf-8")
     notebook.write_text(_notebook(root, scenario, title.strip()), encoding="utf-8")
-    architecture.write_text(text.replace(REGISTRY_END, _registry_row(scenario, title.strip()) + "\n" + REGISTRY_END, 1),
-                            encoding="utf-8")
+    architecture.write_text(
+        text.replace(REGISTRY_END, _registry_row(scenario, title.strip()) + "\n" + REGISTRY_END, 1), encoding="utf-8"
+    )
     return [folder / "settings.json", folder / "run.py", notebook, architecture]
 
 
@@ -138,9 +139,11 @@ def main(argv=None) -> int:
         return 2
     for path in written:
         print(f"wrote {path}")
-    print(f"next: the pre-registration in team/notes/{args.scenario}.md (commit it first, D12); the setup in "
-          f"scenarios/{args.scenario}/settings.json; a line in ARCHITECTURE.md, section 11; then "
-          f"python scenarios/{args.scenario}/run.py --dry-run")
+    print(
+        f"next: the pre-registration in team/notes/{args.scenario}.md (commit it first, D12); the setup in "
+        f"scenarios/{args.scenario}/settings.json; a line in ARCHITECTURE.md, section 11; then "
+        f"python scenarios/{args.scenario}/run.py --dry-run"
+    )
     return 0
 
 

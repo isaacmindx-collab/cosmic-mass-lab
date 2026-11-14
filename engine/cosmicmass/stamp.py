@@ -23,10 +23,16 @@ def engine_commit() -> str:
     """Short commit of the engine, with "-dirty" if files are changed; "unknown" outside git."""
     here = Path(__file__).resolve().parent
     try:
-        commit = subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], cwd=here, capture_output=True,
-                                text=True, check=True).stdout.strip()
-        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=here,
-                               capture_output=True, text=True, check=True).stdout.strip()
+        commit = subprocess.run(
+            ["git", "rev-parse", "--short=7", "HEAD"], cwd=here, capture_output=True, text=True, check=True
+        ).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=here,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
         return commit + ("-dirty" if dirty else "")
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
@@ -58,8 +64,12 @@ def build_stamp(settings, softening: float, run_id: str, commit: str, t0_status:
         "universe": universe,
         "matter": [{"name": name, "m": m, "q": q, "n": n} for (name, m, q), n in matter.items()],
         "numerics": numerics,
-        "environment": {"python": platform.python_version(), "sympy": sympy.__version__,
-                        "mpmath": mpmath.__version__, "numpy": numpy.__version__},
+        "environment": {
+            "python": platform.python_version(),
+            "sympy": sympy.__version__,
+            "mpmath": mpmath.__version__,
+            "numpy": numpy.__version__,
+        },
         "kind": settings.meta["kind"],
         "preregistered": settings.meta["preregistered"],
         "producer": settings.meta["producer"],
