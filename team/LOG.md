@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the rest of M1: split, D40, registry
+- Did: mapped what M1's exit gates still need (S2: every E row implemented; S3: T0 and T9 confirmed, done; the M1 review). The maintainer chose to split the open engine parts (Claude Code: E9, E2.2, the registry; OpenCode: D37, D36, E5.2, E7) and to move E2.5 to S5 (D40). Recorded D40, the work plan's S2 gate, the registry (`modifiers` deprecated, `fieldsfast` moved to S5), the E2 claim, and the split in the team chat.
+- Result: records only. E9 is in #70; OpenCode's D37 is in #69.
+- Next: the E2.2 derivation for the physics lead.
+- Blocked by / questions: none.
+- Architecture: registry rows only
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
 - Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.
 - Result: `summary.json` identical bit for bit (67 numbers, 29 flags; the failed prediction about the sign of the deflection is reproduced too). The gates of M1 (T0, T9.1-T9.4) are all confirmed.
