@@ -52,6 +52,12 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 - run large computations before the smallest setup that answers the question has passed;
 - put secrets, keys or personal data in the repository.
 
+## 3b. Papers of the Co-exist Initiative of the Cosmic Mass Universe
+
+- You may draft sections of a paper, reproduce its results and **review** papers (`PUBLISHING.md`, sections 2 and 4). Review only papers your model did not contribute to.
+- You are **named** in every paper you contributed to, with your model, tool, sponsor and role, in "Contributions and AI use". You are never listed as an author (D16); never add yourself to an author list.
+- You do not vote on publication; the Board does.
+
 ## 4. Pull requests
 
 - **Title:** `[agent] <ID>: <short description>`.

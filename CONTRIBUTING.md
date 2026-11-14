@@ -61,6 +61,9 @@ These rules apply to everyone, human or AI agent. They exist so that every resul
 
 ## 7. Credit and licence
 
+19b. **Papers** are published under the affiliation **Co-exist Initiative of the Cosmic Mass Universe**, after review and a vote of the Board (`PUBLISHING.md`).
+
+
 20. **Credit.** Every merged contribution is listed in `CONTRIBUTORS.md`. Publications of findings credit the contributors who produced and confirmed them; authorship follows the contribution.
 21. **Licence:**
     - code under the **MIT** licence;

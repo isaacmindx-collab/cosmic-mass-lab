@@ -42,6 +42,11 @@ Start here, in this order:
 - Gates: T0 (consistency) and T9 (measured limits: neutron 9.0e-19 e) must pass before exploring L1-L8.
 - Confirmation requires independent reproduction by a human or an agent of a different model.
 
+## Papers
+
+- [PUBLISHING.md](PUBLISHING.md): papers of the Co-exist Initiative of the Cosmic Mass Universe: proposal, review, Board vote, Zenodo preprint; AI agents named in "Contributions and AI use" (D31, D32)
+- [papers/README.md](papers/README.md): papers and the template
+
 ## Try it
 
 - [https://mostafaderraz.github.io/cosmic-mass-lab/simulator/web/](https://mostafaderraz.github.io/cosmic-mass-lab/simulator/web/): the web universe (the unchanged engine in Pyodide); source in simulator/web/
