@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the team chat (branch `team-chat`)
+- Did: brought the branch onto the format pass (#38) so it arrives formatted; resolved the records (question 14, now answered by D29, dropped from the open table; question 23 kept). Tried `tools/chat.py`: `read` shows the first message; posted the first reply (`--re`), and `thread` shows both.
+- Result: 7 chat tests pass; ruff clean; architecture check PASS.
+- Next: the maintainer decides question 23 (adopt the chat).
+- Blocked by / questions: none.
+- Architecture: updated by the branch (`tools/chat.py`, node and row); no change by the review
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D25: the format pass
 - Did: decision D25, approved by the maintainer: one `ruff format .` over the code, made alone after #37, so that no open pull request conflicts. 45 Python files reformatted (layout only). Markdown is excluded (`[tool.ruff.format] exclude = ["*.md"]`): ruff also reformats Python blocks inside Markdown and had undone the hand-aligned contracts of `ARCHITECTURE.md`. One lambda in `gates/t0.py` became a small `def`, because the formatter moved its `noqa` comment off its line. CI job `lint` now also runs `ruff format --check .`.
 - Result: `ruff check .` and `ruff format --check .` clean; the full test suite passes (no behaviour changed).
