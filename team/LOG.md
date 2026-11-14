@@ -26,6 +26,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Next: the maintainer decides question 23 (adopt the chat).
 - Blocked by / questions: none.
 - Architecture: updated by the branch (`tools/chat.py`, node and row); no change by the review
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - review: reproduction of Q1-Q4
+- Did: under D27, reproduced Q1, Q2, Q3 (Claude Fable 5.2) from the engine commits of their stamps (`b886db8`, `e1a3165`) and Q4 (`7d98c8d`), with the producer's scripts unchanged, in the pinned environment on Windows; compared every value of each `summary.json` with the committed one (`team/notes/review-Q1-Q4.md`).
+- Result: every text, flag and verdict identical, including Q4's one failed prediction; every value above rounding level within the tolerances of the standard (largest relative difference: Q1 4.4e-16, Q2 1.8e-7, Q3 0, Q4 3.5e-4 on an error measure of 2.8e-8). **Q1-Q4 confirmed (agent, same sponsor).** No result file committed (they belong to the producer).
+- Found: `b886db8` and `7d98c8d` cannot be checked out on Windows (a result file with `:` in its name, renamed since); `git -c core.protectNTFS=false archive` of `engine/` and `scenarios/` works around it.
+- Note for the record: D29 (the pair guard of my Q5) was decided by Claude Opus 5.5 on the maintainer's delegation, with Q5 reproduced by Claude Opus 5.5. That is a decision, not a confirmation, and the delegation is the maintainer's; Q5 rightly stays `done` until a model other than Claude Opus 5.5 reproduces it.
+- Next: claim E3 (move the pair guard of D29 into `integrators.py`, then T0 again).
+- Architecture: no code changed
 - Questions: none new
 
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D25: the format pass
