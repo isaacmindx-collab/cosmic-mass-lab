@@ -90,6 +90,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | validate | `tools/validate_results.py` | P4 | implemented | validates the results folders against `engine/schemas/`, one readable line per problem; used by `engine/tests/test_schemas.py` on every committed result. Outside the package, so the web universe does not load `jsonschema` |
 | scaffold | `tools/new_scenario.py` | P5 | implemented | creates `scenarios/<ID>/` (`settings.json`: a valid 10-step L0 start; `run.py`: calls the runner, `--dry-run` writes nothing), the notebook from `team/notes/_TEMPLATE.md` and a registry row; never overwrites |
 | webui | `simulator/web/` | UI1 | in-progress | interactive universe in the browser: the unchanged engine runs in Pyodide in a web worker (`worker.js`, `bridge.py`); page `index.html`, `app.js`; `engine-files.json` lists the engine files it loads (D22, proposed) |
+| journal | `tools/build_journal.py` | D34 | implemented | builds the Co-exist Journal (`journal/`): checks the entries of `journal/entries/` (front matter, authors, kinds, labels, the teaching side of D35) and writes the static site (index, entry pages with discussion, authors with the AI teaching register, discussion page, Atom feed); `--check` fails if the committed site is stale. Uses `markdown`, `pymdown-extensions`, `pyyaml` (dev extras); outside the package |
 | gallery | `tools/make_gallery.py` | - | implemented | draws the figures of `docs/GALLERY.md` (SVG, standard library) from the stored results |
 <!-- registry:end -->
 
@@ -148,6 +149,7 @@ flowchart TB
         validate["tools/validate_results.py"]
         schemas["engine/schemas<br/>(stamp, summary)"]
         gallery["tools/make_gallery.py"]
+        journal["tools/build_journal.py<br/>(Co-exist Journal, journal/)"]
         cli["python -m cosmicmass<br/>__main__.py"]
         scen["scenarios/ID/run.py"]
         gate["gates/t0.py"]
@@ -217,6 +219,7 @@ flowchart TB
     tests -.->|"any layer"| gn
     tests --> validate
     tests --> chat
+    tests --> journal
     validate --> schemas
     webui --> runner
     scaffold -.->|"writes settings.json and run.py,<br/>which use"| settings
@@ -740,6 +743,12 @@ def main(argv=None) -> int: ...                      # python tools/validate_res
 def scaffold(scenario: str, title: str, root=ROOT) -> list[Path]: ...   # raises ScaffoldError; writes nothing on error
 def main(argv=None) -> int: ...                      # python tools/new_scenario.py <ID> "<title>"; 2 on error
 
+# tools/build_journal.py (D34, D35): outside the package
+def read_entries() -> tuple[list[Entry], list[str]]: ...   # entries newest first, and one line per problem
+def build(entries) -> dict[str, str]: ...            # the site, {path under journal/: text}; deterministic
+def open_threads(entries, run=None) -> list[str]: ...   # editors: a GitHub Discussions thread per new entry (gh); recorded in journal/discussion.json
+def main(argv=None) -> int: ...                      # python tools/build_journal.py [--check | --open-threads]; 1 on a problem
+
 # tools/chat.py (team chat, question 23): outside the package, standard library only
 def post(sender, to, subject, body, re_id="", folder=CHAT, now=None) -> Path: ...   # one new file; ChatError, nothing written
 def load(folder=CHAT) -> list[Message]: ...          # every message, oldest first (README.md excluded)
@@ -757,6 +766,8 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |
+| 2026-11-14 | Co-exist Journal (`coexist-journal`, stacked on `co-exist-initiative`; D34, D35) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **new** `tools/build_journal.py` (node `journal`, section 4, used by `tests`); section 10: its signatures; `markdown==3.8.2`, `pymdown-extensions==10.16.1`, `pyyaml==6.0.2` added to the dev extras. No engine module or contract changed |
 | 2026-11-14 | E3.2: the Boris push (`E3-boris`, stacked on `E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: `Boris`, `boris_rotation`, `StepContext.rotation` and `.remember` (the cache also keeps the fields and the inertia); `settings.py`: `numerics.integrator` `"verlet"` or `"boris"`, resolved by D10 when left out; `runner.py` picks the integrator. Section 5: `Boris`; section 10: additions. No existing signature changed |
 | 2026-11-14 | E3: the pair guard of D29 (`E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: new function `pair_approach_time`; `next_dt` always applies the pair guard; the default `speed_reference` becomes `"neighbour"` (also in `settings.py`). Section 10: the contract of `StepContext` changed by **decision D29** (default) and the new function. No diagram changed |
 | 2026-11-14 | team chat (`team-chat`; question 23, proposed) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `tools/chat.py` (node `chat`, section 4, used by `tests`); `team/chat/` with its README and the first message; section 10: its signatures. No engine module changed |
