@@ -33,6 +33,10 @@ links:
     url: /team/notes/T9.md
   - title: Findings index
     url: /team/FINDINGS.md
+  - title: Notebook of T9.4
+    url: /team/notes/T9.4.md
+corrections:
+  - "2026-11-14: the paragraph on T9.4 said that antihydrogen falling like hydrogen would exclude this reading. That was wrong: antihydrogen is neutral, so the term $s\\,q\\,g$ is zero for it and under L1a it falls exactly like hydrogen. Its fall tests nothing here, and T9.4 does not exclude L1a by itself (T9.1 does). The paragraph now says so. Reported by Claude Opus 5.5 in OpenCode in the [discussion of this entry](https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/48)."
 ---
 
 Before the lab explores any reading of the Composer coordinate, it must reproduce what is already known (decision D4). The book of the theory works out what the simplest reading, **a force along the line**, would do to measured systems, and finds it excluded. Test T9 runs the same cases in the engine, under the reading L1a, and compares.
@@ -52,7 +56,7 @@ Every statement below is a **finding of the virtual universe under the hypothesi
 
 **The neutron limit (T9.1).** At full strength the reading puts the neutron 1126 standard errors away from the measured value. The largest coupling allowed at two standard errors is $\lambda = 0.0020$. This is the reliable limit: the alternative test, electrons falling near the Earth, is hidden by the screening of metal.
 
-**Matter and antimatter (T9.4).** The antiproton's cosmic mass is $m_p - e\,\mathcal{G}$. Under L1a with all terms, near the neutral Earth only the term $s\,q\,g$ acts (the others are exactly zero), and it pulls the proton in and pushes the antiproton out with the same force: the sum is exactly zero. The real forces are identical. The Composer force is $1.1116\times10^{18}$ times the weight, and it does not depend on the frame angle. Antihydrogen falling like hydrogen would therefore exclude this reading by a very wide margin.
+**Matter and antimatter (T9.4).** The antiproton's cosmic mass is $m_p - e\,\mathcal{G}$. Under L1a with all terms, near the neutral Earth only the term $s\,q\,g$ acts (the others are exactly zero), and it pulls the proton in and pushes the antiproton out with the same force: the sum is exactly zero. The real forces are identical. The Composer force is $1.1116\times10^{18}$ times the weight, and it does not depend on the frame angle. This is a **prediction no experiment has tested**: antihydrogen is neutral, so its fall tests nothing here (under L1a it falls exactly like hydrogen), and the fall of a charged antiparticle has not been measured. T9.4 therefore does not exclude L1a by itself; T9.1 does.
 
 **Hydrogen (T9.2).** Read as a force, the charge share weakens the pull to 0.647892 of the L0 pull at every separation. With the book's scaling, hydrogen would bind at 5.708 eV instead of 13.598 eV: excluded. This check is **done but not yet reproduced** by a human or another model (D14), and it uses the book's scaling, because the engine does not compute atoms.
 
