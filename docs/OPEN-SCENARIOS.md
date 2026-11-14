@@ -45,7 +45,7 @@ Every task, with its files, acceptance criteria and effort, is in `docs/WORK-PLA
 | E4 | Law plug-in interface: L0-L8 as switchable readings | E1-E3 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E4.1, E4.2, L1a of E4.3 and E4.5 delivered; L1b-L1e and E4.4 to do |
 | E5 | State, universe U1-U8, settings loader, seeded populations | E1 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E5.1 and a minimal E5.3 delivered |
 | E6a | Walls: reflecting, absorbing with collection, wrap-around | E5 | easy | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz): reflecting and absorbing walls delivered; wrap-around waits for question 12 of `team/QUESTIONS.md` |
-| E6b | Inflow, heat bath, fixed sources | E6a | medium | open |
+| E6b | Inflow, heat bath, fixed sources | E6a | medium | done (Claude Opus 5.5 agent, sponsor @MostafaDerraz; pull request waiting for review) |
 | E7 | Runner, stamp, command line | E3-E5 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): the time loop, the stamp and the command line delivered; checkpoints and schema validation to do |
 | E8 | Diagnostics, convergence helper, standard plots | E7 | medium | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): E8.1 conservation diagnostics delivered; pressure, temperature, E8.2, E8.3 to do |
 | E9 | Energy in both coordinates (may need an approved derivation) | E2 | hard | claimed (Claude Fable 5.2 agent, sponsor @MostafaDerraz, MVP sprint D20): the L0 energy delivered; the Composer energy needs an approved derivation |

@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E6b
+- Did: claimed E6b; wrote `Inflow` (U7), `HeatBath` (Andersen), `kinetic_temperature` and `K_B` in `environment.py`; settings `universe.inflow` and `universe.heat_bath` (validated, errors name the field); the runner's seeded generator, summary blocks and `temperature` column; the stamp and the P4 stamp schema for the two blocks; 17 tests. Fixed sources (U6) existed already; now tested to be untouched by walls, inflow and bath.
+- Result: inflow over 10^4 steps within one body of `rate t` (0.07%); the bath holds the time-averaged temperature within 2%, for each of three masses too. Same seed, same run. Software facts and checks against mathematics; no finding.
+- Next: review; then T6.1 (pressure equals `n k T` under L0) can be pre-registered.
+- Blocked by / questions: six labelled choices in `team/notes/E6b.md`.
+- Architecture: updated (section 2 row `environment`; section 5 `Inflow`, `HeatBath`; section 10 signatures; section 11)
+- Questions: asked (20, 21, 22). Did not reproduce Q1-Q4: question 22 (who may confirm).
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P4 (#25) and P5 (#26)
 - Did: brought #25 and #26 onto `main` (one log conflict, kept both sides); reviewed the schemas, the validator and the scaffold; ran the scaffold for a real scenario in a throwaway copy (files, registry row, architecture check and the first run all work). Two fixes: `KNOWN_NONCONFORMING` emptied (the D21 verdicts were fixed in #27), and `jsonschema` moved from the runtime dependencies and `requirements.txt` to the dev extras, as D24 says (only `tools/validate_results.py` and its tests use it). Recorded D24 as approved by the maintainer ("ok approved"); question 4 answered.
 - Result: 216 tests passed, coverage 99%; architecture check PASS; `tools/validate_results.py`: all 20 committed run folders valid.
