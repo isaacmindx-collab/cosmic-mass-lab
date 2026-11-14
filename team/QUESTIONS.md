@@ -78,7 +78,7 @@ Not questions, but things only the maintainer can do or should decide:
 - The checklist in `docs/MVP-PLAN.md`, section 4, still says "PR open" for every row; all ten are merged.
 - The board (`docs/OPEN-SCENARIOS.md`) still shows E2 to E9 as claimed under the MVP sprint (D20). The sprint is over; release the claims or reassign them.
 - The gallery (pull request #15) is based on the old branch `MVP-demo`; it should be moved onto `main` or closed.
-- ~~T9.1, T9.3, T9.4 and Q1 to Q3 are `done`; each needs an independent reproduction (D14) to become `confirmed`~~: T9.1, T9.3 and T9.4 confirmed earlier; Q1 to Q4 confirmed (agent, same sponsor) on 2026-11-14 (`team/notes/review-Q1-Q4.md`, D27). Still `done`, waiting for a reproduction by a model other than Claude Opus 5.5: T9.2, Q5 and the D21 scenarios (all produced by Claude Opus 5.5).
+- ~~T9.1, T9.3, T9.4 and Q1 to Q3 are `done`; each needs an independent reproduction (D14) to become `confirmed`~~: T9.1, T9.3 and T9.4 confirmed earlier; Q1 to Q4 confirmed (agent, same sponsor) on 2026-11-14 (`team/notes/review-Q1-Q4.md`, D27). ~~Still `done`, waiting for a reproduction by a model other than Claude Opus 5.5: T9.2, Q5 and the D21 scenarios~~: reproduced by Claude Fable 5.2 on 2026-11-14 (`team/notes/review-T9.2-Q5-D21.md`); all confirmed (agent, same sponsor; D27).
 - Branch protection for `main` (P6) and required checks.
 
 ## Answered

@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) - review: T9.2, Q5, D21.1 to D21.4 reproduced by a different model
+- Did: for the S3 exit gate of M1 ("each reproduced independently"), re-ran T9.2 (`b19237e`), Q5 (`746e044`) and D21.1 to D21.4 (`f263697`) from their stamped engine commits on Linux (Python 3.12.3; the producers used 3.12.10 on Windows), with the producers' scripts unchanged, and compared every value. For T9.2 also an arithmetic check that does not use the engine.
+- Result: all six reproduced. Every text, flag, verdict and step count is identical. Numbers agree to rounding: the largest difference on a judged quantity is 1.1e-11 relative (a three-body separation in Q5). T9.2 and Q5 move from the same-model exceptions D38 and D39 to "confirmed (agent, same sponsor; D27)"; D21.1 to D21.4 from `done` to the same. Outputs not committed.
+- Next: the M1 review draft.
+- Blocked by / questions: none.
+- Architecture: no change (no code)
+- Questions: none new
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E2.2: derivation of the field of moving bodies (question 11)
 - Did: derived the slow-body second field of a moving point body from the compendium's field equations: `B_cal = (1/c^2) v x E_cal` to first order in `v/c` (`team/notes/E2.2.md`), and checked it with SymPy (`team/notes/E2.2_check.py`: div 0, Ampere-Maxwell away from the body, Faraday to order (v/c)^2, Biot-Savart for the Composer part with mu_0 = 4 pi K / c^2). Updated the README's M1 line (E9, L1e and torque done).
 - Result: derivation proposed; all symbolic checks hold. The Real part is the gravitomagnetic field behind the paper's stated LAGEOS failure (1/4), noted as a limit.
