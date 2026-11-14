@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/MostafaDerraz/cosmic-mass-lab/engine/schemas/summary.schema.json",
+  "title": "summary.json of a run (team/RESULTS-STANDARD.md, section 4)",
+  "description": "Either the summary of one run (written by the runner: conservation over the run, no verdict of its own) or the summary of a test with several cases (written by a scenario or gate: a verdict and the measured quantities of each case).",
+  "oneOf": [
+    {"$ref": "#/$defs/run_summary"},
+    {"$ref": "#/$defs/case_summary"}
+  ],
+  "$defs": {
+    "drift": {"type": ["number", "null"], "description": "relative drift; null when not defined (for example the Composer energy)"},
+    "conservation": {
+      "type": "object",
+      "description": "Relative drifts over the run (section 4: mass, charge, energy, momentum).",
+      "required": ["mass", "charge", "energy_re", "momentum"],
+      "properties": {
+        "mass": {"$ref": "#/$defs/drift"},
+        "charge": {"$ref": "#/$defs/drift"},
+        "energy_re": {"$ref": "#/$defs/drift"},
+        "energy_com": {"$ref": "#/$defs/drift"},
+        "momentum": {"$ref": "#/$defs/drift"}
+      }
+    },
+    "explanation": {"type": "string", "minLength": 1, "description": "the verdict in one sentence"},
+    "run_summary": {
+      "type": "object",
+      "required": ["scenario", "law", "steps", "t_end", "initial", "final", "conservation", "convergence",
+                   "verdict", "explanation"],
+      "properties": {
+        "scenario": {"type": "string", "minLength": 1},
+        "law": {"enum": ["L0", "L1a", "L1b", "L1c", "L1d", "L1e"]},
+        "steps": {"type": "integer", "minimum": 0},
+        "t_end": {"type": "number"},
+        "initial": {"type": "object"},
+        "final": {"type": "object"},
+        "conservation": {"$ref": "#/$defs/conservation"},
+        "convergence": {"type": ["object", "null"]},
+        "verdict": {"enum": ["pass", "fail", "finding", "none"],
+                    "description": "'none' only for a plain run, which has no pass criterion"},
+        "explanation": {"$ref": "#/$defs/explanation"}
+      }
+    },
+    "case_summary": {
+      "type": "object",
+      "required": ["scenario", "verdict", "cases", "explanation"],
+      "properties": {
+        "scenario": {"type": "string", "minLength": 1},
+        "verdict": {"enum": ["pass", "fail", "finding"]},
+        "explanation": {"$ref": "#/$defs/explanation"},
+        "prediction": {},
+        "cases": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "object"}
+        }
+      }
+    }
+  }
+}

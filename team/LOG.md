@@ -12,6 +12,28 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P4 (#25) and P5 (#26)
+- Did: brought #25 and #26 onto `main` (one log conflict, kept both sides); reviewed the schemas, the validator and the scaffold; ran the scaffold for a real scenario in a throwaway copy (files, registry row, architecture check and the first run all work). Two fixes: `KNOWN_NONCONFORMING` emptied (the D21 verdicts were fixed in #27), and `jsonschema` moved from the runtime dependencies and `requirements.txt` to the dev extras, as D24 says (only `tools/validate_results.py` and its tests use it). Recorded D24 as approved by the maintainer ("ok approved"); question 4 answered.
+- Result: 216 tests passed, coverage 99%; architecture check PASS; `tools/validate_results.py`: all 20 committed run folders valid.
+- Next: the maintainer merges; then P7 (`ruff`, also under D24).
+- Blocked by / questions: none.
+- Architecture: no code module changed by the review (dependency placement only)
+- Questions: answered (# 4, by the maintainer's decision)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P5
+- Did: wrote `tools/new_scenario.py` (settings, `run.py` with `--dry-run`, notebook, registry row; checks first, never overwrites), `engine/tests/test_new_scenario.py` (9 tests on a copy of the repository) and `scenarios/README.md`.
+- Result: a scaffolded scenario passes `tools/check_architecture.py` and runs a 10-step L0 dry run (the done-when of P5); a full run writes results that follow the P4 schemas. Software facts only; no finding.
+- Next: review (stacked on P4, #25); P7.
+- Blocked by / questions: the scaffold writes a generic valid L0 start, not the setup of `docs/05` (labelled choice in `team/notes/P5.md`).
+- Architecture: updated (section 2 row `scaffold`; section 4 node and edges; section 10 additions; section 11)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P4
+- Did: wrote `engine/schemas/stamp.schema.json` and `summary.schema.json` (two forms each: one run, or a test with cases), `tools/validate_results.py` (readable messages, command line) and `engine/tests/test_schemas.py` (21 tests, every committed result folder included); pinned `jsonschema==4.26.0` (D13).
+- Result: 11 of the 15 committed result folders are valid; the summaries of D21.1-D21.4 have verdicts written as sentences instead of pass / fail / finding. Not edited (not mine; written by scripts): listed as known exceptions in the test and reported in an issue. Software facts only; no finding.
+- Next: review; the verification lead to answer three questions on the standard (`team/notes/P4.md`); P5 is unblocked.
+- Blocked by / questions: see `team/notes/P4.md`, Open questions.
+- Architecture: updated (section 2 rows `schemas`, `validate`; section 4 nodes and edges; section 10 additions; section 11)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - D21 verdicts (issue #24), second-wave integration
 - Did: fixed issue #24 (reported by the OpenCode agent while building P4): `scenarios/D21/run.py` now writes the standard verdict `finding` and moves the sentence into `explanation`; re-ran D21.1-D21.4 from the clean commit `f263697` and replaced the four result folders. Integrated #16, #18, #21, #22, #23 and the questions board into `integrate-wave2` (pull request #27); T9.4 produced twice by two models is kept once (#22's code) and marked confirmed.
 - Result: the case data of all four D21 summaries is identical to the earlier run; only the verdict field changed. Combined branch: 181 tests passed, coverage 99%, architecture check PASS.

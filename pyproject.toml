@@ -25,6 +25,7 @@ dependencies = [
 dev = [
     "pytest==9.2.0",
     "pytest-cov==7.1.0",
+    "jsonschema==4.26.0",  # P4: tools/validate_results.py and its tests (decision D24)
 ]
 
 [project.urls]
