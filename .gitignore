@@ -22,3 +22,6 @@ dist/
 .coverage
 htmlcov/
 .venv/
+# checkpoints of runs in progress (E7.1): removed when the run ends
+results/**/checkpoint.npz
+results/**/checkpoint.npz.writing

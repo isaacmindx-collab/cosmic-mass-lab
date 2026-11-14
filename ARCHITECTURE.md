@@ -61,9 +61,10 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | implemented | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined until E9), momentum, and the temperature of the moving bodies; the pressure on the walls is `runner.wall_pressure` |
 | energy | `engine/cosmicmass/energy.py` | E9 | implemented | energy of the bodies in both coordinates: under L0 (kinetic, Newton plus Coulomb interaction, uniform background), and the Composer energy `-G lambda s sum Com(mu_a mu_b) / r` of decision D23 within its scope (L1a, all terms, radial, inertia `Re`, no second field, no background `g`, `e`); `None` (not defined) outside it |
-| runner | `engine/cosmicmass/runner.py` | E7.1 | in-progress | `run(settings) -> RunResult`: the time loop, stop conditions, outputs; `main(argv)` for the command line (E7.3); checkpoints and resuming not yet |
+| runner | `engine/cosmicmass/runner.py` | E7.1 | implemented | `run(settings) -> RunResult`: the time loop, stop conditions (`steps`, `t_end`; `stopped_by` in the summary), outputs; checkpoints every `numerics.checkpoint_every` steps and resuming (`resume=`, `--resume`), a progress line (`progress=`, `--progress`), a clean stop on Ctrl-C (`should_stop`, `Interrupted`); step control (`numerics.drift_tolerance`, off by default: a step is repeated with half the time step); `main(argv)` for the command line (E7.3) |
+| checkpoint | `engine/cosmicmass/checkpoint.py` | E7.1 | implemented | `save` and `load` of everything the time loop holds, in one `.npz` read without pickle (the columns of the state by name, the step context's remembered acceleration and fields, counters, rows, the random generator); `run_key`: the stamp and the initial state, so that a checkpoint is refused by another run or another engine commit |
 | cli | `engine/cosmicmass/__main__.py` | E7.3 | implemented | `python -m cosmicmass run <settings.json>`: calls `runner.main` |
-| stamp | `engine/cosmicmass/stamp.py` | E7.2 | in-progress | run id, engine commit, `stamp.json`, `summary.json`, `timeseries.csv`; the T0 status lookup (after G1) and validation against the P4 schemas not yet |
+| stamp | `engine/cosmicmass/stamp.py` | E7.2 | implemented | run id, engine commit, `stamp.json`, `summary.json`, `timeseries.csv`; `t0_status` (the verdicts of the stored T0.1 to T0.5 runs whose engine code is the same as now, by `git diff`); `validate_outputs`: the stamp and the summary are checked against the P4 schemas before they are written (`ResultsError`; skipped where `jsonschema` or the schema files are missing) |
 | convergence | `engine/cosmicmass/analysis/convergence.py` | E8.2 | implemented | `convergence(settings, measure, counts=(), resize=None)`: re-run at the step (eta or dt) / 2 and / 4, and at other body counts through the scenario's `resize`; the convergence block of the results standard with relative changes and `converged` (change < 1%) |
 | plots | `engine/cosmicmass/analysis/plots.py` | E8.3 | implemented | standard figures in plain SVG (standard library), made from one results folder alone, byte for byte: drifts against time, trails in the Real plane, the cosmic masses in the General Number plane; `line_plot`, `scatter_plot` for sweeps |
 | tests | `engine/tests/` | P1 | implemented | unit tests for every module (pytest), run in CI with coverage (P2); so far `test_pins.py` (pins of `pyproject.toml` equal `requirements.txt`), `test_import.py`, `test_constants_frame.py` (E1.1), `test_gn.py` (E1.2), `test_gnarray.py` (E1.3), `test_readings_matter.py` (E1.4, E1.5), `test_compendium.py` (E1.6), `test_state_laws.py` (E5.1, E4.1, E4.2), `test_settings.py` (E5.3), `test_fields.py` (E2.1, E2.3, E2.4), `test_integrators.py` (E3.1, E3.3, E6a; one test marked `slow`), `test_runner.py` (E7.1 to E7.3, E8.1, E9), `test_l1a.py` (E4.3, L1a) |
@@ -160,8 +161,9 @@ flowchart TB
 
     subgraph L4["Layer 4: orchestration and analysis"]
         direction LR
-        runner["runner.py"]:::planned
-        stamp["stamp.py"]:::planned
+        runner["runner.py"]
+        checkpoint["checkpoint.py"]
+        stamp["stamp.py"]
         settings["settings.py"]:::planned
         convergence["analysis/convergence.py"]
         plots["analysis/plots.py"]
@@ -228,6 +230,10 @@ flowchart TB
     runner --> environment
     runner --> diagnostics
     runner --> stamp
+    runner --> checkpoint
+    checkpoint --> state
+    checkpoint --> fieldsample
+    stamp -.->|"validates against"| schemas
     runner --> settings
     runner --> fields
     settings --> universe
@@ -430,7 +436,7 @@ classDiagram
         +measure(state, fields) dict
     }
     class Runner {
-        +run(settings) RunResult
+        +run(settings, resume, checkpoint, progress, should_stop) RunResult
     }
     class RunResult {
         +dict stamp
@@ -497,8 +503,11 @@ sequenceDiagram
     E-->>R: walls, absorption (charge collected into q), inflow, heat bath
     R->>D: measure(state, fields)
     D-->>R: mass, charge, energy (Re, Com), momentum, drifts
-    alt drift beyond tolerance
-        R->>R: halve dt and repeat the step (logged)
+    alt numerics.drift_tolerance is set and the step changed the conserved energy by more
+        R->>I: step(state, dt / 2): the step is repeated (at most 10 times; counted in the summary)
+    end
+    opt every numerics.checkpoint_every steps, and when asked to stop
+        R->>R: write the checkpoint (checkpoint.py)
     end
 ```
 
@@ -726,10 +735,37 @@ def kinetic_temperature(state, k_b) -> float: ...   # sum m v^2 / (d N k_B) over
     # Environment.collected: {"bodies", "m", "q", "momentum"} taken by absorbing walls; boundary is "open" | "reflecting" | "absorbing"
 
 # runner.py
-def run(settings: Settings, out_root: Path = Path("results")) -> RunResult: ...
+def run(settings: Settings, out_root: Path = Path("results"), now=None, *, resume=False, checkpoint=None,
+        progress=None, should_stop=None) -> RunResult: ...
 # `settings` may also be a path or a dictionary; out_root=None writes nothing.
 # RunResult: stamp, summary, folder (results/<scenario>/<run-id>/ or None), state (final), timeseries (rows)
-def main(argv=None) -> int: ...     # python -m cosmicmass run <settings.json> [--out results]
+# E7.1 (additions; every earlier call is unchanged):
+#   checkpoint: where checkpoints go (default <out_root>/<scenario>/checkpoint.npz); written every
+#     numerics.checkpoint_every steps and when should_stop() returns True; removed when the run ends
+#   resume: True (that file) or a path; the run continues and gives the same summary.json and timeseries.csv
+#     as a run never interrupted; the stamp gains "resumed_at_steps"; CheckpointError for another run's file
+#   progress(row): called with every recorded row; should_stop(): called after every step, then `Interrupted`
+#   numerics.drift_tolerance (default null: off): a step that changes the conserved energy (E9; else Re) by more
+#     than this relative amount is repeated with half the time step, at most MAX_HALVINGS = 10 times;
+#     summary["step_control"] = {"drift_tolerance", "repeated", "gave_up"} (None when off)
+#   summary["stopped_by"]: "steps" | "t_end"
+def main(argv=None) -> int: ...     # python -m cosmicmass run <settings.json> [--out results] [--resume [FILE]]
+#   [--progress]; Ctrl-C stops after the current step with a checkpoint (exit code 130); errors: exit code 2
+
+# checkpoint.py (E7.1)
+def run_key(stamp: dict, state: State | None = None) -> str: ...   # identity of a run: stamp (without run id, T0
+#   status, checkpoint_every) and initial state
+def save(path, key, state, cache, arrays: dict, book: dict) -> Path: ...   # one .npz, written whole (moved into place)
+def load(path, key) -> tuple: ...    # (state, cache, arrays, book); CheckpointError; np.load(allow_pickle=False)
+# the runner reads and restores StepContext._cache (state, a, fields, inertia): the acceleration remembered
+# after a step was computed with the half-step velocity, so it is saved, not recomputed
+
+# stamp.py (E7.2)
+def t0_status(commit=None, results_root=None) -> str: ...   # "pass" | "fail" | "not run": for each of T0.1-T0.5 the
+#   newest run in results/T0.k/ whose engine_commit has the same engine/cosmicmass/ as `commit` (git diff --quiet);
+#   "not run" if one has none, with changed files ("-dirty"), or outside git
+def validate_outputs(stamp, summary) -> list[str] | None: ...   # problems against engine/schemas; None: cannot check
+def write_results(folder, stamp, summary, rows) -> None: ...     # ResultsError (nothing written) if they break P4
 def wall_pressure(box, load, elapsed) -> dict | None: ...   # E8.1: summary["walls"]: momentum and pressure of
 #   each wall ("<axis>-<side>"), "pressure_mean" over the boundary (2D: per unit length), "elapsed"; None without a box
 
@@ -790,6 +826,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E7: checkpoints, T0 status, schema check (`E7-checkpoints`) | Claude chat session on claude.ai / Claude Fable 5.2 (sponsor @MostafaDerraz) | **new module** `checkpoint.py` (node `checkpoint`; edges `runner --> checkpoint`, `checkpoint --> state`, `checkpoint --> fieldsample`); `runner.py` implemented: `run(..., resume, checkpoint, progress, should_stop)`, `Interrupted`, step control, `--resume` and `--progress` (section 6: the repeated step and the checkpoint); `stamp.py` implemented: `t0_status`, `validate_outputs`, `ResultsError` (edge `stamp -.-> schemas`); settings: `numerics.checkpoint_every`, `numerics.drift_tolerance`; schema: `resumed_at_steps` and the two numerics keys. Section 10: additions only, no existing call changed |
 | 2026-11-14 | E5.4 (`E5-populations`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `populations.py` (node no longer planned; new edge `populations --> environment` for `K_B`); `settings.py`: the key `populations` (seeded, after the listed bodies); `stamp.py` and `engine/schemas/stamp.schema.json`: `populations` when used; `simulator/web/engine-files.json` regenerated. Section 10: additions. Review fix (Claude Opus 5.5 in Claude Code): a heat bath is refused with weighted populations; `summary.json` gains `super_particles` (weights and how to read the temperature) when a population is weighted; no Keplerian speed for a body on the axis |
 | 2026-11-14 | E8 (`E8-diagnostics`, stacked on `E4-directions`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `analysis/convergence.py` (E8.2) and `analysis/plots.py` (E8.3), nodes no longer planned, edges `convergence --> runner`, `plots --> constants` (was a planned `plots --> diagnostics`); `diagnostics.py` implemented: the temperature (edge `diagnostics --> environment`); `runner.py`: `wall_pressure`, summary `walls` (E8.1). `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |

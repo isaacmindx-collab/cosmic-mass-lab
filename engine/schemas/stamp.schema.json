@@ -125,7 +125,9 @@
         "steps": {"type": ["integer", "null"], "minimum": 0},
         "seed": {"type": "integer"},
         "t_end": {"type": ["number", "null"]},
-        "eta": {"type": "number", "exclusiveMinimum": 0}
+        "eta": {"type": "number", "exclusiveMinimum": 0},
+        "checkpoint_every": {"type": ["integer", "null"], "minimum": 1},
+        "drift_tolerance": {"type": ["number", "null"], "exclusiveMinimum": 0}
       }
     },
     "environment": {
@@ -156,6 +158,12 @@
         "kind": {"$ref": "#/$defs/kind"},
         "preregistered": {"type": "boolean"},
         "producer": {"type": "string"},
+        "resumed_at_steps": {
+          "type": "array",
+          "description": "present only for a run taken up again from a checkpoint (E7.1): the steps at which it was resumed",
+          "minItems": 1,
+          "items": {"type": "integer", "minimum": 0}
+        },
         "populations": {
           "type": "array",
           "description": "the seeded populations of the settings (E5.4), as given; with numerics.seed they rebuild the same bodies",

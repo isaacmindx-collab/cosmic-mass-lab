@@ -37,6 +37,10 @@ _NUMERICS = {
     "t_end": None,
     "record_every": None,
     "seed": 0,
+    "checkpoint_every": None,  # E7.1: write a checkpoint every this many steps (None: never)
+    # step control (off by default): repeat a step with half the time step when it changes the
+    # conserved energy by more than this relative amount
+    "drift_tolerance": None,
 }
 _UNIVERSE = {
     "phi_bar_deg": None,
@@ -289,6 +293,14 @@ def load_settings(source) -> Settings:
 
     _known(data.get("numerics", {}), _NUMERICS, "numerics")
     numerics = {**_NUMERICS, **data.get("numerics", {})}
+    every = numerics["checkpoint_every"]
+    if every is not None and (isinstance(every, bool) or not isinstance(every, int) or every < 1):
+        raise SettingsError("'numerics.checkpoint_every' must be a positive whole number, or null")
+    tolerance = numerics["drift_tolerance"]
+    if tolerance is not None and (
+        isinstance(tolerance, bool) or not isinstance(tolerance, (int, float)) or not tolerance > 0
+    ):
+        raise SettingsError("'numerics.drift_tolerance' must be a positive number, or null")
 
     listed = data.get("bodies", [])
     populations = data.get("populations", [])

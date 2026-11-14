@@ -16,7 +16,12 @@ def test_manifest_lists_every_engine_file():
     assert manifest["root"] == "../../engine/"
 
 
-def test_bridge_runs_a_scene_with_the_engine():
+def test_bridge_runs_a_scene_with_the_engine(monkeypatch):
+    import cosmicmass.runner as engine_runner
+
+    # the bridge replaces the runner's `engine_commit` for the browser: put it back after this test, so that
+    # the tests that follow write stamps with a real commit (they are checked against the schema since E7.2)
+    monkeypatch.setattr(engine_runner, "engine_commit", engine_runner.engine_commit)
     sys.path.insert(0, str(WEB))
     try:
         import bridge
