@@ -122,7 +122,7 @@ python scenarios/T1.4/run.py         # the demo: a proton and an electron, under
 
 The demo writes stamped results under `results/T1.4/` and two figures (`orbit.svg`, `separation.svg`). Under the reference law L0 the pair stays on its circle. Under L1a, one reading of the Composer coordinate, the same start gives a long ellipse. **The demo is exploratory, and L1a is a hypothesis that measurement already excludes at this strength** (test T9.1): it shows what the engine does with a reading, not what nature does.
 
-Run your own universe from a settings file with `python -m cosmicmass run settings.json`, and check the engine with `pytest` (it includes the fast consistency gate T0). What version 0.1.0 does and does not do: [`CHANGELOG.md`](CHANGELOG.md).
+Run your own universe from a settings file with `python -m cosmicmass run settings.json`, and check the engine with `pytest` (it includes the fast consistency gate T0). What version 0.1.0 does and does not do: [`CHANGELOG.md`](CHANGELOG.md). Fourteen commented figures of the results so far: [`docs/GALLERY.md`](docs/GALLERY.md).
 
 ## Quick start
 
@@ -145,7 +145,7 @@ Then read [`TEAM.md`](TEAM.md) and the [work plan](docs/WORK-PLAN.md), pick a ta
 |---|---|
 | Verified foundation (sources, compendium, CI) | ✅ done |
 | **MVP 0.1.0**: the first working universe ([release](https://github.com/MostafaDerraz/cosmic-mass-lab/releases/tag/v0.1.0)) | ✅ **released** |
-| S1: infrastructure (P1–P7) | 🟡 P1, P2, P3 done; P4–P7 open |
+| S1: infrastructure (P1–P7) | ✅ **done** (2026-11-14): package, CI tests, architecture check, result schemas, scenario scaffold, branch protection, lint |
 | M1: engine and gates (E1–E9, T0, T9, G1) | 🟡 T0 and T9.1, T9.3 **confirmed**; T9.2, T9.4 open |
 | M2: what can the coupling be? (T1, T2) | ⏳ next, after M1 |
 | M3, M4: angle, many bodies, motion, populations | ⏳ planned |

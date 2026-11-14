@@ -22,7 +22,7 @@ from cosmicmass.frame import Frame
 from cosmicmass.gates.t0 import _escape_radius, write_gate_result
 from cosmicmass.gates.t9 import STANDARD_GRAVITY
 from cosmicmass.laws import LawSpec, make_law, third_law_residual
-from cosmicmass.matter import CosmicMass, preset
+from cosmicmass.matter import preset
 from cosmicmass.runner import run
 from cosmicmass.state import State
 

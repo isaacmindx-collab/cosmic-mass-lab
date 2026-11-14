@@ -20,6 +20,31 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: updated (section 2 row `environment`; section 5 `Inflow`, `HeatBath`; section 10 signatures; section 11)
 - Questions: asked (20, 21, 22). Did not reproduce Q1-Q4: question 22 (who may confirm).
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - P6, stage S1 complete
+- Did: on the maintainer's request ("focus now to finish S1"): created the 8 project labels (`claim`, `result`, `decision`, `urgent`, `agent`, `engine`, `scenario`, `architecture`; `question` and `good first issue` already existed); set 9 repository topics; switched on branch protection for `main` with the rule the maintainer chose: pull request required, the CI checks `verify`, `tests`, `architecture`, `lint` required, no approval required yet, admin bypass (decision D26).
+- Result: GitHub reports `main` protected, with the four required checks, enforced for non-admins. **Stage S1 (P1-P7) is complete.**
+- Next: the maintainer's decisions D23 (energy of L1a, unblocks T2 and M2) and D25 (one format pass); then milestone M2.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the gallery (#15), D21 results layout
+- Did: took the gallery commit of #15 onto `main` with cherry-pick (its branch also carried a stale copy of the D21 work and records); kept `main`'s registry rows and added only the `gallery` row. Ran `tools/make_gallery.py` on today's results: all 14 figures regenerate byte for byte. Updated four stale lines of `docs/GALLERY.md` (T9.1 now confirmed; T9.2 and T9.4 mentioned; Q2 and D23 for the energy of L1a; the web universe is live).
+- Found and fixed my own slip from #27: the four re-run D21 results sat in `results/D21.x/` itself instead of `results/D21.x/<run-id>/` (a `cp -r` into a just-deleted folder), so the links in `team/FINDINGS.md` pointed nowhere; moved them into their run-id folders. Added `engine/tests/test_results_layout.py` (run folders named after their stamp's `run_id`, no loose files); it fails on the old layout and passes now.
+- Result: ruff clean; 219 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
+- Next: maintainer merges; then D23 and D25.
+- Blocked by / questions: none.
+- Architecture: updated by the gallery commit (row and node `gallery`); the review adds a test only
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P7 (#28)
+- Did: brought #28 onto `main` (after #29); resolved `pyproject.toml` (dev extras keep both `jsonschema` and `ruff`) and the log; renumbered P7's format decision from D23 to **D25** (D23 is the energy of L1a; the branch was cut before it existed); ran the pinned `ruff` on the combined code and fixed the two findings it reported in files the branch had not seen (`scenarios/Q/run.py`: unused import; `scenarios/Q4/run.py`: unused loop variable). Neither changes behaviour or results.
+- Result: `ruff check .`: all checks passed; 216 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
+- Next: maintainer merges; then decides D23 (energy of L1a) and D25 (one format pass).
+- Blocked by / questions: none.
+- Architecture: no code module changed by the review
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P4 (#25) and P5 (#26)
 - Did: brought #25 and #26 onto `main` (one log conflict, kept both sides); reviewed the schemas, the validator and the scaffold; ran the scaffold for a real scenario in a throwaway copy (files, registry row, architecture check and the first run all work). Two fixes: `KNOWN_NONCONFORMING` emptied (the D21 verdicts were fixed in #27), and `jsonschema` moved from the runtime dependencies and `requirements.txt` to the dev extras, as D24 says (only `tools/validate_results.py` and its tests use it). Recorded D24 as approved by the maintainer ("ok approved"); question 4 answered.
 - Result: 216 tests passed, coverage 99%; architecture check PASS; `tools/validate_results.py`: all 20 committed run folders valid.
@@ -27,6 +52,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Blocked by / questions: none.
 - Architecture: no code module changed by the review (dependency placement only)
 - Questions: answered (# 4, by the maintainer's decision)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P7
+- Did: configured ruff in `pyproject.toml` (lint rules for errors and likely bugs; `verification/` and `sources/` excluded), pinned `ruff==0.17.5`, added the CI job `lint`, fixed four lint items (no change of behaviour); fixed the dev container, which did not install the engine; proposed D25 for the first format pass.
+- Result: `ruff check .` clean; a clean clone in a new environment, with only the container's command, runs `pytest`: 206 passed. Software facts only; no finding.
+- Next: review (stacked on P5, #26); D25; a real Codespace start to confirm.
+- Blocked by / questions: Docker is not available here, so the container image itself was not built.
+- Architecture: updated (section 9: job `lint`; section 11)
 
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - P5
 - Did: wrote `tools/new_scenario.py` (settings, `run.py` with `--dry-run`, notebook, registry row; checks first, never overwrites), `engine/tests/test_new_scenario.py` (9 tests on a copy of the repository) and `scenarios/README.md`.
@@ -107,6 +139,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Next: maintainer approves or amends D21; reproduction of D21 by another model or a human; the CI fix (branch `ci-d18-per-pr`) and this branch need pull requests.
 - Blocked by / questions: the browser pane is not signed in to GitHub, so the pull requests are not opened yet.
 - Architecture: updated (section 2 registry row `scenarios/D21/`, section 11 change log)
+
+### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - gallery of figures
+- Did: on the sponsor's request, added `docs/GALLERY.md`: fourteen commented figures (`docs/gallery/*.svg`) of T0, T9.1, the demo T1.4 and the D21 scenarios, and the tool `tools/make_gallery.py` that redraws them from the stored results. To have all the results in one place, the branch `gallery` first merges `D21-scenarios` (pull request #13) into the top of the MVP stack (`MVP-demo`), with the four documentation conflicts resolved by keeping both sides.
+- Result: `python tools/make_gallery.py` regenerates the fourteen figures. No new run was added to `results/`, and no new claim is made: each figure is labelled with its law and its kind; the demo figures are labelled exploratory and L1a a hypothesis. `pytest`: 170 passed, 1 deselected.
+- Next: review. If #13 and the stack are merged separately, this branch's merge commit shows how their documents reconcile.
+- Blocked by / questions: none. Two figures are recomputed, not read from files (the positions of T0.2 and the field line of T0.5); the gallery says so.
+- Architecture: updated (sections 2, 4, 11)
 
 ### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - MVP-10 (demo T1.4, release notes)
 - Did: wrote down the expectations for the demo before running it (`team/notes/T1.4.md`, commit `d618739`); wrote `scenarios/T1.4/run.py` and `figures.py` (SVG with the standard library); added "Try it" to `README.md`, wrote `CHANGELOG.md` for 0.1.0 and set the package version to 0.1.0; ran the demo on the committed code (engine commit `30f2172`) and committed its stamped, exploratory outputs with two figures.

@@ -73,6 +73,25 @@ jobs:
         working-directory: verification/general-sinus
         run: python verify_gsp.py
 
+  lint:
+    # Task P7: ruff, with the settings and the pinned version of pyproject.toml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the pinned ruff
+        run: |
+          PIN=$(python -c "import tomllib; dev = tomllib.load(open('pyproject.toml', 'rb'))['project']['optional-dependencies']['dev']; print(next(d for d in dev if d.startswith('ruff')))")
+          echo "installing $PIN"
+          pip install "$PIN"
+
+      - name: Ruff lint
+        run: ruff check . --output-format=github
+
   tests:
     runs-on: ubuntu-latest
     steps:

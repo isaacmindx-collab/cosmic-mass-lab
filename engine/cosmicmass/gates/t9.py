@@ -14,7 +14,7 @@ import numpy as np
 
 from ..constants import SI
 from ..fields import DirectSum
-from ..laws import LawSpec, make_law
+from ..laws import LawSpec
 from ..matter import preset
 from ..runner import run
 from ..settings import load_settings
