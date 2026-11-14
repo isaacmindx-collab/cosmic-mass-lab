@@ -50,12 +50,12 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | universe | `engine/cosmicmass/universe.py` | E5.2 | planned | `Universe`: settings U1-U8 (angle, dimension, units, boundary, backgrounds, sources, inflow, populations) |
 | settings | `engine/cosmicmass/settings.py` | E5.3 | in-progress | load and validate `settings.json`; build `Frame`, `State`, `LawSpec`, numerics (minimal MVP version; `Universe` and the P4 schemas come later) |
 | populations | `engine/cosmicmass/populations.py` | E5.4 | planned | seeded generators: shells, rings, boxes, velocity spread (temperature), super-particles |
-| fieldsample | `engine/cosmicmass/fields/sample.py` | E4.2 | implemented | `FieldSample(g, e, B_g, b)` with `E_cal(frame)` and `B_cal(frame)`; the `FieldSolver` interface |
-| fields | `engine/cosmicmass/fields/direct.py` | E2.1 | in-progress | direct-sum field solver `DirectSum`: static `g`, `e` (F1-F2) with Plummer softening, no self-field, uniform backgrounds (U5); `B_g`, `b` from moving bodies (F3-F4, task E2.2) not yet |
+| fieldsample | `engine/cosmicmass/fields/sample.py` | E4.2 | implemented | `FieldSample(g, e, B_g, b, screened=None)` with `E_cal(frame)` and `B_cal(frame)`; `screened` holds the screened field for option L8; the `FieldSolver` interface |
+| fields | `engine/cosmicmass/fields/direct.py` | E2.1 | in-progress | direct-sum field solver `DirectSum`: static `g`, `e` (F1-F2) with Plummer softening, no self-field, uniform backgrounds (U5); `at_bodies_screened` and `debye_length` (option L8: the kernel `exp(-r/L)(1 + r/L)/r^2` over the Debye length of the population); `B_g`, `b` from moving bodies (F3-F4, task E2.2) not yet |
 | fieldsfast | `engine/cosmicmass/fields/tree.py` | E2.5 | planned | fast solver for large N (tree or grid), same interface |
 | lawbase | `engine/cosmicmass/laws/base.py` | E4.1 | implemented | `Law` base class, `LawSpec` (reading and L2-L8 options, stamp form), `ForcePair`, registry of laws (`register`, `make_law`); `third_law_residual` (E4.5); `Law.inertia` reads the option L7 (`Re`, `Sh`, `abs` of `mu`; E3.4) |
 | l0 | `engine/cosmicmass/laws/l0.py` | E4.2 | implemented | reference law L0: `Re(mu) dv/dt = Re[mu (E_cal + v x B_cal)]` |
-| l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | readings L1a-L1d of the Composer coordinate (hypotheses), each L0 plus `+/- lambda` times what the reading adds (labelled rule, `team/notes/E4.md`), with the options sign (L2), strength (L3), terms (L5) and inertia (L7); L1e, and the options L4, L6, L8 not yet |
+| l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | readings L1a-L1d of the Composer coordinate (hypotheses), each L0 plus `+/- lambda` times what the reading adds (labelled rule, `team/notes/E4.md`), with the options sign (L2), strength (L3), direction (L4: radial, perpendicular, along the velocity), terms (L5), moving bodies (L6), inertia (L7) and range (L8: screened); L1e and the direction "torque" not yet (question 24) |
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
 | integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); the inertia readings (E3.4) not yet; the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
@@ -235,6 +235,7 @@ flowchart TB
     convergence --> runner
     plots --> diagnostics
     integrators --> fields
+    integrators --> environment
     integrators --> lawbase
     integrators --> state
     settings --> environment
@@ -667,6 +668,8 @@ class State:
 class FieldSolver(Protocol):
     def sample(self, state: State, points: np.ndarray) -> FieldSample: ...
     # FieldSample.g, .e: (P, d); .B_g, .b: (P, 3) in 3D, (P,) in 2D
+    # FieldSample.screened: FieldSample | None = None (E4.4, addition): the screened field, filled by the
+    #   StepContext only for a law with range "screened" (L8); DirectSum.at_bodies_screened(state, length)
 # fields/direct.py: DirectSum(constants=SI, softening=0.0, background=None) is a FieldSolver, and adds
 #   at_bodies(state) -> FieldSample     the field at every body from the other alive bodies (no self-field)
 
@@ -757,6 +760,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E4.4 part B: L4, L6, L8 (`E4-directions`, stacked on `E4-readings`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `laws/l1.py`: directions (L4: radial, perpendicular, velocity), the moving-body term (L6: on, only), the screened range (L8); `fields/direct.py`: `at_bodies_screened`, `debye_length`; `fields/sample.py`: `FieldSample.screened` (addition); `integrators.py`: the `StepContext` fills the screened field for L8 (new edge `integrators --> environment`, for `K_B`). Section 10: additions |
 | 2026-11-14 | E4.3 (L1b-L1d) and E3.4 (L7) (`E4-readings`, stacked on `E3-boris`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `laws/l1.py`: a common base `_ComposerReading` (L0 plus `+/- lambda` times what the reading adds; options L2, L3, L5) and the laws L1b, L1c, L1d; `laws/base.py`: `Law.inertia` reads L7 (`Re`, `Sh`, `abs`), using `readings`. Section 7: L1a-L1d implemented. No signature changed |
 | 2026-11-14 | E3.2: the Boris push (`E3-boris`, stacked on `E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: `Boris`, `boris_rotation`, `StepContext.rotation` and `.remember` (the cache also keeps the fields and the inertia); `settings.py`: `numerics.integrator` `"verlet"` or `"boris"`, resolved by D10 when left out; `runner.py` picks the integrator. Section 5: `Boris`; section 10: additions. No existing signature changed |
 | 2026-11-14 | E3: the pair guard of D29 (`E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: new function `pair_approach_time`; `next_dt` always applies the pair guard; the default `speed_reference` becomes `"neighbour"` (also in `settings.py`). Section 10: the contract of `StepContext` changed by **decision D29** (default) and the new function. No diagram changed |

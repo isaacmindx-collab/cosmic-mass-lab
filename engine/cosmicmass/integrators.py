@@ -30,11 +30,13 @@ Scope and labelled assumptions:
   D21 (each body's own motion), plus the guard.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Protocol
 
 import numpy as np
 
+from .environment import K_B
+from .fields.direct import debye_length
 from .frame import Frame
 from .laws.base import Law
 from .state import State
@@ -122,6 +124,9 @@ class StepContext:
         if self._cache is not None and self._cache[0] is state:
             return self._cache[1]
         fields = self.solver.at_bodies(state)
+        if getattr(self.law.spec, "range", "1/r^2") == "screened":  # option L8: the screened field too
+            length = debye_length(state, self.solver.constants, K_B[self.solver.constants.units])
+            fields = replace(fields, screened=self.solver.at_bodies_screened(state, length))
         force = self.law.forces(state, fields, self.frame).total()
         inertia = self.law.inertia(state, self.frame)
         moving = state.alive & ~state.fixed

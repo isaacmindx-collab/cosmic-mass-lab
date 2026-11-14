@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4 part B: L4, L6, L8
+- Did: the options L4 (radial, perpendicular, along the velocity), L6 (the Composer coordinate of `mu (v x B_cal)`, on or only) and L8 (the Composer coupling screened over the Debye length of the population; `DirectSum.at_bodies_screened`, `debye_length`, `FieldSample.screened`); definitions labelled in `team/notes/E4.md`.
+- Result: hand cases; the reduce-to-L0 test over every direction x moving option, bit for bit; L8 screens the Composer coupling and never L0. Software checks against mathematics; no finding.
+- Next: L1e and the direction torque (question 24); then E5.4, E7.1, E8.
+- Blocked by / questions: question 24.
+- Architecture: updated (section 2 rows `fieldsample`, `fields`, `l1`; section 4 edge `integrators --> environment`; section 10 additions; section 11)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3.4 and E4 part A: L1b-L1d, L7
 - Did: E3 done (D29 guard, E3.2, E3.4); claimed E4. `laws/l1.py`: one base for the readings (L0 plus `+/- lambda` times what the reading adds) and L1b, L1c, L1d; `Law.inertia` reads L7 (`Re`, `Sh`, `abs`). Definitions labelled in `team/notes/E4.md` for the physics lead.
 - Result: each reading by hand; the reduce-to-L0 test for every reading x terms x sign x inertia, 2D and 3D, bit for bit. Software checks against mathematics; no finding.

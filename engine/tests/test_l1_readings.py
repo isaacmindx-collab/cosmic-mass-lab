@@ -48,9 +48,8 @@ def test_the_readings_are_registered_hypotheses():
     for reading in READINGS:
         law = make_law(reading)
         assert law.hypothesis is True and law.id == reading
-        for option in ({"direction": "perpendicular"}, {"moving": "on"}, {"range": "screened"}):
-            with pytest.raises(NotImplementedError):
-                make_law(LawSpec(reading=reading, **option))
+        with pytest.raises(NotImplementedError):  # not yet: it needs a spin per body (question 24)
+            make_law(LawSpec(reading=reading, direction="torque"))
 
 
 def test_the_readings_by_hand():
@@ -124,3 +123,58 @@ def test_l7_inertia_readings():
     assert law("abs").inertia(state, f)[0] == pytest.approx(math.sqrt(8.0**2 + (5.0 * 2 * math.sqrt(3) / 2) ** 2))
     with pytest.raises(ValueError):
         make_law(LawSpec(reading="L0", inertia="Sh"))  # the reference law takes no option
+
+
+def moving_case():
+    """The hand case of `hand_case`, moving with v = (2, -1), in uniform B_g = 3 and b = 0.5 (2D)."""
+    f, state, fields = hand_case()
+    state.v[0] = [2.0, -1.0]
+    fields = FieldSample(fields.g, fields.e, np.array([3.0]), np.array([0.5]))
+    return f, state, fields
+
+
+def test_l6_the_moving_body_term_by_hand():
+    f, state, fields = moving_case()
+    vxb, vxbg = np.array([-1.0 * 0.5, -2.0 * 0.5]), np.array([-1.0 * 3.0, -2.0 * 3.0])  # (v_y B, -v_x B)
+    moving = 3.0 * vxb + 5.0 * vxbg + 2 * 2 * 0.5 * 5.0 * vxb  # m (v x b) + q (v x B_g) + 2 s cos q (v x b)
+    c = np.array([35.0, 143.0])
+    added = lambda **kw: make_law(LawSpec(reading="L1a", **kw)).forces(state, fields, f).composer[0]  # noqa: E731
+    assert added() == pytest.approx(2 * c)  # L6 off: as before
+    assert added(moving="on") == pytest.approx(2 * (c + moving))
+    assert added(moving="only") == pytest.approx(2 * moving)
+    assert added(moving="on", terms="s q g") == pytest.approx(2 * (np.array([35.0, 0.0]) + moving))
+    # L1d reads the Real part of the same product: with "only", Re(mu (v x B_cal)) = m v x B_g - s^2 q v x b
+    real = 3.0 * vxbg - 4.0 * 5.0 * vxb
+    shadow, height = real + 1.0 * moving, math.sqrt(3) * moving
+    total = make_law(LawSpec(reading="L1d", moving="only")).forces(state, fields, f).composer[0]
+    expected = math.sqrt(shadow @ shadow + height @ height) * shadow / np.linalg.norm(shadow) - real
+    assert total == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("d", [2, 3])
+def test_l4_directions(d):
+    f, state, fields = random_case(d)
+    radial = make_law("L1a").forces(state, fields, f).composer
+    perpendicular = make_law(LawSpec(reading="L1a", direction="perpendicular")).forces(state, fields, f).composer
+    assert np.allclose(perpendicular[:, 0], -radial[:, 1]) and np.allclose(perpendicular[:, 1], radial[:, 0])
+    if d == 3:
+        assert np.array_equal(perpendicular[:, 2], radial[:, 2])  # a turn about z keeps z
+    assert np.allclose(np.sum(perpendicular[:, :2] * radial[:, :2], axis=1), 0.0, atol=1e-12)
+    along = make_law(LawSpec(reading="L1a", direction="velocity")).forces(state, fields, f).composer
+    unit = state.v / np.linalg.norm(state.v, axis=1)[:, None]
+    assert np.allclose(along, np.linalg.norm(radial, axis=1)[:, None] * unit, rtol=1e-12)
+    state.v[0] = 0.0  # a body at rest gets nothing along its velocity
+    along = make_law(LawSpec(reading="L1a", direction="velocity")).forces(state, fields, f).composer
+    assert np.array_equal(along[0], np.zeros(d))
+
+
+@pytest.mark.parametrize("d", [2, 3])
+def test_every_option_reduces_to_l0_exactly(d):
+    # the reduce-to-L0 test over the options added in part B: directions and the moving-body term
+    f, state, fields = random_case(d)
+    reference = make_law("L0").forces(state, fields, f).total()
+    for reading in READINGS:
+        for direction in ("radial", "perpendicular", "velocity"):
+            for moving in ("off", "on", "only"):
+                spec = LawSpec(reading=reading, strength=0.0, direction=direction, moving=moving)
+                assert np.array_equal(make_law(spec).forces(state, fields, f).total(), reference), spec

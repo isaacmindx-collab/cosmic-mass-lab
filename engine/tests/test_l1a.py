@@ -34,9 +34,8 @@ def test_l1a_is_registered_as_a_hypothesis():
     assert {"L0", "L1a"} <= set(available_laws())
     law = make_law(LawSpec(reading="L1a"))
     assert isinstance(law, L1a) and law.hypothesis is True and law.id == "L1a"
-    for option in ({"direction": "perpendicular"}, {"moving": "on"}, {"range": "screened"}):
-        with pytest.raises(NotImplementedError):
-            make_law(LawSpec(reading="L1a", **option))
+    with pytest.raises(NotImplementedError):  # not yet: it needs a spin per body (question 24)
+        make_law(LawSpec(reading="L1a", direction="torque"))
 
 
 @pytest.mark.parametrize("d", [2, 3])
