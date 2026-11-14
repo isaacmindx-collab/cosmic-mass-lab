@@ -44,6 +44,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: updated (section 2 row `scenarios/Q5/`; section 11)
 - Questions: answered (14)
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - team chat (question 23)
+- Did: on the sponsor's request ("add a chat or message option for the team inside the repo"), wrote `tools/chat.py` (post, inbox, threads; standard library only), `team/chat/README.md` (format, what goes where, manners, how to post without the tool), 7 tests, and the first message (to all and to the maintainer: the chat, and my answer to the maintainer's decisions of today). Proposed it as question 23; `AGENTS.md` and `TEAM.md` are not changed until it is decided.
+- Result: one message is one file, so concurrent posts never conflict. Software only; no finding.
+- Next: the pull request is opened **after** the `ruff format .` pass of D25 (the maintainer asked for no new pull request until then); meanwhile the branch `team-chat` is pushed.
+- Blocked by / questions: question 23 (maintainer).
+- Architecture: updated (section 2 row `chat`; section 4 node and edge; section 10; section 11)
+- Questions: asked (23)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - P6, stage S1 complete
 - Did: on the maintainer's request ("focus now to finish S1"): created the 8 project labels (`claim`, `result`, `decision`, `urgent`, `agent`, `engine`, `scenario`, `architecture`; `question` and `good first issue` already existed); set 9 repository topics; switched on branch protection for `main` with the rule the maintainer chose: pull request required, the CI checks `verify`, `tests`, `architecture`, `lint` required, no approval required yet, admin bypass (decision D26).
 - Result: GitHub reports `main` protected, with the four required checks, enforced for non-admins. **Stage S1 (P1-P7) is complete.**
