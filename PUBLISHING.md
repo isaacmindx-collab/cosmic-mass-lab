@@ -26,11 +26,11 @@ Negative results are publishable: a reading that the universe forbids, or a conv
 | Step | Who | What |
 |---|---|---|
 | 1. Propose | anyone | Open an issue with the **Paper proposal** template: the results, the draft title, the proposed authors and AI contributors. |
-| 2. Write | the authors | Draft in `papers/<paper-id>/` from `papers/_TEMPLATE/`, by pull request, like any other work. Every number is traced to a results folder or a verification script. |
+| 2. Write | the authors | Draft in `papers/<paper-id>/` from `papers/_TEMPLATE/`, in LaTeX with the initiative's class `coexist.cls` **unchanged** (section 9), by pull request, like any other work. Every number is traced to a results folder or a verification script. |
 | 3. Review | at least two reviewers | Written reports in `papers/<paper-id>/reviews/` (section 4). At least one human reviewer when the Board has one who is not an author; at least one AI reviewer of a model that did not contribute to the paper. |
 | 4. Revise | the authors | Answer every point of every report in `papers/<paper-id>/RESPONSE.md`. |
 | 5. Vote | the Board | Vote on the paper's issue (section 3). Approved: the paper is frozen with a tag `paper-<paper-id>-v1`. |
-| 6. Publish | one author | Posts the approved PDF on Zenodo **from their own account**, with the affiliation "Co-exist initiative of Cosmic mass universe" for every author (section 6), and adds the DOI to the paper's README. |
+| 6. Publish | one author | **Only after step 5**, posts the approved PDF (built with the option `approved`) on Zenodo **from their own account**, with the affiliation "Co-exist initiative of Cosmic mass universe" for every author (section 6), and adds the DOI to the paper's README. |
 | 7. Journal | the Board | If the Board judges the result outstanding, it recommends a suitable journal. The authors decide whether to submit, and follow that journal's rules on authorship and AI. |
 
 A paper rejected by the Board may be revised and proposed again. A published preprint is corrected by a new Zenodo version, never deleted.
@@ -88,6 +88,15 @@ Reviewers may run anything they need. A reviewer who reproduces a result is cred
 
 The rules of `TEAM.md`, section 10, apply to papers in full: no fabricated data, citations or results; no silent edits; mistakes are corrected openly. A paper found wrong after publication receives a corrected version, or a withdrawal notice that keeps the record.
 
+**No posting before the Board's final approval.** Anyone who posts, deposits or circulates a paper of the initiative, or any paper carrying the affiliation "Co-exist initiative of Cosmic mass universe", **before the Board's final approval** (step 5) breaks the rules of the initiative. This covers Zenodo, arXiv, other preprint servers, journals and personal pages. Drafts are shared only inside the repository, for review. When it happens:
+
+1. the posting is not a publication of the initiative, and the Board says so on the paper's issue;
+2. the person who posted it is asked to withdraw it, or to remove the affiliation and every mention of the initiative from it;
+3. the paper goes back to review, and its vote starts again;
+4. after a repeated breach, the Board may decide that the person may not publish under the initiative for a period it sets, and records that decision in `team/DECISIONS.md`.
+
+The class `coexist.cls` helps: a draft prints "Not to be posted before the Board's approval" on every page, and it refuses to compile with a DOI until the option `approved` and the date of the Board's approval are set.
+
 ## 8. Members of the Board
 
 | Member | Since | Role |
@@ -95,3 +104,25 @@ The rules of `TEAM.md`, section 10, apply to papers in full: no fabricated data,
 | Mostafa Derraz (@MostafaDerraz) | 2026-11-14 | founding member, chair |
 
 AI reviewers do not need membership: any AI agent with a sponsor may write a review report, as long as its model did not contribute to the paper under review.
+
+## 9. The LaTeX template
+
+Every paper of the initiative uses the same template, so every paper looks the same and carries the same fixed sections (decision D33). It is in [`papers/_TEMPLATE/`](papers/_TEMPLATE/):
+
+| File | What it is |
+|---|---|
+| [`coexist.cls`](papers/_TEMPLATE/coexist.cls) | The class of the initiative. **Used unchanged**; changes to it are made only by pull request with the maintainer's approval, for every paper at once. |
+| [`paper.tex`](papers/_TEMPLATE/paper.tex) | The skeleton of a paper: title block, abstract, sections, the statement labels, and the fixed end matter. |
+| [`references.bib`](papers/_TEMPLATE/references.bib) | The theory papers and the repository, ready to cite. |
+| [`example.pdf`](papers/_TEMPLATE/example.pdf) | The skeleton compiled, to see what a paper of the initiative looks like. |
+
+What the class fixes for every paper:
+
+- the title banner and running head with the name of the initiative; affiliation 1 of every author is "Co-exist initiative of Cosmic mass universe";
+- the statement labels `\mathematics`, `\measurement{source}`, `\finding{law}` and `\hypothesis{L}`;
+- the end matter, in this order: **Reproducibility** (`\reproducibility`), **Contributions and AI use** (environment `contributions`), **Acknowledgements** and **Declarations** (`\declarations`), **Review** (`\boardreview{...}`);
+- the **acknowledgements**: the same thanks in every paper to everyone who takes part in the initiative, human or AI, to the Board and the reviewers, and to the theory the lab is built on. A paper adds its own thanks with `\acknowledgements{...}`;
+- the **declarations**: competing interests, funding, ethics, data and code availability, use of AI, and publication. Their defaults (no competing interests, no specific funding, no human participants) are changed with `\competinginterests{...}`, `\funding{...}` or `\ethics{...}` only when they are not true for that paper;
+- the option `draft` (the default) or `approved` (after the Board's vote, with `\approvaldate{...}`; then `\doi{...}` once posted).
+
+To build: `latexmk -pdf paper.tex` with any TeX distribution (TeX Live, MiKTeX) or on Overleaf (upload the three files).

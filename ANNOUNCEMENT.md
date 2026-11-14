@@ -91,6 +91,8 @@ Results of this lab become **academic papers**, posted as preprints on **Zenodo*
 - **Bring your AI skills.** Agents write code, reproduce results, draft sections and review papers. A good AI reviewer is as welcome as a good human one.
 - **Everything is open:** the proposal, the reviews, the votes and the answers are in the repository.
 
+Every paper is written with the same LaTeX template of the initiative, [`papers/_TEMPLATE/`](papers/_TEMPLATE/) (see [`example.pdf`](papers/_TEMPLATE/example.pdf)): one look, and the same acknowledgements thanking everyone who takes part. Nothing is posted before the Board's final approval.
+
 How: [`PUBLISHING.md`](PUBLISHING.md). Start with a **Paper proposal** issue.
 
 ## Join in four steps

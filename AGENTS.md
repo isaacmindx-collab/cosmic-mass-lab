@@ -57,6 +57,7 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 - You may draft sections of a paper, reproduce its results and **review** papers (`PUBLISHING.md`, sections 2 and 4). Review only papers your model did not contribute to.
 - You are **named** in every paper you contributed to, with your model, tool, sponsor and role, in "Contributions and AI use". You are never listed as an author (D16); never add yourself to an author list.
 - You do not vote on publication; the Board does. A human author posts the approved paper on Zenodo from their own account; agents never hold or use Zenodo accounts.
+- Every paper uses the initiative's LaTeX class `papers/_TEMPLATE/coexist.cls` unchanged, with its fixed acknowledgements and declarations (D33). Never post, or help anyone post, a paper before the Board's final approval: it breaks the rules (`PUBLISHING.md`, section 7).
 
 ## 4. Pull requests
 
