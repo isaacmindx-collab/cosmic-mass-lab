@@ -1,10 +1,11 @@
-"""The measured limits T9.1 and T9.3 (decision D4), under the hypothesis L1a.
+"""The measured limits T9.1, T9.3 and T9.4 (decision D4), under the hypothesis L1a.
 
 Setups and pass criteria: `docs/05-scenarios-and-tests.md`, section 2, T9; the numbers are
 the book's (Chapter 9: a neutron would act as if it carried 9.0e-19 e; a charge in gravity
-would act as if it sat in 1.14e11 V/m). The measured neutron charge, (-0.2 +/- 0.8)e-21 e,
-is the value the book cites (Baumann et al., Phys. Rev. D 37, 1988). Pre-registration:
-`team/notes/T9.md`. The forces are evaluated once; nothing is integrated.
+would act as if it sat in 1.14e11 V/m; a particle and its antiparticle near a neutral mass
+would be pushed in opposite directions). The measured neutron charge, (-0.2 +/- 0.8)e-21 e,
+is the value the book cites (Baumann et al., Phys. Rev. D 37, 1988). Pre-registrations:
+`team/notes/T9.md`, `team/notes/T9.4.md`. The forces are evaluated once; nothing is integrated.
 """
 
 import numpy as np
@@ -15,7 +16,7 @@ from ..laws import LawSpec, make_law
 from ..matter import preset
 from ..settings import load_settings
 
-__all__ = ["t9_1", "t9_3", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY"]
+__all__ = ["t9_1", "t9_3", "t9_4", "NEUTRON_CHARGE_MEASURED", "STANDARD_GRAVITY"]
 
 NEUTRON_CHARGE_MEASURED = (-0.2e-21, 0.8e-21)  # value and standard error, in units of e (as cited by the book)
 STANDARD_GRAVITY = 9.80665  # m/s^2, the conventional standard acceleration of gravity
@@ -80,3 +81,55 @@ def t9_3(phi_bar_deg: float = 79.86) -> dict:
     }
     case["pass"] = bool(abs(size - 1.14e11) < 0.005e11 and case["relative_error_vs_s_g"] < 1e-12)
     return {"id": "T9.3", "pass": case["pass"], "cases": {"electron": case}, "runs": {"electron": settings}}
+
+
+def t9_4(strength: float = 1.0, phi_bar_deg: float = 79.86) -> dict:
+    """T9.4: a proton, then an antiproton (`m_p - e G`, the skew flip), at 7e6 m from the
+    neutral Earth, under L1a with all terms. Their Composer forces are opposite."""
+    proton, r = preset("proton"), 7e6
+    bodies = {"proton": {"preset": "proton"},
+              "antiproton": {"name": "antiproton", "m": proton.m, "q": -proton.q}}
+    cases, runs, composer, real = {}, {}, {}, {}
+    for name, body in bodies.items():
+        pair_bodies = [{"preset": "Earth", "x": [0.0, 0.0], "fixed": True}, dict(body, x=[r, 0.0])]
+        settings = _settings("T9.4", LawSpec(reading="L1a", strength=strength).to_dict(), pair_bodies,
+                             phi_bar_deg=phi_bar_deg)
+        s, fields, pair = _forces(settings)
+        terms = {}
+        for term in ("s q g", "-m E/s", "-2 cos q E"):
+            spec = LawSpec(reading="L1a", strength=strength, terms=term).to_dict()
+            terms[term] = [float(c) for c in _forces(dict(settings, law=spec))[2].composer[1]]
+        g = fields.g[1]
+        q = s.state.q[1]
+        composer[name], real[name] = pair.composer[1], pair.real[1]
+        expected = strength * s.frame.s * abs(q) * float(np.linalg.norm(g))
+        size = float(np.linalg.norm(pair.composer[1]))
+        towards_earth = bool(float(np.dot(pair.composer[1], g)) > 0)  # g points towards the Earth
+        cases[name] = {
+            "composer_force": [float(c) for c in pair.composer[1]], "real_force": [float(c) for c in pair.real[1]],
+            "composer_terms": terms, "g": [float(c) for c in g], "composer_size": size,
+            "expected_s_q_g": expected, "relative_error_vs_s_q_g": abs(size / expected - 1) if expected else size,
+            "composer_towards_earth": towards_earth,
+            "composer_over_real": size / float(np.linalg.norm(pair.real[1])),
+        }
+        runs[name] = settings
+    p, a = cases["proton"], cases["antiproton"]
+    scale = float(np.linalg.norm(composer["proton"]))
+    total = float(np.linalg.norm(composer["proton"] + composer["antiproton"]))
+    opposite = total / scale if scale else total
+    checks = {
+        "opposite_to_1e-15": opposite < 1e-15,
+        "proton_pulled_antiproton_pushed": p["composer_towards_earth"] and not a["composer_towards_earth"],
+        "size_s_e_g_to_1e-12": p["relative_error_vs_s_q_g"] < 1e-12 and a["relative_error_vs_s_q_g"] < 1e-12,
+        "real_forces_equal": bool(np.array_equal(real["proton"], real["antiproton"])),
+        "other_terms_zero": all(c == 0.0 for case in (p, a) for term in ("-m E/s", "-2 cos q E")
+                                for c in case["composer_terms"][term]),
+    }
+    checks = {name: bool(ok) for name, ok in checks.items()}
+    passed = all(checks.values())
+    pair = {"relative_sum_of_composer_forces": opposite, "checks": checks, "pass": passed,
+            "measurement": "none: the fall of a charged antiparticle has not been measured (book, Chapter 9)",
+            "tolerance": {"opposite": 1e-15, "relative": 1e-12}}
+    for case in (p, a):
+        case["pass"] = passed
+    return {"id": "T9.4", "pass": passed, "cases": {"proton": p, "antiproton": a, "pair": pair}, "runs": runs}
