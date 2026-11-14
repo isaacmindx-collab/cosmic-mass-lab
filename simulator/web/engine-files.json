@@ -30,6 +30,7 @@
   "cosmicmass/runner.py",
   "cosmicmass/settings.py",
   "cosmicmass/stamp.py",
-  "cosmicmass/state.py"
+  "cosmicmass/state.py",
+  "cosmicmass/universe.py"
  ]
 }
