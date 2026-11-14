@@ -86,7 +86,9 @@ def test_diagnostics_and_drifts():
     state.alive[1] = False  # an absorbed body still counts in the totals of mass and charge
     later = d.measure(state)
     assert later["mass"] == first["mass"] and later["charge"] == first["charge"]
-    assert drifts(first, first) == {"mass": 0.0, "charge": 0.0, "energy_re": 0.0, "energy_com": None, "momentum": 0.0}
+    assert drifts(first, first) == {
+        "mass": 0.0, "charge": 0.0, "energy_re": 0.0, "energy_com": None, "energy_total": 0.0, "momentum": 0.0
+    }  # fmt: skip
     changed = dict(first, energy_re=first["energy_re"] * 1.5, momentum=[2 * p for p in first["momentum"]], charge=1e-19)
     out = drifts(first, changed)
     assert (
