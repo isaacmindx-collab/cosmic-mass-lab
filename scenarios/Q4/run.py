@@ -114,7 +114,7 @@ def q4() -> dict:
         "4: A and B agree with the reference to 1e-5": bool(a4["separation_vs_reference"] < 1e-5 and b4["separation_vs_reference"] < 1e-5),
     }
     cases["predictions"]["pass"] = all(cases["predictions"].values())
-    for name, case in cases.items():
+    for case in cases.values():
         case.setdefault("pass", True)  # measurements carry no criterion of their own; the predictions do
     return {"id": "Q4", "pass": cases["predictions"]["pass"], "cases": cases, "runs": runs}
 

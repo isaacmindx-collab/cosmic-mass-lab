@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P7 (#28)
+- Did: brought #28 onto `main` (after #29); resolved `pyproject.toml` (dev extras keep both `jsonschema` and `ruff`) and the log; renumbered P7's format decision from D23 to **D25** (D23 is the energy of L1a; the branch was cut before it existed); ran the pinned `ruff` on the combined code and fixed the two findings it reported in files the branch had not seen (`scenarios/Q/run.py`: unused import; `scenarios/Q4/run.py`: unused loop variable). Neither changes behaviour or results.
+- Result: `ruff check .`: all checks passed; 216 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
+- Next: maintainer merges; then decides D23 (energy of L1a) and D25 (one format pass).
+- Blocked by / questions: none.
+- Architecture: no code module changed by the review
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P4 (#25) and P5 (#26)
 - Did: brought #25 and #26 onto `main` (one log conflict, kept both sides); reviewed the schemas, the validator and the scaffold; ran the scaffold for a real scenario in a throwaway copy (files, registry row, architecture check and the first run all work). Two fixes: `KNOWN_NONCONFORMING` emptied (the D21 verdicts were fixed in #27), and `jsonschema` moved from the runtime dependencies and `requirements.txt` to the dev extras, as D24 says (only `tools/validate_results.py` and its tests use it). Recorded D24 as approved by the maintainer ("ok approved"); question 4 answered.
 - Result: 216 tests passed, coverage 99%; architecture check PASS; `tools/validate_results.py`: all 20 committed run folders valid.
