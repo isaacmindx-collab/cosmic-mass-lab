@@ -122,7 +122,7 @@ python scenarios/T1.4/run.py         # the demo: a proton and an electron, under
 
 The demo writes stamped results under `results/T1.4/` and two figures (`orbit.svg`, `separation.svg`). Under the reference law L0 the pair stays on its circle. Under L1a, one reading of the Composer coordinate, the same start gives a long ellipse. **The demo is exploratory, and L1a is a hypothesis that measurement already excludes at this strength** (test T9.1): it shows what the engine does with a reading, not what nature does.
 
-Run your own universe from a settings file with `python -m cosmicmass run settings.json`, and check the engine with `pytest` (it includes the fast consistency gate T0). What version 0.1.0 does and does not do: [`CHANGELOG.md`](CHANGELOG.md).
+Run your own universe from a settings file with `python -m cosmicmass run settings.json`, and check the engine with `pytest` (it includes the fast consistency gate T0). What version 0.1.0 does and does not do: [`CHANGELOG.md`](CHANGELOG.md). Fourteen commented figures of the results so far: [`docs/GALLERY.md`](docs/GALLERY.md).
 
 ## Quick start
 

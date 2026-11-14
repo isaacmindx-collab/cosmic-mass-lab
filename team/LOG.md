@@ -12,6 +12,15 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of the gallery (#15), D21 results layout
+- Did: took the gallery commit of #15 onto `main` with cherry-pick (its branch also carried a stale copy of the D21 work and records); kept `main`'s registry rows and added only the `gallery` row. Ran `tools/make_gallery.py` on today's results: all 14 figures regenerate byte for byte. Updated four stale lines of `docs/GALLERY.md` (T9.1 now confirmed; T9.2 and T9.4 mentioned; Q2 and D23 for the energy of L1a; the web universe is live).
+- Found and fixed my own slip from #27: the four re-run D21 results sat in `results/D21.x/` itself instead of `results/D21.x/<run-id>/` (a `cp -r` into a just-deleted folder), so the links in `team/FINDINGS.md` pointed nowhere; moved them into their run-id folders. Added `engine/tests/test_results_layout.py` (run folders named after their stamp's `run_id`, no loose files); it fails on the old layout and passes now.
+- Result: ruff clean; 219 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
+- Next: maintainer merges; then D23 and D25.
+- Blocked by / questions: none.
+- Architecture: updated by the gallery commit (row and node `gallery`); the review adds a test only
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of P7 (#28)
 - Did: brought #28 onto `main` (after #29); resolved `pyproject.toml` (dev extras keep both `jsonschema` and `ruff`) and the log; renumbered P7's format decision from D23 to **D25** (D23 is the energy of L1a; the branch was cut before it existed); ran the pinned `ruff` on the combined code and fixed the two findings it reported in files the branch had not seen (`scenarios/Q/run.py`: unused import; `scenarios/Q4/run.py`: unused loop variable). Neither changes behaviour or results.
 - Result: `ruff check .`: all checks passed; 216 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
@@ -114,6 +123,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Next: maintainer approves or amends D21; reproduction of D21 by another model or a human; the CI fix (branch `ci-d18-per-pr`) and this branch need pull requests.
 - Blocked by / questions: the browser pane is not signed in to GitHub, so the pull requests are not opened yet.
 - Architecture: updated (section 2 registry row `scenarios/D21/`, section 11 change log)
+
+### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - gallery of figures
+- Did: on the sponsor's request, added `docs/GALLERY.md`: fourteen commented figures (`docs/gallery/*.svg`) of T0, T9.1, the demo T1.4 and the D21 scenarios, and the tool `tools/make_gallery.py` that redraws them from the stored results. To have all the results in one place, the branch `gallery` first merges `D21-scenarios` (pull request #13) into the top of the MVP stack (`MVP-demo`), with the four documentation conflicts resolved by keeping both sides.
+- Result: `python tools/make_gallery.py` regenerates the fourteen figures. No new run was added to `results/`, and no new claim is made: each figure is labelled with its law and its kind; the demo figures are labelled exploratory and L1a a hypothesis. `pytest`: 170 passed, 1 deselected.
+- Next: review. If #13 and the stack are merged separately, this branch's merge commit shows how their documents reconcile.
+- Blocked by / questions: none. Two figures are recomputed, not read from files (the positions of T0.2 and the field line of T0.5); the gallery says so.
+- Architecture: updated (sections 2, 4, 11)
 
 ### 2026-11-10 - Claude chat session on claude.ai / Claude Fable 5.2 (claude-fable-5-2) (sponsor @MostafaDerraz) - MVP-10 (demo T1.4, release notes)
 - Did: wrote down the expectations for the demo before running it (`team/notes/T1.4.md`, commit `d618739`); wrote `scenarios/T1.4/run.py` and `figures.py` (SVG with the standard library); added "Try it" to `README.md`, wrote `CHANGELOG.md` for 0.1.0 and set the package version to 0.1.0; ran the demo on the committed code (engine commit `30f2172`) and committed its stamped, exploratory outputs with two figures.
