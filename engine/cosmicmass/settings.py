@@ -10,6 +10,8 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import numpy as np
+
 from .environment import K_B, Environment, HeatBath, Inflow
 from .frame import DEFAULT_PHI_BAR_DEG, Frame
 from .laws import Law, LawSpec, make_law
@@ -20,7 +22,7 @@ __all__ = ["Settings", "SettingsError", "load_settings", "make_inflow", "make_he
 
 # decision D10: velocity Verlet, adaptive step, softening 1e-3 of the smallest separation
 _NUMERICS = {
-    "integrator": "verlet",
+    "integrator": None,  # resolved below: "boris" with a background B_g or b, otherwise "verlet" (D10)
     "adaptive": True,
     "dt_initial": None,
     "softening": None,
@@ -237,8 +239,16 @@ def load_settings(source) -> Settings:
 
     _known(data.get("numerics", {}), _NUMERICS, "numerics")
     numerics = {**_NUMERICS, **data.get("numerics", {})}
-    if numerics["integrator"] != "verlet":
-        raise SettingsError("'numerics.integrator': only 'verlet' exists in the MVP")
+    if numerics["integrator"] is None:  # D10: velocity Verlet, Boris with a second field B_cal
+        magnetic = background != "none" and any(
+            np.any(np.asarray(background.get(key, 0.0)) != 0) for key in ("B_g", "b")
+        )
+        # the Boris push reads only L0's v x B_cal: with L6 on (law.B_cal), velocity Verlet
+        numerics["integrator"] = "boris" if magnetic and law_spec.moving == "off" else "verlet"
+    if numerics["integrator"] not in ("verlet", "boris"):
+        raise SettingsError("'numerics.integrator' must be 'verlet' or 'boris'")
+    if numerics["integrator"] == "boris" and law_spec.moving != "off":
+        raise SettingsError("'numerics.integrator': 'boris' reads only L0's v x B_cal; with law.B_cal on, use 'verlet'")
     meta = {
         "kind": data.get("kind", "finding"),
         "preregistered": bool(data.get("preregistered", False)),

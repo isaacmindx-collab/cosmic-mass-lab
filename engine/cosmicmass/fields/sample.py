@@ -28,6 +28,9 @@ class FieldSample:
     e: np.ndarray
     B_g: np.ndarray
     b: np.ndarray
+    # option L8 "screened": the same field with the screened (Yukawa) kernel of the bodies, filled by
+    # the step context only for a law that asks for it; None otherwise (E4.4, addition)
+    screened: "FieldSample | None" = None
 
     def __post_init__(self):
         if self.g.ndim != 2 or self.g.shape[1] not in (2, 3) or self.e.shape != self.g.shape:

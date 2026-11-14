@@ -30,11 +30,13 @@ Scope and labelled assumptions:
   D21 (each body's own motion), plus the guard.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Protocol
 
 import numpy as np
 
+from .environment import K_B
+from .fields.direct import debye_length
 from .frame import Frame
 from .laws.base import Law
 from .state import State
@@ -43,6 +45,8 @@ __all__ = [
     "StepContext",
     "Integrator",
     "VelocityVerlet",
+    "Boris",
+    "boris_rotation",
     "nearest_distances",
     "nearest_neighbours",
     "pair_approach_time",
@@ -119,15 +123,40 @@ class StepContext:
         """`force / inertia` for every moving body; zero for fixed and absorbed bodies."""
         if self._cache is not None and self._cache[0] is state:
             return self._cache[1]
-        force = self.law.forces(state, self.solver.at_bodies(state), self.frame).total()
+        fields = self.solver.at_bodies(state)
+        if getattr(self.law.spec, "range", "1/r^2") == "screened":  # option L8: the screened field too
+            length = debye_length(state, self.solver.constants, K_B[self.solver.constants.units])
+            fields = replace(fields, screened=self.solver.at_bodies_screened(state, length))
+        force = self.law.forces(state, fields, self.frame).total()
         inertia = self.law.inertia(state, self.frame)
         moving = state.alive & ~state.fixed
         if np.any(inertia[moving] == 0):
             raise ZeroDivisionError("a moving body has zero inertia under this law; the motion is undefined")
         a = np.zeros_like(force)
         a[moving] = force[moving] / inertia[moving, None]
-        self._cache = (state, a)
+        self._cache = (state, a, fields, inertia)
         return a
+
+    def rotation(self, state: State) -> np.ndarray:
+        """The rotation rate `Omega` of each moving body, such that the velocity-dependent part of its
+        acceleration is `v x Omega`: `Omega = (m B_g + q B) / inertia`, with `B = -s^2 b` (the Real
+        coordinate of `mu (v x B_cal)`, L0). Shape `(N,)` in 2D (out of the plane), `(N, 3)` in 3D;
+        zero for fixed and absorbed bodies."""
+        self.acceleration(state)
+        _, _, fields, inertia = self._cache
+        moving = state.alive & ~state.fixed
+        per_body = np.where(moving, 1.0 / np.where(moving, inertia, 1.0), 0.0)  # 1 / inertia, 0 if not moving
+        if fields.B_g.ndim == 2:  # 3D: vectors
+            omega = state.m[:, None] * fields.B_g - self.frame.s**2 * state.q[:, None] * fields.b
+            return omega * per_body[:, None]
+        return (state.m * fields.B_g - self.frame.s**2 * state.q * fields.b) * per_body  # 2D: out of the plane
+
+    def remember(self, state: State, a: np.ndarray) -> None:
+        """Replace the remembered acceleration of `state` (the same positions, so the same fields),
+        after its velocity changed: used by the Boris push, whose force is linear in the velocity."""
+        if self._cache is None or self._cache[0] is not state:
+            raise ValueError("remember() needs the acceleration of this state computed first")
+        self._cache = (state, a, *self._cache[2:])
 
     def invalidate(self) -> None:
         """Forget the remembered acceleration (after anything else changed the state)."""
@@ -185,3 +214,62 @@ class VelocityVerlet:
         a1 = ctx.acceleration(new)  # computed with the half-step velocity, then remembered
         new.v[moving] = v_half[moving] + (0.5 * dt) * a1[moving]
         return new
+
+
+def _cross(v: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    """`v x Omega` for N bodies: `Omega` of shape `(N, 3)` in 3D, `(N,)` out of the plane in 2D."""
+    if v.shape[1] == 3:
+        return np.cross(v, omega)
+    return np.stack([v[:, 1] * omega, -v[:, 0] * omega], axis=1)
+
+
+def boris_rotation(v: np.ndarray, omega: np.ndarray, h: float) -> np.ndarray:
+    """Turn `v` as `dv/dt = v x Omega` does over a time `h`, with Boris's formula: the speed is kept
+    exactly, and the angle is `2 atan(|Omega| h / 2)` instead of `|Omega| h` (an error of
+    `(|Omega| h)^3 / 12` per call)."""
+    t = omega * (0.5 * h)
+    t2 = np.sum(t * t, axis=1) if t.ndim == 2 else t * t
+    s = 2.0 * t / (1.0 + (t2[:, None] if t.ndim == 2 else t2))
+    v_prime = v + _cross(v, t)
+    return v + _cross(v_prime, s)
+
+
+class Boris(VelocityVerlet):
+    """Velocity Verlet with the Boris push for `v x B_cal` (task E3.2; D10: "Boris with `B_cal`").
+
+    The acceleration is split as `a = a_E(x) + v x Omega(x)` (`StepContext.rotation`). One step is
+    velocity Verlet in which each half kick is a Boris push over half the step (a quarter kick with
+    `a_E`, a turn with `Omega`, a quarter kick): push at `x_n`, drift, push at `x_(n+1)`. It is second
+    order and time-reversible; the turns keep the speed exactly; a charge moving at the drift velocity
+    `E x B / B^2` in uniform fields stays on it exactly (the Boris push keeps that drift at any step);
+    with no second field (`Omega = 0`) it is velocity Verlet. The same adaptive step (`next_dt`).
+
+    Scope: the velocity-dependent force is the Real coordinate of `mu (v x B_cal)` (L0's), which is
+    the only one every implemented law reads; a law that reads the Composer coordinate of
+    `mu (v x B_cal)` (option L6, `B_cal` on) is refused."""
+
+    def step(self, state: State, dt: float, ctx: StepContext) -> State:
+        if getattr(ctx.law.spec, "moving", "off") != "off":
+            raise NotImplementedError("the Boris push reads only the Real coordinate of mu (v x B_cal) (L6 off)")
+        h = 0.5 * dt
+        moving = state.alive & ~state.fixed
+        a0, omega0 = ctx.acceleration(state), ctx.rotation(state)
+        v = self._push(state.v, a0 - _cross(state.v, omega0), omega0, h)  # half step at x_n
+        new = state.copy()
+        new.x[moving] = state.x[moving] + dt * v[moving]  # drift
+        new.v[moving] = v[moving]
+        new.t = state.t + dt
+        ctx.invalidate()
+        a1, omega1 = ctx.acceleration(new), ctx.rotation(new)  # at the new place, with the half-step velocity
+        a_e1 = a1 - _cross(new.v, omega1)
+        v = self._push(new.v, a_e1, omega1, h)  # half step at x_(n+1)
+        new.v[moving] = v[moving]
+        ctx.remember(new, a_e1 + _cross(new.v, omega1))  # the acceleration at the final velocity
+        return new
+
+    @staticmethod
+    def _push(v: np.ndarray, a_e: np.ndarray, omega: np.ndarray, h: float) -> np.ndarray:
+        """The Boris push over a time `h`: quarter kick, turn, quarter kick (with `h/2` kicks)."""
+        v = v + (0.5 * h) * a_e
+        v = boris_rotation(v, omega, h)
+        return v + (0.5 * h) * a_e

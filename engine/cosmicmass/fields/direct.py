@@ -24,7 +24,7 @@ from ..constants import SI, Constants
 from ..state import State
 from .sample import FieldSample
 
-__all__ = ["DirectSum", "smallest_separation", "BACKGROUND_KEYS"]
+__all__ = ["DirectSum", "smallest_separation", "debye_length", "BACKGROUND_KEYS"]
 
 BACKGROUND_KEYS = ("g", "e", "B_g", "b")  # uniform background fields (setting U5)
 _BLOCK = 2_000_000  # largest number of point-source pairs handled at once
@@ -42,6 +42,32 @@ def smallest_separation(state: State) -> float:
         dist[np.arange(len(chunk)), start + np.arange(len(chunk))] = np.inf  # not a body with itself
         best = min(best, float(dist.min()))
     return best
+
+
+def debye_length(state: State, constants: Constants, k_b: float) -> float:
+    """The screening length of option L8, from the population state (a labelled choice,
+    `team/notes/E4.md`): `sqrt(k_B T / (4 pi K sum_i n_i q_i^2))`, the Debye length. `T` is the
+    kinetic temperature of the moving alive bodies; the densities come from the box that bounds the
+    alive bodies: its volume in 3D, and in 2D (bodies of 3D space moving in a plane, D21) its area
+    times the mean spacing `a = sqrt(area / N)`. Infinite (no screening) without temperature, charge
+    or extent."""
+    alive = state.alive
+    moving = alive & ~state.fixed
+    n = int(alive.sum())
+    if n < 2 or not np.any(moving):
+        return np.inf
+    kinetic2 = float(np.sum(state.m[moving] * np.sum(state.v[moving] ** 2, axis=1)))
+    temperature = kinetic2 / (state.dimension * int(moving.sum()) * k_b)
+    extent = np.ptp(state.x[alive], axis=0)
+    if state.dimension == 3:
+        volume = float(np.prod(extent))
+    else:
+        area = float(np.prod(extent))
+        volume = area * np.sqrt(area / n)
+    charge2 = float(np.sum(state.q[alive] ** 2))
+    if temperature <= 0 or charge2 == 0 or volume <= 0:
+        return np.inf
+    return float(np.sqrt(k_b * temperature * volume / (4 * np.pi * constants.K * charge2)))
 
 
 class DirectSum:
@@ -77,8 +103,13 @@ class DirectSum:
         """The field at every body from all the other alive bodies (no self-field)."""
         return self._sample(state, state.x, skip_self=True)
 
+    def at_bodies_screened(self, state: State, length: float) -> FieldSample:
+        """The same, with each body's field screened over `length` (option L8): the kernel
+        `1/r^2` becomes `exp(-r/L) (1 + r/L) / r^2`. The uniform background is not screened."""
+        return self._sample(state, state.x, skip_self=True, screening=length)
+
     # --- internals ----------------------------------------------------------
-    def _sample(self, state: State, points: np.ndarray, skip_self: bool) -> FieldSample:
+    def _sample(self, state: State, points: np.ndarray, skip_self: bool, screening: float = np.inf) -> FieldSample:
         d = state.dimension
         if points.ndim != 2 or points.shape[1] != d:
             raise ValueError(f"points must have shape (P, {d})")
@@ -94,8 +125,11 @@ class DirectSum:
                 rows = start + np.arange(r.shape[0])
                 own = rows[:, None] == src[None, :]
                 dist2[own] = np.inf
-            with np.errstate(divide="ignore"):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 weight = dist2**-1.5  # 1 / (r^2 + eps^2)^(3/2)
+                if np.isfinite(screening):  # option L8: exp(-r/L) (1 + r/L)
+                    ratio = np.sqrt(dist2) / screening
+                    weight = np.where(np.isfinite(dist2), weight * np.exp(-ratio) * (1 + ratio), 0.0)
             g[start : start + step] = np.einsum("pn,pnd->pd", weight * ms, r)
             e[start : start + step] = np.einsum("pn,pnd->pd", weight * qs, r)
         G = self.constants.G_N

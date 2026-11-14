@@ -44,6 +44,30 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: no code changed
 - Questions: none new
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4 part B: L4, L6, L8
+- Did: the options L4 (radial, perpendicular, along the velocity), L6 (the Composer coordinate of `mu (v x B_cal)`, on or only) and L8 (the Composer coupling screened over the Debye length of the population; `DirectSum.at_bodies_screened`, `debye_length`, `FieldSample.screened`); definitions labelled in `team/notes/E4.md`.
+- Result: hand cases; the reduce-to-L0 test over every direction x moving option, bit for bit; L8 screens the Composer coupling and never L0. Software checks against mathematics; no finding.
+- Next: L1e and the direction torque (question 24); then E5.4, E7.1, E8.
+- Blocked by / questions: question 24.
+- Architecture: updated (section 2 rows `fieldsample`, `fields`, `l1`; section 4 edge `integrators --> environment`; section 10 additions; section 11)
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3.4 and E4 part A: L1b-L1d, L7
+- Did: E3 done (D29 guard, E3.2, E3.4); claimed E4. `laws/l1.py`: one base for the readings (L0 plus `+/- lambda` times what the reading adds) and L1b, L1c, L1d; `Law.inertia` reads L7 (`Re`, `Sh`, `abs`). Definitions labelled in `team/notes/E4.md` for the physics lead.
+- Result: each reading by hand; the reduce-to-L0 test for every reading x terms x sign x inertia, 2D and 3D, bit for bit. Software checks against mathematics; no finding.
+- Next: E4 part B (L4 perpendicular and along the velocity, L6, L8); then L1e and the torque, after question 24.
+- Blocked by / questions: question 24 (optional columns of `State`), with a proposed answer.
+- Architecture: updated (section 2 rows `l1`, `lawbase`; section 11)
+- Questions: asked (24) and answered (13 and 24, proposed)
+
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3 part 2: the Boris push (E3.2)
+- Did: `Boris` in `integrators.py` (velocity Verlet whose half kicks are Boris pushes; `StepContext.rotation`, `.remember`); `numerics.integrator` `"verlet"` or `"boris"`, chosen by D10 when left out; 7 tests. A first splitting failed my own drift test (a wobble of 1.25e-7 of the speed) and was replaced before delivery.
+- Result: gyration in uniform `b` (2D and 3D): radius within 1e-6, speed constant to 1e-12, period within 1e-6 (the done-when of E3.2); E x B drift kept to 1e-9; without a second field Boris equals Verlet to rounding. Full suite: 256 passed. Software checks against mathematics; no finding.
+- Next: E3.4 (inertia readings) together with E4.4 (L7 is one of the modifiers).
+- Blocked by / questions: none. The second field comes from backgrounds only until E2.2.
+- Architecture: updated (section 2 row `integrators`; section 5 `VelocityVerlet`, `Boris`; section 10 additions; section 11)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3 part 1: the pair guard of D29
 - Did: claimed E3 (chat message `20261114-162843`); put the pair guard of D29 into `integrators.py` (`pair_approach_time`; `next_dt` always applies `eta min r_ij / |v_ij|`); default `speed_reference` now `"neighbour"` (labelled reading of D29, in `team/notes/E3.md`); 2 new tests; three calls of an older unit test now ask for `"absolute"` explicitly.
 - Result: full T0 gate with convergence passes on `8545bfa` (T0.1c: 3,961 steps, separation error 1.3e-7, as Q4 measured); 249 tests passed, coverage 99.31%.
