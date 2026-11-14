@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4: L1e and the torque (D37)
+- Did: released the rest of E5 (handoff in `team/notes/E5.md`) and claimed E4 again after D37 (issue #57). `State` gains the optional columns `xc`, `vc`, `spin`, `radius` and `extend`; a law gains the hooks `velocity_coupling`, `composer_acceleration`, `torque`; both integrators advance the new columns; the reading **L1e** and the direction **"torque"** in `laws/l1.py`; settings and time series.
+- Result: L1e by hand; `Re(mu a) / Re(mu)` is L0's acceleration (to 1e-13); the reduce-to-L0 test for L1e, bit for bit; a body in uniform fields moves in two coordinates exactly, and `x - s^2 (q/m) xc` follows L0; the torque spins a body up without pushing it. Software checks against the formulas; L1e and the torque are hypotheses. No finding.
+- Next: E9 (the energy of L1a, D23), then the wrap-around wall (D36), then E2.2 (question 11).
+- Blocked by / questions: question 25 (under L1e, is the place `x` or a reading of `X`?), for the physics lead.
+- Architecture: updated (section 2 rows `state`, `lawbase`, `l1`, `integrators`; section 5 `State`; section 10, the contract addition of D37; section 11)
+- Questions: asked (25)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - Q5 confirmed (D39); M1 status in the README
 - Did: re-ran `scenarios/Q5/run.py` from its stamped engine commit `746e044` in a clean worktree; on the maintainer's decision ("Yes, close Q5") recorded Q5 as confirmed by the same model (D39), added the reproduction run, updated `team/FINDINGS.md` and journal entry 2026-004 (dated note). Corrected the stale M1 line of `README.md` (it still said "T9.2, T9.4 open") and the T9.2 row of `docs/OPEN-SCENARIOS.md`.
 - Result: `summary.json` identical bit for bit (67 numbers, 29 flags; the failed prediction about the sign of the deflection is reproduced too). The gates of M1 (T0, T9.1-T9.4) are all confirmed.

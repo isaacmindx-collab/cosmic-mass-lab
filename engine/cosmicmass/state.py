@@ -24,6 +24,11 @@ class State:
     fixed: np.ndarray  # (N,) bool: pinned sources (U6)
     alive: np.ndarray  # (N,) bool: absorbed bodies are switched off, never deleted
     t: float = 0.0
+    # optional columns (decision D37): zeros unless given; read only by the code that needs them
+    xc: np.ndarray | None = None  # (N, d) Composer position (the reading L1e)
+    vc: np.ndarray | None = None  # (N, d) Composer velocity (L1e)
+    spin: np.ndarray | None = None  # (N,) in 2D, (N, 3) in 3D: spin angular momentum (L4 "torque")
+    radius: np.ndarray | None = None  # (N,) radius of each body; 0 is a point body
 
     def __post_init__(self):
         self.m, self.q = np.array(self.m, dtype=float), np.array(self.q, dtype=float)
@@ -38,6 +43,16 @@ class State:
             raise ValueError("the dimension d must be 2 or 3")
         if not np.all(np.isfinite(self.m)) or not np.all(np.isfinite(self.q)):
             raise ValueError("m and q must be finite")
+        d = self.x.shape[1]
+        shapes = {"xc": (n, d), "vc": (n, d), "spin": (n, 3) if d == 3 else (n,), "radius": (n,)}
+        for name, shape in shapes.items():
+            value = getattr(self, name)
+            value = np.zeros(shape) if value is None else np.array(value, dtype=float)
+            if value.shape != shape:
+                raise ValueError(f"{name} must have shape {shape}")
+            setattr(self, name, value)
+        if np.any(self.radius < 0):
+            raise ValueError("a radius cannot be negative")
 
     @classmethod
     def from_bodies(cls, bodies, x, v=None, fixed=None, t: float = 0.0) -> "State":
@@ -76,5 +91,30 @@ class State:
     def copy(self) -> "State":
         """An independent copy: changing it never changes the original."""
         return State(
-            self.m.copy(), self.q.copy(), self.x.copy(), self.v.copy(), self.fixed.copy(), self.alive.copy(), self.t
+            self.m.copy(),
+            self.q.copy(),
+            self.x.copy(),
+            self.v.copy(),
+            self.fixed.copy(),
+            self.alive.copy(),
+            self.t,
+            xc=self.xc.copy(),
+            vc=self.vc.copy(),
+            spin=self.spin.copy(),
+            radius=self.radius.copy(),
         )
+
+    def extend(self, m, q, x, v) -> None:
+        """Append bodies in place (an inflow): alive, free, with zero optional columns."""
+        m, q = np.atleast_1d(np.asarray(m, dtype=float)), np.atleast_1d(np.asarray(q, dtype=float))
+        x, v = np.atleast_2d(np.asarray(x, dtype=float)), np.atleast_2d(np.asarray(v, dtype=float))
+        k, d = len(m), self.dimension
+        if q.shape != (k,) or x.shape != (k, d) or v.shape != (k, d):
+            raise ValueError(f"extend: m and q need one length k, x and v the shape (k, {d})")
+        self.m, self.q = np.append(self.m, m), np.append(self.q, q)
+        self.x, self.v = np.vstack([self.x, x]), np.vstack([self.v, v])
+        self.fixed = np.append(self.fixed, np.zeros(k, dtype=bool))
+        self.alive = np.append(self.alive, np.ones(k, dtype=bool))
+        self.xc, self.vc = np.vstack([self.xc, np.zeros((k, d))]), np.vstack([self.vc, np.zeros((k, d))])
+        self.spin = np.vstack([self.spin, np.zeros((k, 3))]) if d == 3 else np.append(self.spin, np.zeros(k))
+        self.radius = np.append(self.radius, np.zeros(k))

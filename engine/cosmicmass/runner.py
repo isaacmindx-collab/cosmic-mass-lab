@@ -39,7 +39,16 @@ class RunResult:
     timeseries: list
 
 
-def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True, k_b: float | None = None) -> dict:
+def _row(
+    step: int,
+    dt: float,
+    measured: dict,
+    state: State,
+    bodies: bool = True,
+    k_b: float | None = None,
+    composer: bool = False,
+    spin: bool = False,
+) -> dict:
     row = {
         "step": step,
         "t": measured["t"],
@@ -56,6 +65,11 @@ def _row(step: int, dt: float, measured: dict, state: State, bodies: bool = True
         for i in range(state.n):
             row.update({f"x{i}_{k}": float(c) for k, c in enumerate(state.x[i])})
             row.update({f"v{i}_{k}": float(c) for k, c in enumerate(state.v[i])})
+            if composer:  # a law of two coordinates (L1e): the Composer position and velocity (D37)
+                row.update({f"xc{i}_{k}": float(c) for k, c in enumerate(state.xc[i])})
+                row.update({f"vc{i}_{k}": float(c) for k, c in enumerate(state.vc[i])})
+            if spin:  # the direction "torque" of L4: the spin (D37)
+                row.update({f"spin{i}_{k}": float(c) for k, c in enumerate(np.atleast_1d(state.spin[i]))})
     return row
 
 
@@ -106,7 +120,12 @@ def run(settings, out_root: Path | str | None = Path("results"), now=None) -> Ru
     bath = make_heat_bath(universe["heat_bath"], universe["units"]) if universe.get("heat_bath") else None
     environment = Environment(universe["boundary"], box.get("lower"), box.get("upper"), inflow=inflow, heat_bath=bath)
     rng = np.random.default_rng(num["seed"])  # every random draw of the run (D13: the seed is in the stamp)
-    columns = {"bodies": inflow is None, "k_b": bath.k_b if bath is not None else None}
+    columns = {
+        "bodies": inflow is None,
+        "k_b": bath.k_b if bath is not None else None,
+        "composer": settings.law_spec.reading == "L1e" or bool(state.vc.any()),
+        "spin": settings.law_spec.direction == "torque",
+    }
     ctx = StepContext(
         settings.make_law(),
         solver,

@@ -46,18 +46,18 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | gnarray | `engine/cosmicmass/gnarray.py` | E1.3 | implemented | `GNArray`: vectorised General Numbers and vector fields (NumPy), same operations and same bits as `GeneralNumber` |
 | readings | `engine/cosmicmass/readings.py` | E1.4 | implemented | `Re`, `Com`, `Sh`, `Ht`, `abs` for scalars and arrays |
 | matter | `engine/cosmicmass/matter.py` | E1.5 | implemented | `CosmicMass(m, q, name)`, `mu(frame)`, matter presets `PRESETS` (electron, proton, neutron, alpha, dust, planets) |
-| state | `engine/cosmicmass/state.py` | E5.1 | implemented | `State`: structure-of-arrays `m, q, x, v, fixed, alive, t`; `mu(frame)`, `total_mu`, `copy`, `from_bodies` |
+| state | `engine/cosmicmass/state.py` | E5.1 | implemented | `State`: structure-of-arrays `m, q, x, v, fixed, alive, t`, and the optional columns of D37 (`xc`, `vc`, `spin`, `radius`; zeros unless given); `mu(frame)`, `total_mu`, `copy`, `extend`, `from_bodies` |
 | universe | `engine/cosmicmass/universe.py` | E5.2 | planned | `Universe`: settings U1-U8 (angle, dimension, units, boundary, backgrounds, sources, inflow, populations) |
 | settings | `engine/cosmicmass/settings.py` | E5.3 | in-progress | load and validate `settings.json`; build `Frame`, `State`, `LawSpec`, numerics (minimal MVP version; `Universe` and the P4 schemas come later) |
 | populations | `engine/cosmicmass/populations.py` | E5.4 | implemented | seeded generators (`generate`): shapes `box`, `shell`, `ring`; bulk flow, thermal spread at a temperature (with the real particle's mass), Keplerian circular speeds; super-particles (`weight`); used by the settings key `populations` |
 | fieldsample | `engine/cosmicmass/fields/sample.py` | E4.2 | implemented | `FieldSample(g, e, B_g, b, screened=None)` with `E_cal(frame)` and `B_cal(frame)`; `screened` holds the screened field for option L8; the `FieldSolver` interface |
 | fields | `engine/cosmicmass/fields/direct.py` | E2.1 | in-progress | direct-sum field solver `DirectSum`: static `g`, `e` (F1-F2) with Plummer softening, no self-field, uniform backgrounds (U5); `at_bodies_screened` and `debye_length` (option L8: the kernel `exp(-r/L)(1 + r/L)/r^2` over the Debye length of the population); `B_g`, `b` from moving bodies (F3-F4, task E2.2) not yet |
 | fieldsfast | `engine/cosmicmass/fields/tree.py` | E2.5 | planned | fast solver for large N (tree or grid), same interface |
-| lawbase | `engine/cosmicmass/laws/base.py` | E4.1 | implemented | `Law` base class, `LawSpec` (reading and L2-L8 options, stamp form), `ForcePair`, registry of laws (`register`, `make_law`); `third_law_residual` (E4.5); `Law.inertia` reads the option L7 (`Re`, `Sh`, `abs` of `mu`; E3.4) |
+| lawbase | `engine/cosmicmass/laws/base.py` | E4.1 | implemented | `Law` base class, `LawSpec` (reading and L2-L8 options, stamp form), `ForcePair`, registry of laws (`register`, `make_law`); `third_law_residual` (E4.5); `Law.inertia` reads the option L7 (`Re`, `Sh`, `abs` of `mu`; E3.4); optional hooks of D37: `velocity_coupling` (L0's by default), `composer_acceleration` and `torque` (none by default) |
 | l0 | `engine/cosmicmass/laws/l0.py` | E4.2 | implemented | reference law L0: `Re(mu) dv/dt = Re[mu (E_cal + v x B_cal)]` |
-| l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | readings L1a-L1d of the Composer coordinate (hypotheses), each L0 plus `+/- lambda` times what the reading adds (labelled rule, `team/notes/E4.md`), with the options sign (L2), strength (L3), direction (L4: radial, perpendicular, along the velocity), terms (L5), moving bodies (L6), inertia (L7) and range (L8: screened); L1e and the direction "torque" not yet (question 24) |
+| l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | implemented | readings L1a-L1d of the Composer coordinate (hypotheses), each L0 plus `+/- lambda` times what the reading adds (labelled rule, `team/notes/E4.md`), with the options sign (L2), strength (L3), direction (L4: radial, perpendicular, along the velocity, torque on the spin), terms (L5), moving bodies (L6), inertia (L7) and range (L8: screened); and **L1e**: the General Number acceleration `a = E_cal + v x B_cal`, the body moving in two coordinates (`x` and `xc`, D37) |
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
-| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); the inertia readings (E3.4) not yet; the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
+| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); both advance the optional columns of D37 (`advance_secondary`: `xc` with `vc`, the spin with the torque); the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | implemented | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined until E9), momentum, and the temperature of the moving bodies; the pressure on the walls is `runner.wall_pressure` |
 | energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
@@ -338,9 +338,14 @@ classDiagram
         +ndarray fixed
         +ndarray alive
         +float t
+        +ndarray xc
+        +ndarray vc
+        +ndarray spin
+        +ndarray radius
         +mu(frame) GNArray
         +total_mu(frame, alive_only) GNArray
         +copy() State
+        +extend(m, q, x, v)
     }
     class Universe {
         +Frame frame
@@ -668,6 +673,21 @@ class State:
     fixed: np.ndarray   # (N,) bool: pinned sources (U6)
     alive: np.ndarray   # (N,) bool: absorbed bodies are switched off, never deleted
     t: float
+    # optional columns (decision D37, additions): keywords, zeros unless given, copied by copy() and extended
+    # by extend(); every existing call of State(...) and State.from_bodies(...) is unchanged
+    xc: np.ndarray      # (N, d) Composer position (L1e)
+    vc: np.ndarray      # (N, d) Composer velocity (L1e)
+    spin: np.ndarray    # (N,) in 2D, (N, 3) in 3D: spin angular momentum (L4 "torque")
+    radius: np.ndarray  # (N,) radius; 0 is a point body (torque; absorbing surfaces, T4.3)
+    def extend(self, m, q, x, v) -> None: ...   # append bodies in place (inflow), with zero optional columns
+# laws/base.py, optional hooks of a Law (D37, additions; the defaults leave every earlier law as it was):
+#   velocity_coupling(state, fields, frame) -> W, with v x W the velocity-dependent force (default: L0's)
+#   composer_acceleration(state, fields, frame) -> (N, d) | None     the acceleration of xc (L1e)
+#   torque(state, fields, frame) -> (N,) | (N, 3) | None             the torque on the spin (L4 "torque")
+# integrators.py: StepContext.secondary(state) -> (composer_acceleration, torque);
+#   advance_secondary(state, new, dt, before, after): xc with vc, the spin with the torque, in both integrators
+# settings: a body may give "xc", "vc", "spin", "radius"; the time series gains xc<i>_<k>, vc<i>_<k> under L1e
+#   (or with a Composer velocity) and spin<i>_<k> with the direction "torque"
 
 # fields: every solver has the same signature
 class FieldSolver(Protocol):
@@ -787,6 +807,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E4: L1e and the torque (`E4-two-coordinates`; decision D37, issue #57) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `state.py`: optional columns `xc`, `vc`, `spin`, `radius` and `extend` (**contract addition, D37**; used by the inflow of `environment.py`); `laws/base.py`: hooks `velocity_coupling`, `composer_acceleration`, `torque`; `laws/l1.py` implemented: the reading **L1e** and the direction "torque"; `integrators.py`: `StepContext.secondary`, `advance_secondary` in both integrators, `rotation` from the law's coupling; settings (body keys) and runner (time-series columns). Sections 5, 7 and 10 |
 | 2026-11-14 | E5.4 (`E5-populations`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `populations.py` (node no longer planned; new edge `populations --> environment` for `K_B`); `settings.py`: the key `populations` (seeded, after the listed bodies); `stamp.py` and `engine/schemas/stamp.schema.json`: `populations` when used; `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | E8 (`E8-diagnostics`, stacked on `E4-directions`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `analysis/convergence.py` (E8.2) and `analysis/plots.py` (E8.3), nodes no longer planned, edges `convergence --> runner`, `plots --> constants` (was a planned `plots --> diagnostics`); `diagnostics.py` implemented: the temperature (edge `diagnostics --> environment`); `runner.py`: `wall_pressure`, summary `walls` (E8.1). `simulator/web/engine-files.json` regenerated. Section 10: additions |
 | 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |

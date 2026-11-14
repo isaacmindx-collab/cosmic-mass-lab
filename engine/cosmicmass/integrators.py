@@ -47,6 +47,7 @@ __all__ = [
     "VelocityVerlet",
     "Boris",
     "boris_rotation",
+    "advance_secondary",
     "nearest_distances",
     "nearest_neighbours",
     "pair_approach_time",
@@ -146,10 +147,18 @@ class StepContext:
         _, _, fields, inertia = self._cache
         moving = state.alive & ~state.fixed
         per_body = np.where(moving, 1.0 / np.where(moving, inertia, 1.0), 0.0)  # 1 / inertia, 0 if not moving
-        if fields.B_g.ndim == 2:  # 3D: vectors
-            omega = state.m[:, None] * fields.B_g - self.frame.s**2 * state.q[:, None] * fields.b
-            return omega * per_body[:, None]
-        return (state.m * fields.B_g - self.frame.s**2 * state.q * fields.b) * per_body  # 2D: out of the plane
+        coupling = self.law.velocity_coupling(state, fields, self.frame)  # L0's: m B_g - s^2 q b
+        return coupling * (per_body[:, None] if coupling.ndim == 2 else per_body)
+
+    def secondary(self, state: State) -> tuple:
+        """`(composer_acceleration, torque)` of the law at `state` (each `None` if the law gives none),
+        with the fields remembered for this state and its present velocity (decision D37)."""
+        self.acceleration(state)
+        fields = self._cache[2]
+        return (
+            self.law.composer_acceleration(state, fields, self.frame),
+            self.law.torque(state, fields, self.frame),
+        )
 
     def remember(self, state: State, a: np.ndarray) -> None:
         """Replace the remembered acceleration of `state` (the same positions, so the same fields),
@@ -204,6 +213,7 @@ class VelocityVerlet:
 
     def step(self, state: State, dt: float, ctx: StepContext) -> State:
         a0 = ctx.acceleration(state)
+        before = ctx.secondary(state)
         new = state.copy()
         moving = state.alive & ~state.fixed
         v_half = state.v + (0.5 * dt) * a0
@@ -213,7 +223,25 @@ class VelocityVerlet:
         ctx.invalidate()
         a1 = ctx.acceleration(new)  # computed with the half-step velocity, then remembered
         new.v[moving] = v_half[moving] + (0.5 * dt) * a1[moving]
+        advance_secondary(state, new, dt, before, ctx.secondary(new))
         return new
+
+
+def advance_secondary(state: State, new: State, dt: float, before: tuple, after: tuple) -> None:
+    """Advance the optional columns of D37 over one step, in `new`, with the same scheme as the Real
+    coordinate (half kick, drift, half kick): the Composer position `xc` moves with the Composer
+    velocity `vc`, which is kicked by the law's Composer acceleration (L1e); the spin is turned by the
+    law's torque (L4 "torque"). Fixed and absorbed bodies are left alone. With no Composer velocity,
+    acceleration or torque, nothing is touched."""
+    (ac0, tq0), (ac1, tq1) = before, after
+    moving = state.alive & ~state.fixed
+    h = 0.5 * dt
+    if ac0 is not None or state.vc.any():
+        vc_half = state.vc if ac0 is None else state.vc + h * ac0
+        new.xc[moving] = state.xc[moving] + dt * vc_half[moving]
+        new.vc[moving] = vc_half[moving] if ac1 is None else vc_half[moving] + h * ac1[moving]
+    if tq0 is not None and tq1 is not None:
+        new.spin[moving] = state.spin[moving] + h * (tq0[moving] + tq1[moving])
 
 
 def _cross(v: np.ndarray, omega: np.ndarray) -> np.ndarray:
@@ -254,6 +282,7 @@ class Boris(VelocityVerlet):
         h = 0.5 * dt
         moving = state.alive & ~state.fixed
         a0, omega0 = ctx.acceleration(state), ctx.rotation(state)
+        before = ctx.secondary(state)
         v = self._push(state.v, a0 - _cross(state.v, omega0), omega0, h)  # half step at x_n
         new = state.copy()
         new.x[moving] = state.x[moving] + dt * v[moving]  # drift
@@ -265,6 +294,7 @@ class Boris(VelocityVerlet):
         v = self._push(new.v, a_e1, omega1, h)  # half step at x_(n+1)
         new.v[moving] = v[moving]
         ctx.remember(new, a_e1 + _cross(new.v, omega1))  # the acceleration at the final velocity
+        advance_secondary(state, new, dt, before, ctx.secondary(new))
         return new
 
     @staticmethod
