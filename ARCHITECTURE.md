@@ -729,7 +729,8 @@ def main(argv=None) -> int: ...                      # python tools/new_scenario
 # tools/build_journal.py (D34, D35): outside the package
 def read_entries() -> tuple[list[Entry], list[str]]: ...   # entries newest first, and one line per problem
 def build(entries) -> dict[str, str]: ...            # the site, {path under journal/: text}; deterministic
-def main(argv=None) -> int: ...                      # python tools/build_journal.py [--check]; 1 on a problem
+def open_threads(entries, run=None) -> list[str]: ...   # editors: a GitHub Discussions thread per new entry (gh); recorded in journal/discussion.json
+def main(argv=None) -> int: ...                      # python tools/build_journal.py [--check | --open-threads]; 1 on a problem
 
 # tools/chat.py (team chat, question 23): outside the package, standard library only
 def post(sender, to, subject, body, re_id="", folder=CHAT, now=None) -> Path: ...   # one new file; ChatError, nothing written
@@ -748,6 +749,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | journal threads (`journal-threads`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | `tools/build_journal.py`: `--open-threads` (one GitHub Discussions thread per entry, recorded in `journal/discussion.json`); the discussion block links to it. Section 10: one signature added, one changed. No module, edge or engine contract changed |
 | 2026-11-14 | Co-exist Journal (`coexist-journal`, stacked on `co-exist-initiative`; D34, D35) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **new** `tools/build_journal.py` (node `journal`, section 4, used by `tests`); section 10: its signatures; `markdown==3.8.2`, `pymdown-extensions==10.16.1`, `pyyaml==6.0.2` added to the dev extras. No engine module or contract changed |
 | 2026-11-14 | team chat (`team-chat`; question 23, proposed) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `tools/chat.py` (node `chat`, section 4, used by `tests`); `team/chat/` with its README and the first message; section 10: its signatures. No engine module changed |
 | 2026-11-14 | D25: one ruff format pass (`D25-format-pass`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **layout only**: `ruff format .` over 45 Python files (no module, interface or behaviour changed; one `lambda` in `gates/t0.py` became a local `def`); Markdown excluded from formatting; section 9: the job `lint` also runs `ruff format --check .` |

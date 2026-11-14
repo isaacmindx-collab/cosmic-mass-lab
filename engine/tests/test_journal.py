@@ -64,6 +64,20 @@ def test_teaching_register_counts_both_sides():
     assert "AI teaching register" in html and "<th>Physics side</th>" in html
 
 
+def test_open_threads_records_new_threads_only(tmp_path, monkeypatch):
+    cfg = tmp_path / "discussion.json"
+    cfg.write_text('{"repoId": "R", "threadCategoryId": "C", "threads": {"2026-001": "https://x/1"}}', encoding="utf-8")
+    monkeypatch.setattr(bj, "DISCUSSION_CFG", cfg)
+    entries, _ = bj.read_entries()
+    calls = []
+    opened = bj.open_threads(entries, run=lambda cmd: calls.append(cmd) or f"https://x/{len(calls) + 1}\n")
+    assert len(calls) == len(entries)  # every entry but 2026-001, plus the discussion page
+    assert opened[-1].startswith("open: ")
+    assert '"2026-001": "https://x/1"' in cfg.read_text(encoding="utf-8")
+    html = bj.discussion_block("2026-001", "t", "i")
+    assert 'href="https://x/1"' in html and "Join the discussion" in html
+
+
 def test_math_and_repository_links():
     html = bj.render_md("See [the findings](/team/FINDINGS.md) and $a_b * c_d$.")
     assert 'href="https://github.com/MostafaDerraz/cosmic-mass-lab/blob/main/team/FINDINGS.md"' in html

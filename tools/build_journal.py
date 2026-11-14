@@ -327,9 +327,14 @@ def discussion_config() -> dict:
     return json.loads(DISCUSSION_CFG.read_text(encoding="utf-8"))
 
 
-def discussion_block(term: str, issue_title: str) -> str:
-    """The discussion under an entry (or on the discussion page), keyed by a fixed term."""
+def discussion_block(key: str, term: str, issue_title: str) -> str:
+    """The discussion under an entry (key: its id) or on the discussion page (key: "open").
+
+    In order of preference: giscus inside the page (when its category id is set), the entry's own thread in
+    GitHub Discussions (journal/discussion.json, "threads"; opened with --open-threads), a new GitHub issue.
+    """
     cfg = discussion_config()
+    thread = (cfg.get("threads") or {}).get(key, "")
     if cfg.get("repoId") and cfg.get("categoryId"):
         widget = (
             f'<script src="https://giscus.app/client.js" data-repo="{esc(cfg["repo"])}" '
@@ -339,11 +344,16 @@ def discussion_block(term: str, issue_title: str) -> str:
             'data-theme="preferred_color_scheme" data-lang="en" data-loading="lazy" crossorigin="anonymous" '
             "async></script>"
         )
+    elif thread:
+        widget = (
+            f'<p class="soon"><a class="button" href="{esc(thread)}">Join the discussion</a> '
+            '<span class="hint">opens this entry\'s thread in GitHub Discussions; reading needs no account</span></p>'
+        )
     else:
         url = f"{REPO}/issues/new?title={quote(issue_title)}"
         widget = (
-            '<p class="soon">The live discussion opens here as soon as GitHub Discussions is switched on for the '
-            f'repository. Until then: <a class="button" href="{esc(url)}">Ask or comment on GitHub</a></p>'
+            '<p class="soon">The editor opens a discussion thread when the entry is published. Until then: '
+            f'<a class="button" href="{esc(url)}">Ask or comment on GitHub</a></p>'
         )
     return (
         '<section class="discussion" id="discussion"><h2>Discussion</h2>'
@@ -356,7 +366,7 @@ def discuss_page() -> str:
         "<section class='hero'><h1>Discussion</h1><p class='lede'>Questions and answers about the cosmic mass, "
         "the General Numbers and the virtual universe, in mathematics and physics, from anyone, human or AI. "
         "To discuss one entry, use the discussion at the bottom of its page.</p></section>"
-        + discussion_block(f"{NAME}: open discussion", f"[{NAME}] Question: ")
+        + discussion_block("open", f"{NAME}: open discussion", f"[{NAME}] Question: ")
     )
     return page(f"Discussion · {NAME}", body, "")
 
@@ -464,7 +474,7 @@ def entry_page(e: Entry) -> str:
   <p class="source">In-house entry, checked by an editor, not peer reviewed{editor} ·
   <a href="{REPO}/blob/main/{src}">Markdown source</a> ·
   <a href="{REPO}/commits/main/{src}">history</a></p>
-  {discussion_block(f"{NAME} {e.id}", f"[{NAME} {e.id}] ")}
+  {discussion_block(e.id, f"{NAME} {e.id}", f"[{NAME} {e.id}] ")}
 </article>"""
     return page(f"{e.title} · {NAME}", body, root, description=re.sub(r"\s+", " ", e.summary)[:300])
 
@@ -557,9 +567,73 @@ def generated_paths():
     return owned
 
 
+def thread_body(title: str, url: str, summary: str) -> str:
+    return (
+        f"Discussion of **{title}** in the {NAME}, the in-house journal of the {INITIATIVE}.\n\n"
+        f"Read it here: {url}\n\n"
+        + (f"> {re.sub(r'\s+', ' ', summary)}\n\n" if summary else "")
+        + "Everyone may comment, ask and answer here: people and AI models and agents. "
+        "AI agents post through their sponsor's account and begin every comment with one line: "
+        "`AI: <model> (<provider>), in <tool>, sponsor @handle`. The authors answer the questions left here "
+        "(decision D35). Label what you claim (mathematics, measurement, finding, hypothesis), be kind, and "
+        f"never invent a number. Rules: {SITE}about.html"
+    )
+
+
+def open_threads(entries, run=None) -> list[str]:
+    """Open a GitHub Discussions thread for every entry that has none (and for the discussion page).
+
+    Needs `gh`, signed in with write access; posts in the category "threadCategoryId" of discussion.json
+    and records each thread's address there. Run by an editor after the entries are merged.
+    """
+    import subprocess
+
+    run = run or (lambda cmd: subprocess.run(cmd, capture_output=True, text=True, check=True).stdout)
+    cfg = discussion_config()
+    threads = cfg.setdefault("threads", {})
+    wanted = [
+        (e.id, f"{NAME} {e.id}: {e.title}", f"{SITE}e/{e.id}/", e.summary) for e in sorted(entries, key=lambda e: e.id)
+    ]
+    wanted.append(("open", f"{NAME}: questions and answers", f"{SITE}discuss.html", ""))
+    query = (
+        "mutation($repo:ID!,$cat:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repo,"
+        "categoryId:$cat,title:$title,body:$body}){discussion{url}}}"
+    )
+    opened = []
+    for key, title, url, summary in wanted:
+        if threads.get(key):
+            continue
+        out = run(
+            [
+                "gh",
+                "api",
+                "graphql",
+                "-f",
+                f"query={query}",
+                "-f",
+                f"repo={cfg['repoId']}",
+                "-f",
+                f"cat={cfg['threadCategoryId']}",
+                "-f",
+                f"title={title}",
+                "-f",
+                f"body={thread_body(title, url, summary)}",
+                "--jq",
+                ".data.createDiscussion.discussion.url",
+            ]
+        ).strip()
+        threads[key] = out
+        opened.append(f"{key}: {out}")
+        DISCUSSION_CFG.write_text(json.dumps(cfg, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return opened
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true", help="fail if an entry is invalid or the site is out of date")
+    ap.add_argument(
+        "--open-threads", action="store_true", help="editors: open a GitHub Discussions thread for new entries"
+    )
     args = ap.parse_args(argv)
     entries, errors = read_entries()
     if errors:
@@ -567,6 +641,9 @@ def main(argv=None) -> int:
         for err in errors:
             print("  -", err)
         return 1
+    if args.open_threads:
+        for line in open_threads(entries):
+            print("opened", line)
     files = build(entries)
     stale = generated_paths() - set(files)
     if args.check:

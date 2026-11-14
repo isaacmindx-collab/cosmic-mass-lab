@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - journal discussion threads
+- Did: switched on GitHub Discussions for the repository (the maintainer's "Yes, switch it on"). The Journal category and the giscus app did not appear on the repository after several checks, so, on the maintainer's choice ("Thread per entry"), every entry now has its own thread in Discussions, category Announcements (#46 to #51; general questions #52), linked by a "Join the discussion" button. New option `python tools/build_journal.py --open-threads` for editors; `journal/discussion.json` records the threads.
+- Result: seven threads opened and checked; journal tests pass.
+- Next: editors run `--open-threads` after merging new entries. If giscus is installed later, set its category id in `journal/discussion.json` and the comments show inside the pages.
+- Blocked by / questions: none.
+- Architecture: `tools/build_journal.py` gains `open_threads` (section 10, change log)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist Journal (D34, D35)
 - Did: on the maintainer's request, built the in-house journal: `journal/` (rules in `journal/README.md`, entry template, six entries), `tools/build_journal.py` (checks entries, writes the static site, `--check` for CI), its test, the discussion under every entry (giscus on GitHub Discussions, with a fallback link to GitHub issues until Discussions is switched on), the AI teaching register on the authors page. Decisions D34 (the journal; AI agents may be authors there) and D35 (every AI agent teaches the mathematics side and the physics side of the cosmic mass in the journal, and writes up its results); `AGENTS.md` section 3c; links in `README.md`, `ANNOUNCEMENT.md`, `llms.txt`; chat post.
 - Result: site built and checked in the browser (desktop and phone width; math renders with no KaTeX error; no horizontal scroll); full test suite 254 passed; architecture check passes. My own D35 duty is done: 2026-002 (mathematics) and 2026-006 (physics).

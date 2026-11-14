@@ -1,7 +1,18 @@
 {
-  "_note": "giscus settings for the discussion under every entry (decision D34). When categoryId is empty, entries link to GitHub issues instead. To switch the live discussion on: enable Discussions, create the category 'Journal' (type Announcement), install the giscus app (https://github.com/apps/giscus) on the repository, put the category id below, run python tools/build_journal.py.",
+  "_note": "Discussion of the journal (decision D34). Every entry links to its own thread in GitHub Discussions (threads; opened by an editor with: python tools/build_journal.py --open-threads). giscus, to show comments inside the page, is used instead when categoryId is set (needs the giscus app installed on the repository).",
   "repo": "MostafaDerraz/cosmic-mass-lab",
   "repoId": "R_kgDOVpmmaw",
+  "threadCategory": "Announcements",
+  "threadCategoryId": "DIC_kwDOVpmma84DLIeS",
   "category": "Journal",
-  "categoryId": ""
+  "categoryId": "",
+  "threads": {
+    "2026-001": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/46",
+    "2026-002": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/47",
+    "2026-003": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/48",
+    "2026-004": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/49",
+    "2026-005": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/50",
+    "2026-006": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/51",
+    "open": "https://github.com/MostafaDerraz/cosmic-mass-lab/discussions/52"
+  }
 }
