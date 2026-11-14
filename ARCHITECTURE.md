@@ -60,7 +60,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); both advance the optional columns of D37 (`advance_secondary`: `xc` with `vc`, the spin with the torque); the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | implemented | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined until E9), momentum, and the temperature of the moving bodies; the pressure on the walls is `runner.wall_pressure` |
-| energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
+| energy | `engine/cosmicmass/energy.py` | E9 | implemented | energy of the bodies in both coordinates: under L0 (kinetic, Newton plus Coulomb interaction, uniform background), and the Composer energy `-G lambda s sum Com(mu_a mu_b) / r` of decision D23 within its scope (L1a, all terms, radial, inertia `Re`, no second field, no background `g`, `e`); `None` (not defined) outside it |
 | runner | `engine/cosmicmass/runner.py` | E7.1 | in-progress | `run(settings) -> RunResult`: the time loop, stop conditions, outputs; `main(argv)` for the command line (E7.3); checkpoints and resuming not yet |
 | cli | `engine/cosmicmass/__main__.py` | E7.3 | implemented | `python -m cosmicmass run <settings.json>`: calls `runner.main` |
 | stamp | `engine/cosmicmass/stamp.py` | E7.2 | in-progress | run id, engine commit, `stamp.json`, `summary.json`, `timeseries.csv`; the T0 status lookup (after G1) and validation against the P4 schemas not yet |
@@ -754,7 +754,7 @@ def wall_pressure(box, load, elapsed) -> dict | None: ...   # E8.1: summary["wal
 #   each wall ("<axis>-<side>"), "pressure_mean" over the boundary (2D: per unit length), "elapsed"; None without a box
 
 # diagnostics.py
-class Diagnostics:      # Diagnostics(frame, constants, softening=0.0, background=None)
+class Diagnostics:      # Diagnostics(frame, constants, softening=0.0, background=None, law=None)
     def measure(self, state: State, fields=None) -> dict: ...
     # keys: t, temperature (E8.1, addition), mass, charge, kinetic, energy_re, energy_com (None: not defined),
     #   momentum, momentum_scale
@@ -767,11 +767,14 @@ def convergence(settings, measure, counts=(), resize=None, tolerance=0.01) -> di
 def figures(folder) -> list[Path]: ...   # folder/figures/drifts.svg, trails.svg, mu_plane.svg, from the folder alone
 def line_plot(path, curves, x_label, y_label, caption, square=False) -> Path: ...
 def scatter_plot(path, points, x_label, y_label, caption, axes=()) -> Path: ...
-def drifts(first: dict, last: dict) -> dict: ...   # relative drifts of mass, charge, energy_re, momentum
+def drifts(first: dict, last: dict) -> dict: ...   # relative drifts of mass, charge, energy_re, energy_com, energy_total, momentum
+# measure() rows: energy_com (D23, None if not defined) and energy_total (what the law conserves; None if not defined)
 
-# energy.py (reference law L0, Real coordinate only)
+# energy.py (E9: both coordinates)
 def energy_l0(state, frame, constants, softening=0.0, background=None) -> dict: ...
 # keys: kinetic, interaction (-G_N sum Re(mu_a mu_b) / r), background (-sum Re[mu E_cal] . x), total
+def composer_energy(state, law, frame, constants, softening=0.0, background=None) -> float | None: ...
+# decision D23: -G_N lambda s sum_{a<b} Com(mu_a mu_b) / r within D23_SCOPE; None outside it
 ```
 
 ```python

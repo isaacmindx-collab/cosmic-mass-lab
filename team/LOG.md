@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - E9: the Composer energy (D23)
+- Did: on the maintainer's split of the rest of M1 (my share: E9, E2.2, the registry), implemented E9: `energy.composer_energy` (D23: `-G lambda s sum Com(mu_a mu_b) / r` within its scope; `None` outside it); `Diagnostics(..., law=)` reports `energy_com` and `energy_total` (what the law conserves) and their drifts; the runner passes the law; schema addition; 6 tests.
+- Result: on an eccentric orbit of two charged bodies under L1a (lambda 0.5, 20,000 steps) the Real energy alone drifts by 4.1e-3, Real plus Composer by 3.7e-8 (L0 on the same orbit: 2.8e-8). Full suite 313 passed.
+- Next: E2.2 (derivation of the field of moving bodies, for the physics lead), the registry clean-up, D40.
+- Blocked by / questions: none.
+- Architecture: updated (row `energy` implemented; section 10; change log)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E4: L1e and the torque (D37)
 - Did: released the rest of E5 (handoff in `team/notes/E5.md`) and claimed E4 again after D37 (issue #57). `State` gains the optional columns `xc`, `vc`, `spin`, `radius` and `extend`; a law gains the hooks `velocity_coupling`, `composer_acceleration`, `torque`; both integrators advance the new columns; the reading **L1e** and the direction **"torque"** in `laws/l1.py`; settings and time series.
 - Result: L1e by hand; `Re(mu a) / Re(mu)` is L0's acceleration (to 1e-13); the reduce-to-L0 test for L1e, bit for bit; a body in uniform fields moves in two coordinates exactly, and `x - s^2 (q/m) xc` follows L0; the torque spins a body up without pushing it. Software checks against the formulas; L1e and the torque are hypotheses. No finding.
