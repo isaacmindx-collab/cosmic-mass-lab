@@ -1,0 +1,68 @@
+% Paper of the "Co-exist initiative of Cosmic mass universe".
+% Use the class unchanged (PUBLISHING.md; decision D33). While under review keep the option `draft`;
+% the Board's approval switches it to `approved`, and the DOI is added after posting on Zenodo.
+\documentclass[draft]{coexist}
+
+\paperid{PAPER-ID}                 % the folder name, e.g. 2026-T9-limits
+\keywords{cosmic mass; General Numbers; virtual universe}
+\engine{cosmicmass 0.1.0, commit abc1234}
+% \approvaldate{YYYY-MM-DD}        % set by the Board
+% \doi{10.5281/zenodo.NNNNNNN}     % set after posting on Zenodo
+
+\title{Title of the Paper}
+\author{First Author\affil{1}, Second Author\affil{1,2}}
+\affiliation{2}{Other institution (optional)}   % affiliation 1 is always the initiative
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+What was asked, how it was answered (law and setup), what was found, and what kind of statement it is.
+\end{abstract}
+
+\section{Introduction}
+Each body is one General Number, its cosmic mass $\cmu = m + q\G$, with
+$\G^2 = 2s\cos\bar\varphi\,\G - s^2$ and $s = \sqrt{K/G_N}$ \citep{derraz-gn,derraz-cm}.
+State the question this paper answers.
+
+\section{Method}
+The engine, the law (L0, or a hypothesis such as L1a with its options), the settings as in
+\texttt{stamp.json}, and the pre-registration (where and when it was committed).
+
+\section{Results}
+Label every statement:
+\mathematics{} for proved or verified statements,
+\measurement{source} for measured values (with their source),
+\finding{L0} for results of the virtual universe, and \hypothesis{L1a} for readings that are hypotheses.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{lll}\toprule
+Result & Value & Results folder \\\midrule
+Example & $9.009\times10^{-19}\,e$ & \texttt{results/T9.1/<run-id>} \\\bottomrule
+\end{tabular}
+\caption{Every number traced to its results folder; say who reproduced it (decisions D14, D27).}
+\end{table}
+
+\section{Discussion}
+What the result means inside the virtual universe, and what it does not say about nature.
+The field law covers slow bodies and does not replace general relativity.
+
+\reproducibility
+Commands to re-run every result, the release, the seeds.
+
+\begin{contributions}
+\textbf{Authors.} First Author: conceptualisation, writing. Second Author: investigation, validation.\\
+\textbf{AI agents.} Claude Opus 5.5 (Anthropic), in Claude Code, sponsor M.~Derraz: software, validation.
+\end{contributions}
+
+% Fixed acknowledgements and declarations of the initiative. Add your own thanks here if you wish;
+% change a declaration only if the default is not true for this paper.
+% \acknowledgements{We also thank ... for ...}
+% \competinginterests{...}   \funding{...}   \ethics{...}
+\declarations
+
+\boardreview{names of the reviewers, human and AI}
+
+\nocite{cosmic-mass-lab}
+\bibliography{references}
+\end{document}
