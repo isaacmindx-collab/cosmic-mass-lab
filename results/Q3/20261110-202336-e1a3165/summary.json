@@ -1,0 +1,57 @@
+{
+  "cases": {
+    "K": {
+      "codata_2018": 8987551792.3,
+      "codata_2022": 8987551786.170797,
+      "pass": true,
+      "relative_change": 6.819655951062487e-10
+    },
+    "T0.1b_period": {
+      "codata_2018": 1.5194152439530386e-16,
+      "codata_2022": 1.519415244471133e-16,
+      "pass": true,
+      "relative_change": 3.4098279755312433e-10
+    },
+    "T0.1c_separation": {
+      "codata_2018": 3.5386289583922987e-10,
+      "codata_2022": 3.5386289571669754e-10,
+      "pass": true,
+      "relative_change": 3.46270567774809e-10
+    },
+    "T9.1_q_eff_in_e": {
+      "codata_2018": -9.008817273723288e-19,
+      "codata_2022": -9.00881727679514e-19,
+      "pass": true,
+      "relative_change": 3.409829085754268e-10
+    },
+    "T9.3_field": {
+      "codata_2018": 113799018617.14745,
+      "codata_2022": 113799018578.34395,
+      "pass": true,
+      "relative_change": 3.4098279755312433e-10
+    },
+    "s": {
+      "codata_2018": 11604270430.488235,
+      "codata_2022": 11604270426.53138,
+      "pass": true,
+      "relative_change": 3.4098279755312433e-10
+    },
+    "verdicts": {
+      "any_flip": false,
+      "pass": true,
+      "with_codata_2018": {
+        "T0.1b": true,
+        "T9.1": true,
+        "T9.3": true
+      },
+      "with_codata_2022": {
+        "T0.1b": true,
+        "T9.1": true,
+        "T9.3": true
+      }
+    }
+  },
+  "explanation": "Q3 under L0 and the hypothesis L1a: every case meets its criterion.",
+  "scenario": "Q3",
+  "verdict": "pass"
+}

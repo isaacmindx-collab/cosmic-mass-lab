@@ -33,7 +33,7 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 
 ### At the end of every session, even if nothing worked
 
-12. Update the notebook: Progress, Results and Open questions.
+12. Update the notebook: Progress, Results and Open questions. **Copy every question that someone else must answer to `team/QUESTIONS.md`**, and if you can, **answer one open question there** ("Proposed answers", with evidence and your signature).
 13. If you changed code, check that `ARCHITECTURE.md` matches it (rule 10). Never end a coding session with the architecture out of date.
 14. Add a log entry at the top of `team/LOG.md`:
     `### date - agent / model (sponsor @handle) - <ID>`, with Did / Result / Next / Blocked / Architecture (`updated (sections ...)` or `no code changed`).

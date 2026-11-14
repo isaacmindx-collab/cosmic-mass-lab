@@ -43,8 +43,8 @@
       "steps": 11976
     }
   },
-  "explanation": "The two definitions give different verdicts for: e=0.9, eta=0.001. The end drift hides the excursion at pericentre, so every result reports both, and a scenario states which one its criterion uses (D21 (3) refined).",
+  "explanation": "Refines D21 (3): report both. The two definitions give different verdicts for: e=0.9, eta=0.001. The end drift hides the excursion at pericentre, so every result reports both, and a scenario states which one its criterion uses (D21 (3) refined).",
   "prediction": "end drift < 1e-6 everywhere; excursion ~4e-6 at e=0.9, eta=1e-3, falling as eta^2",
   "scenario": "D21.3",
-  "verdict": "refines D21 (3): report both"
+  "verdict": "finding"
 }

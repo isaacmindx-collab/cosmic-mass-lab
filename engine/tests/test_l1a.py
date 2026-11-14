@@ -76,3 +76,30 @@ def test_the_charge_share_vanishes_at_ninety_degrees_and_the_rest_does_not_depen
     for terms in ("s q g", "-m E/s"):
         assert np.array_equal(at(10.0, terms), at(170.0, terms))
     assert not np.allclose(at(10.0, "all"), at(170.0, "all"))  # L1a as a whole depends on the angle
+
+
+def test_third_law_residual_utility():
+    # E4.5: the largest |F_ab + F_ba| over the pairs of a state
+    from cosmicmass.constants import SI
+    from cosmicmass.fields import DirectSum
+    from cosmicmass.laws import third_law_residual
+    from cosmicmass.matter import preset
+
+    f, solver = Frame.si(), DirectSum(constants=SI)
+    p, e, n = preset("proton"), preset("electron"), preset("neutron")
+    state = State.from_bodies([p, e, n], [[0.0, 0.0], [1e-10, 0.0], [0.0, 2e-10]])
+    out = third_law_residual(make_law("L0"), state, solver, f)
+    assert out["relative"] < 1e-12 and out["force"] > 0 and out["pair"] in ((0, 1), (0, 2), (1, 2))
+    # one half of the Coupling term alone does not obey the law; the residual is s G |q_a m_b - q_b m_a| / r^2
+    half = third_law_residual(make_law(LawSpec(reading="L1a", terms="s q g")), state, solver, f)
+    assert half["pair"] in ((0, 2), (1, 2)) and half["relative"] == pytest.approx(1.0)  # a charge and a neutron: one-sided
+    pair = State.from_bodies([p, e], [[0.0, 0.0], [1e-10, 0.0]])
+    one = third_law_residual(make_law(LawSpec(reading="L1a", terms="s q g")), pair, solver, f)
+    expected = f.s * SI.G_N * abs(p.q * e.m - e.q * p.m) / 1e-10**2
+    composer_only = one["residual"]  # the Real parts cancel, so the residual is the Composer asymmetry
+    assert composer_only == pytest.approx(expected, rel=1e-9)
+    # absorbed bodies are left out; a state whose bodies exert no force gives relative None
+    state.alive[:] = [True, False, False]
+    assert third_law_residual(make_law("L0"), state, solver, f) == {"pair": None, "residual": 0.0, "force": 0.0, "relative": None}
+    weightless = State(m=[0.0, 0.0], q=[0.0, 0.0], x=[[0.0, 0.0], [1.0, 0.0]], v=[[0.0, 0.0]] * 2, fixed=[False] * 2, alive=[True] * 2)
+    assert third_law_residual(make_law("L0"), weightless, solver, f)["relative"] is None

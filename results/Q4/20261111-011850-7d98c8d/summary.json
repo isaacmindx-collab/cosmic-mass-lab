@@ -1,0 +1,99 @@
+{
+  "cases": {
+    "1: Earth-moon, own frame; A (absolute)": {
+      "end_drift": 1.509903313490213e-14,
+      "largest_excursion": 2.6356694604601216e-13,
+      "pass": true,
+      "period_error": 3.333383380432764e-07,
+      "steps": 6284
+    },
+    "1: Earth-moon, own frame; B (nearest neighbour)": {
+      "end_drift": 1.1546319456101628e-14,
+      "largest_excursion": 2.6201263381153694e-13,
+      "pass": true,
+      "period_error": 3.3333833515669653e-07,
+      "steps": 6284
+    },
+    "2: Earth-moon, plus 29780 m per s; A (absolute)": {
+      "end_drift": 2.3425705819590803e-14,
+      "largest_excursion": 3.064215547965432e-14,
+      "pass": true,
+      "period_error": 3.8683811709461224e-10,
+      "steps": 184660
+    },
+    "2: Earth-moon, plus 29780 m per s; B (nearest neighbour)": {
+      "end_drift": 1.2656542480726785e-14,
+      "final_separation_vs_own_frame": 1.3884449145962208e-12,
+      "largest_excursion": 1.865174681370263e-14,
+      "pass": true,
+      "period_error": 3.333385405479561e-07,
+      "steps": 6284
+    },
+    "3: two protons, own frame; A (absolute)": {
+      "end_drift": 3.245569388798941e-07,
+      "largest_excursion": 3.245569388798941e-07,
+      "pass": true,
+      "separation_error": 3.815981308719074e-07,
+      "steps": 3245
+    },
+    "3: two protons, own frame; B (nearest neighbour)": {
+      "end_drift": 6.904321314671336e-08,
+      "largest_excursion": 6.904321314671336e-08,
+      "pass": true,
+      "separation_error": 1.3289826839013585e-07,
+      "steps": 3961
+    },
+    "3: two protons, plus 1e6 m per s; A (absolute)": {
+      "end_drift": 8.815170815523743e-14,
+      "largest_excursion": 3.0953017926549364e-13,
+      "pass": true,
+      "separation_error": 2.6390822860378194e-10,
+      "steps": 34167
+    },
+    "3: two protons, plus 1e6 m per s; B (nearest neighbour)": {
+      "end_drift": 9.510126020018106e-11,
+      "largest_excursion": 9.510126020018106e-11,
+      "pass": true,
+      "separation_error": 1.3289831679585973e-07,
+      "steps": 3961
+    },
+    "4: Sun-Earth-moon; A (absolute)": {
+      "earth_moon_separation": 384749709.06355053,
+      "end_drift": 3.26405569239796e-14,
+      "largest_excursion": 7.083222897108499e-14,
+      "pass": true,
+      "separation_vs_reference": 3.9438752263976085e-10,
+      "steps": 186692
+    },
+    "4: Sun-Earth-moon; B (nearest neighbour)": {
+      "earth_moon_separation": 384749719.88040835,
+      "end_drift": 7.915890165577366e-14,
+      "largest_excursion": 2.369215934550084e-13,
+      "pass": true,
+      "separation_vs_reference": 2.7719624151600897e-08,
+      "steps": 6449
+    },
+    "4: Sun-Earth-moon; reference (B, eta = 1.25e-4)": {
+      "circular_speed_of_the_earth_for_information": 29788.8993205065,
+      "earth_moon_separation": 384749709.215291,
+      "end_drift": 1.2212453270876722e-14,
+      "largest_excursion": 3.5416114485542494e-14,
+      "pass": true,
+      "steps": 51588
+    },
+    "predictions": {
+      "1: B takes the steps of A within 1%": true,
+      "2: A takes about 29 times more steps when boosted (20 to 40)": true,
+      "2: B takes the same steps and error boosted or not": true,
+      "3: A boosted takes more than ten times the steps": false,
+      "3: B boosted keeps steps and the 3.8e-7 error": true,
+      "4: A and B agree with the reference to 1e-5": true,
+      "4: A takes about 180,000 steps (120,000 to 260,000)": true,
+      "4: B takes 6,300 to 13,000 steps": true,
+      "pass": false
+    }
+  },
+  "explanation": "Q4 under the reference law L0: at least one case fails.",
+  "scenario": "Q4",
+  "verdict": "fail"
+}

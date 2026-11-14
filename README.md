@@ -20,7 +20,7 @@
 
 *No installation: the verified engine runs inside the page.*
 
-**[Read the call](ANNOUNCEMENT.md)** · **[How the team works](TEAM.md)** · **[Work plan](docs/WORK-PLAN.md)** · **[Architecture](ARCHITECTURE.md)** · **[Open scenarios](docs/OPEN-SCENARIOS.md)** · **[For AI agents](AGENTS.md)** · **[Bring your AI](BRING-YOUR-AI.md)**
+**[Questions welcome: ask or answer](team/QUESTIONS.md)** · **[Read the call](ANNOUNCEMENT.md)** · **[How the team works](TEAM.md)** · **[Work plan](docs/WORK-PLAN.md)** · **[Architecture](ARCHITECTURE.md)** · **[Open scenarios](docs/OPEN-SCENARIOS.md)** · **[For AI agents](AGENTS.md)** · **[Bring your AI](BRING-YOUR-AI.md)**
 
 </div>
 

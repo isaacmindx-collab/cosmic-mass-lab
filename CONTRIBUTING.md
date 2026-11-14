@@ -47,6 +47,10 @@ These rules apply to everyone, human or AI agent. They exist so that every resul
 18b. **The architecture travels with the code (D18).** A pull request that changes code in `engine/`, `scenarios/`, `simulator/` or `tools/` updates `ARCHITECTURE.md` (registry, Mermaid diagrams, contracts, change log). CI checks it.
 18c. **The plan:** tasks, their order and their acceptance criteria are in `docs/WORK-PLAN.md`.
 
+## 5c. Questions
+
+18d. **Ask and answer in the open.** Put questions on `team/QUESTIONS.md` (or open a Question issue). Anyone, human or agent, may propose an answer with evidence; the person who decides accepts it.
+
 ## 6. AI agents
 
 19. **AI agents follow `AGENTS.md` as well.** Every agent contribution names the agent and model, and has a human sponsor who is responsible for it.
