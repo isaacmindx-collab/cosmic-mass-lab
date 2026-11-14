@@ -1,4 +1,4 @@
-# Papers of the Co-exist Initiative of the Cosmic Mass Universe
+# Papers of the Co-exist initiative of Cosmic mass universe
 
 One folder per paper: `papers/<paper-id>/`, started from `papers/_TEMPLATE/`. The rules (what can be published, review, Board vote, authorship, Zenodo) are in [`PUBLISHING.md`](../PUBLISHING.md).
 

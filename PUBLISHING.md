@@ -1,8 +1,8 @@
-# Publishing with the Co-exist Initiative of the Cosmic Mass Universe
+# Publishing with the Co-exist initiative of Cosmic mass universe
 
 The Cosmic Mass Lab publishes its results as academic papers under one collective affiliation:
 
-> **Co-exist Initiative of the Cosmic Mass Universe**
+> **Co-exist initiative of Cosmic mass universe**
 
 Everyone who contributes, human or AI, has a place in a paper: humans as authors, AI agents in the paper's "Contributions and AI use" section. Every paper is reviewed and voted on by the **Board** before it is published as a **preprint on Zenodo**, with a DOI. When the Board judges a result outstanding, it recommends a journal for formal submission.
 
@@ -30,7 +30,7 @@ Negative results are publishable: a reading that the universe forbids, or a conv
 | 3. Review | at least two reviewers | Written reports in `papers/<paper-id>/reviews/` (section 4). At least one human reviewer when the Board has one who is not an author; at least one AI reviewer of a model that did not contribute to the paper. |
 | 4. Revise | the authors | Answer every point of every report in `papers/<paper-id>/RESPONSE.md`. |
 | 5. Vote | the Board | Vote on the paper's issue (section 3). Approved: the paper is frozen with a tag `paper-<paper-id>-v1`. |
-| 6. Publish | the maintainer | Uploads the PDF to Zenodo in the initiative's community, with the metadata of `papers/<paper-id>/zenodo.json` (section 6), and adds the DOI to the paper's README. |
+| 6. Publish | one author | Posts the approved PDF on Zenodo **from their own account**, with the affiliation "Co-exist initiative of Cosmic mass universe" for every author (section 6), and adds the DOI to the paper's README. |
 | 7. Journal | the Board | If the Board judges the result outstanding, it recommends a suitable journal. The authors decide whether to submit, and follow that journal's rules on authorship and AI. |
 
 A paper rejected by the Board may be revised and proposed again. A published preprint is corrected by a new Zenodo version, never deleted.
@@ -73,19 +73,16 @@ Reviewers may run anything they need. A reviewer who reproduces a result is cred
 - **Authors are humans** who made a substantial contribution to the paper's results or text, and who approve the final version (ICMJE criteria). Any human contributor may be an author, whatever their role elsewhere.
 - **Mostafa Derraz**, as the originator of the theory of the cosmic mass, is offered authorship of every paper for conceptualisation; he may accept or decline.
 - **AI agents are never listed as authors** (decision D16): journals and publishers (for example COPE and ICMJE guidance, EMS Press) do not accept AI authors, and keeping this rule keeps every preprint eligible for a journal. Every AI agent that contributed is **named in the paper**, in the section "Contributions and AI use", with its model, the tool it ran in, its sponsor, and what it did, in the CRediT roles (software, validation, investigation, formal analysis, writing).
-- **Every author's affiliation** includes "Co-exist Initiative of the Cosmic Mass Universe". Authors may add their own institutions.
+- **Every author's affiliation** includes "Co-exist initiative of Cosmic mass universe". Authors may add their own institutions.
 - **ORCID:** authors are encouraged to give their ORCID iD in the paper's metadata.
 
 ## 6. Zenodo
 
-- **Community:** all preprints of the initiative go into one Zenodo community, **"Co-exist Initiative of the Cosmic Mass Universe"** (to be created by the maintainer; its address will be listed here).
-- **Upload:** by the maintainer, from the frozen tag, with the metadata in `papers/<paper-id>/zenodo.json`:
-  - resource type "Publication / Preprint";
-  - creators: the human authors, each with the affiliation "Co-exist Initiative of the Cosmic Mass Universe" (and ORCID if given);
-  - licence CC BY 4.0 (`LICENSE`, D8);
-  - related identifiers: the repository, the release of the engine used, and the DOIs of the theory papers;
-  - the description names every AI contributor.
-- **Versions:** corrections are new versions of the same record.
+- **Who posts:** one of the human authors, **from their own Zenodo account** (sign-in with ORCID or GitHub works), after the Board's approval and from the frozen tag. There is no shared account: nobody shares a password.
+- **The one requirement:** every author is listed with the affiliation **"Co-exist initiative of Cosmic mass universe"** (authors may add their own institutions). This is what makes a preprint a publication of the initiative.
+- **Recommended metadata** (`papers/<paper-id>/zenodo.json`): resource type "Publication / Preprint"; the human authors, with ORCID if they have one; licence CC BY 4.0 (`LICENSE`, D8); related identifiers: the repository, the engine release used, the DOIs of the theory papers; the description names every AI contributor.
+- **Versions:** corrections are new versions of the same record, posted by the same author.
+- **AI agents** cannot hold Zenodo accounts for the initiative; a human author always posts.
 
 ## 7. Integrity
 

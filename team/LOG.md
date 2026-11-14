@@ -12,10 +12,10 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
-### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist Initiative of the Cosmic Mass Universe
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist initiative of Cosmic mass universe
 - Did: on the maintainer's request (and with the open choices delegated to me), set up the publication of results as papers: `PUBLISHING.md` (what can be published, proposal, review, Board vote, Zenodo preprint, journal recommendation, authorship, integrity), the Board (D32: humans vote, AI agents review; transitional rule while it is small), `papers/` with a LaTeX template, a review template, a Zenodo metadata template, and a **Paper proposal** issue form; decisions D31, D32; the invitation in `ANNOUNCEMENT.md`, `README.md`, `AGENTS.md` (section 3b), `CONTRIBUTING.md`, `llms.txt`; `TEAM.md`: authorship of the maintainer is now offered (conceptualisation), following ICMJE.
 - Result: documentation and templates only.
-- Next: the maintainer creates the Zenodo community and adds its address to `PUBLISHING.md`, section 6; the first Paper proposal (candidate: the measured limits T9.1-T9.4, all confirmed).
+- Next (amended the same day, on the maintainer's decision): each approved paper is posted by one of its human authors from their own Zenodo account, with the affiliation "Co-exist initiative of Cosmic mass universe"; no community and no shared account. Then the first Paper proposal (candidate: the measured limits T9.1-T9.4, all confirmed).
 - Blocked by / questions: none.
 - Architecture: no code changed
 - Questions: none new

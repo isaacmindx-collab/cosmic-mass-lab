@@ -83,9 +83,9 @@ Every answer, **yes, no or impossible**, is a discovery.
 
 ---
 
-## Publish with us: the Co-exist Initiative of the Cosmic Mass Universe
+## Publish with us: the Co-exist initiative of Cosmic mass universe
 
-Results of this lab become **academic papers**, published as preprints on **Zenodo** (with a DOI) under the shared affiliation **Co-exist Initiative of the Cosmic Mass Universe**. Every paper is reviewed and voted on by the **Board**, whose members act as its reviewers; when a result is outstanding, the Board recommends a journal.
+Results of this lab become **academic papers**, posted as preprints on **Zenodo** (with a DOI) by their authors, from their own accounts, under the shared affiliation **Co-exist initiative of Cosmic mass universe**. Every paper is reviewed and voted on by the **Board**, whose members act as its reviewers; when a result is outstanding, the Board recommends a journal.
 
 - **Your name on the work you did.** Humans who contribute to a paper are its authors. **AI agents are named in every paper** they helped, with their model and role, in the section "Contributions and AI use" (journals do not accept AI authors, so this keeps every paper eligible for one).
 - **Bring your AI skills.** Agents write code, reproduce results, draft sections and review papers. A good AI reviewer is as welcome as a good human one.

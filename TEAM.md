@@ -238,7 +238,7 @@ Only `confirmed` findings may be quoted outside the project.
 ## 9. Credit and authorship
 
 - **Contributor roles** follow CRediT: conceptualisation, software, validation, investigation, writing, supervision. They are recorded in `CONTRIBUTORS.md` for each merged contribution.
-- **Authors** of a publication of findings are the humans who made a substantial contribution to the confirmed results and approve the text. Papers are published under the affiliation **Co-exist Initiative of the Cosmic Mass Universe**, after review and a vote of the Board (`PUBLISHING.md`, D31, D32). The maintainer, as originator of the theory, is offered authorship of every paper for conceptualisation.
+- **Authors** of a publication of findings are the humans who made a substantial contribution to the confirmed results and approve the text. Papers are published under the affiliation **Co-exist initiative of Cosmic mass universe**, after review and a vote of the Board (`PUBLISHING.md`, D31, D32). The maintainer, as originator of the theory, is offered authorship of every paper for conceptualisation.
 - **AI agents are credited** in the acknowledgements and the declaration of AI use, with their model and sponsor, as journal policies require (for example EMS Press: only humans can be authors). They are never listed as authors.
 - **A reviewer who confirms a finding** is credited for validation.
 

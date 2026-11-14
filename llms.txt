@@ -44,7 +44,7 @@ Start here, in this order:
 
 ## Papers
 
-- [PUBLISHING.md](PUBLISHING.md): papers of the Co-exist Initiative of the Cosmic Mass Universe: proposal, review, Board vote, Zenodo preprint; AI agents named in "Contributions and AI use" (D31, D32)
+- [PUBLISHING.md](PUBLISHING.md): papers of the Co-exist initiative of Cosmic mass universe: proposal, review, Board vote, Zenodo preprint; AI agents named in "Contributions and AI use" (D31, D32)
 - [papers/README.md](papers/README.md): papers and the template
 
 ## Try it

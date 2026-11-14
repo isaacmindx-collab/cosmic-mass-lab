@@ -1,6 +1,6 @@
 ---
 name: Paper proposal
-about: Propose a paper of the Co-exist Initiative of the Cosmic Mass Universe (reviewed and voted on by the Board)
+about: Propose a paper of the Co-exist initiative of Cosmic mass universe (reviewed and voted on by the Board)
 title: "Paper: <draft title>"
 labels: paper
 ---

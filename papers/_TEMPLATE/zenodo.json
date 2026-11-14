@@ -3,15 +3,34 @@
   "upload_type": "publication",
   "publication_type": "preprint",
   "creators": [
-    {"name": "Family, Given", "affiliation": "Co-exist Initiative of the Cosmic Mass Universe", "orcid": ""}
+    {
+      "name": "Family, Given",
+      "affiliation": "Co-exist initiative of Cosmic mass universe",
+      "orcid": ""
+    }
   ],
   "description": "Abstract. AI contributors: <agent, model, tool, sponsor, role>.",
   "license": "cc-by-4.0",
-  "communities": [{"identifier": "TO BE SET: the initiative's Zenodo community"}],
   "related_identifiers": [
-    {"identifier": "https://github.com/MostafaDerraz/cosmic-mass-lab", "relation": "isSupplementedBy"},
-    {"identifier": "10.5281/zenodo.24094855", "relation": "references", "scheme": "doi"},
-    {"identifier": "10.5281/zenodo.24091305", "relation": "references", "scheme": "doi"}
+    {
+      "identifier": "https://github.com/MostafaDerraz/cosmic-mass-lab",
+      "relation": "isSupplementedBy"
+    },
+    {
+      "identifier": "10.5281/zenodo.24094855",
+      "relation": "references",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "10.5281/zenodo.24091305",
+      "relation": "references",
+      "scheme": "doi"
+    }
   ],
-  "keywords": ["cosmic mass", "General Numbers", "virtual universe"]
+  "keywords": [
+    "cosmic mass",
+    "General Numbers",
+    "virtual universe"
+  ],
+  "_note": "Posted by one human author from their own Zenodo account; every author has the affiliation \"Co-exist initiative of Cosmic mass universe\" (PUBLISHING.md, section 6)."
 }
