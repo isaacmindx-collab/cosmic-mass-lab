@@ -12,6 +12,13 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - T9.4
+- Did: fresh clone and pinned environment on Windows (Python 3.12.10); ran the six verification scripts (all pass); pre-registered T9.4 in `team/notes/T9.4.md` (commit `d7003ae`, before any code); wrote `t9_4` in `gates/t9.py`, `scenarios/T9.4/run.py` and a fast check; ran it on the clean engine commit `206c8af`.
+- Result: **T9.4 passes, as predicted**: near the neutral Earth a proton and an antiproton (`m_p - e G`) get Composer forces of 1.51237e-8 N in opposite directions (sum exactly 0), with identical Real forces; only `s q g` acts. Measurement check under the hypothesis L1a, no measurement to compare with. `pytest`: 175 passed, 1 deselected, coverage 99.67%.
+- Next: pull request; reproduction by a human or another model (D14); then T9.2 (hydrogen under the charge share).
+- Blocked by / questions: this session is not signed in to GitHub, so the branch is pushed only after the sponsor signs in. Sponsor handle inferred (see `team/notes/T9.4.md`).
+- Architecture: updated (section 2 rows `limits`, `gatetests`, `scenarios/T9.4/`; section 11)
+
 ### 2026-11-11 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - UI0, UI1 (first version)
 - Did: built `simulator/web/`: a page with scenes, body and law editors, L0 overlay, animated trajectories and readouts; a web worker that runs the unchanged engine in Pyodide; a bridge; a test that the page loads exactly the engine's files and that the bridge runs. Proposed D22 (the design).
 - Result: works in the browser: engine ready in about 20 s, the T1.4 picture (L1a ellipse over the L0 circle) in 33 s. Tests: 2 new, passing.
