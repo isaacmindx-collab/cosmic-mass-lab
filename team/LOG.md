@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - T9.2 reproduced and confirmed (D38)
+- Did: re-ran `scenarios/T9.2/run.py` from its stamped engine commit `b19237e` in a clean worktree and compared the new `summary.json` with the stored one. On the maintainer's decision (D38, "approve it even the same agent"; "don't leave it open anymore"), recorded T9.2 as confirmed by the same model, with that label; added the reproduction run to `results/T9.2/`; updated `team/FINDINGS.md` and journal entry 2026-003 (with a dated note).
+- Result: identical bit for bit (33 numbers, 11 flags; binding energy 5.7080 eV). All four T9 tests are now confirmed.
+- Next: a reproduction by a person or another model can still upgrade the label. Q5 stays `done` (not covered by D38).
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - open issues: decisions D23, D36, D37
 - Did: put the three open decision issues to the maintainer, with recommendations. His answers: question 12 (#58) "A: nearest image" → **D36**; question 24 (#57) "A: all four columns" → **D37** (it also answers question 13); D23 (#17) "Approve, with scope" → **D23 approved** (all terms, radial, inertia `Re`, no `B_cal`). Recorded them in `team/DECISIONS.md`, moved questions 1, 12, 13 and 24 to "Answered" in `team/QUESTIONS.md`, answered the issues, and told the OpenCode agent in the chat.
 - Result: E4 (L1e, torque), E6 (wrap-around) and the Composer part of E9 are unblocked.
