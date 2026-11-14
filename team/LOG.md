@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3 part 2: the Boris push (E3.2)
+- Did: `Boris` in `integrators.py` (velocity Verlet whose half kicks are Boris pushes; `StepContext.rotation`, `.remember`); `numerics.integrator` `"verlet"` or `"boris"`, chosen by D10 when left out; 7 tests. A first splitting failed my own drift test (a wobble of 1.25e-7 of the speed) and was replaced before delivery.
+- Result: gyration in uniform `b` (2D and 3D): radius within 1e-6, speed constant to 1e-12, period within 1e-6 (the done-when of E3.2); E x B drift kept to 1e-9; without a second field Boris equals Verlet to rounding. Full suite: 256 passed. Software checks against mathematics; no finding.
+- Next: E3.4 (inertia readings) together with E4.4 (L7 is one of the modifiers).
+- Blocked by / questions: none. The second field comes from backgrounds only until E2.2.
+- Architecture: updated (section 2 row `integrators`; section 5 `VelocityVerlet`, `Boris`; section 10 additions; section 11)
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3 part 1: the pair guard of D29
 - Did: claimed E3 (chat message `20261114-162843`); put the pair guard of D29 into `integrators.py` (`pair_approach_time`; `next_dt` always applies `eta min r_ij / |v_ij|`); default `speed_reference` now `"neighbour"` (labelled reading of D29, in `team/notes/E3.md`); 2 new tests; three calls of an older unit test now ask for `"absolute"` explicitly.
 - Result: full T0 gate with convergence passes on `8545bfa` (T0.1c: 3,961 steps, separation error 1.3e-7, as Q4 measured); 249 tests passed, coverage 99.31%.

@@ -57,7 +57,7 @@ The single list of every code module, planned or real. **`tools/check_architectu
 | l0 | `engine/cosmicmass/laws/l0.py` | E4.2 | implemented | reference law L0: `Re(mu) dv/dt = Re[mu (E_cal + v x B_cal)]` |
 | l1 | `engine/cosmicmass/laws/l1.py` | E4.3 | in-progress | reading L1a of the Composer coordinate (hypothesis), with the options sign (L2), strength (L3) and terms (L5); L1b-L1e not yet |
 | modifiers | `engine/cosmicmass/laws/modifiers.py` | E4.4 | planned | L2 sign, L3 strength, L4 direction, L5 terms, L6 moving bodies, L7 inertia, L8 range |
-| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); Boris (E3.2) and the inertia readings (E3.4) not yet; the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
+| integrators | `engine/cosmicmass/integrators.py` | E3.1 | in-progress | `VelocityVerlet` with the adaptive time step of D10, `StepContext` (law, solver, frame, numerics); `Boris` (E3.2: velocity Verlet whose half kicks are Boris pushes, for `v x B_cal`; chosen by the settings when a background `B_g` or `b` is present, D10); the inertia readings (E3.4) not yet; the step rule of D29: relative to the nearest neighbour by default (`speed_reference = "neighbour"`; `"absolute"` keeps D10 and D21), plus the pair guard `eta min r_ij / |v_ij|` (`pair_approach_time`) |
 | environment | `engine/cosmicmass/environment.py` | E6 | in-progress | `Environment`: reflecting walls (velocity turned back, body not moved, impulse reported) and absorbing walls with a collector of mass, charge and momentum; `Inflow` (U7: bodies enter through one face, `floor(rate t)` of them, seeded places), `HeatBath` (Andersen), `kinetic_temperature`, `K_B`; fixed sources (U6) are never touched. Wrap-around and absorbing surfaces of bodies not yet |
 | diagnostics | `engine/cosmicmass/diagnostics.py` | E8.1 | in-progress | `Diagnostics.measure` and `drifts`: conservation of mass, charge, energy (`Re`; `Com` not defined yet), momentum; pressure and temperature not yet |
 | energy | `engine/cosmicmass/energy.py` | E9 | in-progress | energy of the bodies under L0 (kinetic, Newton plus Coulomb interaction, uniform background); the Composer coordinate needs an approved derivation |
@@ -395,6 +395,15 @@ classDiagram
         +step(state, dt, context) State
         +next_dt(state, context) float
     }
+    class VelocityVerlet {
+        +step(state, dt, context) State
+        +next_dt(state, context) float
+    }
+    class Boris {
+        +step(state, dt, context) State
+    }
+    Integrator <|.. VelocityVerlet
+    VelocityVerlet <|-- Boris
     class Environment {
         +Inflow inflow
         +HeatBath heat_bath
@@ -686,6 +695,12 @@ class Integrator(Protocol):
 #   speed_reference="neighbour" (the default since D29) or "absolute" (D10 and D21: each body's own motion);
 #   next_dt always applies the pair guard of D29: dt <= eta * pair_approach_time(state)
 def pair_approach_time(state) -> float: ...   # min over pairs of alive bodies of r_ij / |v_i - v_j| (D29)
+#   StepContext.rotation(state) -> Omega: v x Omega is the velocity-dependent acceleration, Omega =
+#     (m B_g - s^2 q b) / inertia; shape (N,) in 2D, (N, 3) in 3D (E3.2, addition)
+#   StepContext.remember(state, a): replace the remembered acceleration of the same state (E3.2, addition)
+class Boris(VelocityVerlet): ...   # E3.2: the same next_dt; step() refuses a law with L6 on
+def boris_rotation(v, omega, h) -> np.ndarray: ...   # turns v as dv/dt = v x Omega over h, speed kept exactly
+# settings: numerics.integrator "verlet" | "boris"; left out, "boris" when a background B_g or b is not zero (D10)
 
 # environment.py
 class Environment:      # Environment(boundary="open" | "reflecting" | "absorbing", lower=None, upper=None,
@@ -742,6 +757,7 @@ Newest first. One line per pull request that changed the architecture.
 
 | Date | Pull request | Who | Change |
 |---|---|---|---|
+| 2026-11-14 | E3.2: the Boris push (`E3-boris`, stacked on `E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: `Boris`, `boris_rotation`, `StepContext.rotation` and `.remember` (the cache also keeps the fields and the inertia); `settings.py`: `numerics.integrator` `"verlet"` or `"boris"`, resolved by D10 when left out; `runner.py` picks the integrator. Section 5: `Boris`; section 10: additions. No existing signature changed |
 | 2026-11-14 | E3: the pair guard of D29 (`E3-pair-guard`) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | `integrators.py`: new function `pair_approach_time`; `next_dt` always applies the pair guard; the default `speed_reference` becomes `"neighbour"` (also in `settings.py`). Section 10: the contract of `StepContext` changed by **decision D29** (default) and the new function. No diagram changed |
 | 2026-11-14 | team chat (`team-chat`; question 23, proposed) | Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) | **new** `tools/chat.py` (node `chat`, section 4, used by `tests`); `team/chat/` with its README and the first message; section 10: its signatures. No engine module changed |
 | 2026-11-14 | D25: one ruff format pass (`D25-format-pass`) | Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) | **layout only**: `ruff format .` over 45 Python files (no module, interface or behaviour changed; one `lambda` in `gates/t0.py` became a local `def`); Markdown excluded from formatting; section 9: the job `lint` also runs `ruff format --check .` |
