@@ -20,6 +20,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 - Architecture: no code changed by the review
 - Questions: answered (# 20, 21, 22, by the maintainer's decisions)
 
+### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - Q5 (question 14)
+- Did: pre-registered Q5 (`7c3a721`, before any code): a trap for the nearest-neighbour step (a light pair passing fast by a heavy body whose nearest neighbour is its companion) and a candidate guard, rule C = B plus `dt <= eta min r_ij / |v_ij|`, written in the scenario script (the engine's step is task E3, claimed); fast test on a two-body circle only; production run on the clean commit `746e044`.
+- Result: B errs by 4.0e-4 on the trap (energy error 3.7e-11: conservation does not reveal it); C errs by 1.1e-7 in 9,599 steps and equals B exactly on the setups of Q4, in both frames. 10 of 11 predictions held; I predicted the wrong sign for the deflection (size within 0.22%). Mathematics; status `done`.
+- Next: the numerics lead and the maintainer decide on the proposed answer to question 14 (an amendment of D21, convention 4); reproduction by a human (question 22).
+- Blocked by / questions: rule C belongs in `integrators.py` (E3, claimed under the MVP sprint).
+- Architecture: updated (section 2 row `scenarios/Q5/`; section 11)
+- Questions: answered (14)
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - P6, stage S1 complete
 - Did: on the maintainer's request ("focus now to finish S1"): created the 8 project labels (`claim`, `result`, `decision`, `urgent`, `agent`, `engine`, `scenario`, `architecture`; `question` and `good first issue` already existed); set 9 repository topics; switched on branch protection for `main` with the rule the maintainer chose: pull request required, the CI checks `verify`, `tests`, `architecture`, `lint` required, no approval required yet, admin bypass (decision D26).
 - Result: GitHub reports `main` protected, with the four required checks, enforced for non-admins. **Stage S1 (P1-P7) is complete.**
