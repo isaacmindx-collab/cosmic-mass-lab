@@ -1,6 +1,6 @@
 # Gallery: what the virtual universe has shown so far
 
-Fourteen figures drawn from the stored results of version 0.1.0. Each one says which law it uses and what kind of statement it is, in the three kinds of `CONTRIBUTING.md` (rule 11): a **check of the engine against mathematics**, a **measurement check**, or a **finding of the virtual universe**. So far there is no confirmed finding: the only run under a reading of the Composer coordinate is an **exploratory** demo.
+Fourteen figures drawn from the stored results (version 0.1.0 and the D21 scenarios; statuses updated 2026-11-14). Each one says which law it uses and what kind of statement it is, in the three kinds of `CONTRIBUTING.md` (rule 11): a **check of the engine against mathematics**, a **measurement check**, or a **finding of the virtual universe**. So far there is no confirmed finding: the only run under a reading of the Composer coordinate is an **exploratory** demo.
 
 Regenerate every figure with one command, from the results folders in the repository:
 
@@ -84,7 +84,7 @@ Not drawn, because they are single numbers and not motions: T0.3 (the three case
 - **What it shows:** under that hypothesis a neutron near a proton would respond as if it carried a charge of 9.009e-19 e (red). The measured charge of the neutron is (-0.2 +/- 0.8)e-21 e, as cited by the book; the blue bar is that limit at two standard errors, 1.8e-21 e.
 - **How to read it:** the blue bar is barely visible. The hypothesis misses by a factor 500, about 1126 standard errors. For L1a to survive, lambda must be below 0.0020.
 - **Kind:** **measurement check**. The engine reproduces the book's number (9.0e-19 e); the comparison with the measurement is the book's argument, and the cited papers were not checked here.
-- **Source:** `results/T9.1/`. Status `done`, not yet reproduced independently. Notebook: [`team/notes/T9.md`](../team/notes/T9.md).
+- **Source:** `results/T9.1/`. Status `confirmed` (recomputed independently by a second model). Notebook: [`team/notes/T9.md`](../team/notes/T9.md). The other measured limits are reproduced too, without figures yet: T9.2 (hydrogen under the charge share, 5.708 eV against the book's 5.71 eV) and T9.4 (proton and antiproton pushed opposite ways, confirmed by two models).
 
 Not drawn: T9.3 (a charge in gravity would feel the force of an electric field of 1.138e11 V/m, 2e21 times the weight of an electron; a single number).
 
@@ -114,6 +114,7 @@ Everything in section 3 is **exploratory** (decision D12): not pre-registered as
 - **What it shows:** the L0 energy (kinetic plus Newton and Coulomb) of the pair during both runs, divided by its starting value.
 - **How to read it:** constant under L0. Under L1a it falls to about half and returns, in step with the orbit.
 - **What to keep in mind:** this is not a failure of the integrator. The L0 energy is simply not the conserved quantity of L1a. The engine has no energy for the Composer coordinate yet: it is not in the compendium and needs a derivation approved by the physics lead. Until then, no reading can be classified as conserving or not (test family T2).
+- **Update (scenario Q2, `team/notes/Q.md`):** for L1a with all its terms, the sum `kinetic - G sum [Re + lambda s Com](mu_a mu_b) / r` is conserved to 4.1e-7 on four runs, while the L0 energy above is not. The pair force of L1a is central and symmetric, which explains it (`team/QUESTIONS.md`, question 1). It is proposed as decision D23 and waits for the physics lead.
 
 ### 3.3 The engine choosing its own time step
 
@@ -161,5 +162,5 @@ Not drawn: D21.1 (an orbit run in 2D and the same orbit tilted in 3D give period
 
 - No picture of many bodies evolving for long times, no structure formation, no populations: the engine does not have them yet (`CHANGELOG.md`, "What it does not do yet").
 - No picture of the second field `B_cal` or of moving charges acting on each other magnetically.
-- No interactive view. The universe in the browser is stage S7 of the work plan.
+- No interactive view here: for that, the universe runs live in the browser at <https://mostafaderraz.github.io/cosmic-mass-lab/simulator/web/> (stage S7, first version).
 - No confirmed finding about the Composer coordinate. Sections 1 and 4 check the engine; section 2 repeats a known exclusion; section 3 is exploratory.
