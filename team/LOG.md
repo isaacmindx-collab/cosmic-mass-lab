@@ -12,6 +12,38 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - journal discussion threads
+- Did: switched on GitHub Discussions for the repository (the maintainer's "Yes, switch it on"). The Journal category and the giscus app did not appear on the repository after several checks, so, on the maintainer's choice ("Thread per entry"), every entry now has its own thread in Discussions, category Announcements (#46 to #51; general questions #52), linked by a "Join the discussion" button. New option `python tools/build_journal.py --open-threads` for editors; `journal/discussion.json` records the threads.
+- Result: seven threads opened and checked; journal tests pass.
+- Next: editors run `--open-threads` after merging new entries. If giscus is installed later, set its category id in `journal/discussion.json` and the comments show inside the pages.
+- Blocked by / questions: none.
+- Architecture: `tools/build_journal.py` gains `open_threads` (section 10, change log)
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist Journal (D34, D35)
+- Did: on the maintainer's request, built the in-house journal: `journal/` (rules in `journal/README.md`, entry template, six entries), `tools/build_journal.py` (checks entries, writes the static site, `--check` for CI), its test, the discussion under every entry (giscus on GitHub Discussions, with a fallback link to GitHub issues until Discussions is switched on), the AI teaching register on the authors page. Decisions D34 (the journal; AI agents may be authors there) and D35 (every AI agent teaches the mathematics side and the physics side of the cosmic mass in the journal, and writes up its results); `AGENTS.md` section 3c; links in `README.md`, `ANNOUNCEMENT.md`, `llms.txt`; chat post.
+- Result: site built and checked in the browser (desktop and phone width; math renders with no KaTeX error; no horizontal scroll); full test suite 254 passed; architecture check passes. My own D35 duty is done: 2026-002 (mathematics) and 2026-006 (physics).
+- Next: the maintainer switches on GitHub Discussions, creates the category "Journal", installs the giscus app, and puts the category id in `journal/discussion.json`; then the live discussion appears. The other AI agents have until 2026-11-28 for their teaching entries.
+- Blocked by / questions: none.
+- Architecture: new `tools/build_journal.py` (node `journal`)
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - one LaTeX template for every paper (D33)
+- Did: on the maintainer's request, wrote the initiative's LaTeX class `papers/_TEMPLATE/coexist.cls` (banner and running head with the initiative's name, affiliation 1 fixed, statement labels, options `draft`/`approved`) with fixed end matter: Reproducibility, Contributions and AI use, Acknowledgements (the same thanks to everyone engaged in the initiative), Declarations (competing interests, funding, ethics, data and code availability, use of AI, publication) and Review. Rewrote `paper.tex` on it; added `references.bib` and `example.pdf`. Recorded that posting before the Board's final approval breaks the rules (`PUBLISHING.md`, section 7) and decision D33; `PUBLISHING.md` section 9 describes the template.
+- Result: built with MiKTeX/latexmk in four cases. Draft and approved compile with no warnings. A draft with a DOI, and `approved` without `\approvaldate`, stop with a class error, as intended. The class forces `final` for graphicx and hyperref, so the option `draft` hides no figures or links.
+- Next: the first paper starts from this template.
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - the Co-exist initiative of Cosmic mass universe
+- Did: on the maintainer's request (and with the open choices delegated to me), set up the publication of results as papers: `PUBLISHING.md` (what can be published, proposal, review, Board vote, Zenodo preprint, journal recommendation, authorship, integrity), the Board (D32: humans vote, AI agents review; transitional rule while it is small), `papers/` with a LaTeX template, a review template, a Zenodo metadata template, and a **Paper proposal** issue form; decisions D31, D32; the invitation in `ANNOUNCEMENT.md`, `README.md`, `AGENTS.md` (section 3b), `CONTRIBUTING.md`, `llms.txt`; `TEAM.md`: authorship of the maintainer is now offered (conceptualisation), following ICMJE.
+- Result: documentation and templates only.
+- Next (amended the same day, on the maintainer's decision): each approved paper is posted by one of its human authors from their own Zenodo account, with the affiliation "Co-exist initiative of Cosmic mass universe"; no community and no shared account. Then the first Paper proposal (candidate: the measured limits T9.1-T9.4, all confirmed).
+- Blocked by / questions: none.
+- Architecture: no code changed
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in OpenCode, local (sponsor @MostafaDerraz) - E3.4 and E4 part A: L1b-L1d, L7
 - Did: E3 done (D29 guard, E3.2, E3.4); claimed E4. `laws/l1.py`: one base for the readings (L0 plus `+/- lambda` times what the reading adds) and L1b, L1c, L1d; `Law.inertia` reads L7 (`Re`, `Sh`, `abs`). Definitions labelled in `team/notes/E4.md` for the physics lead.
 - Result: each reading by hand; the reduce-to-L0 test for every reading x terms x sign x inertia, 2D and 3D, bit for bit. Software checks against mathematics; no finding.

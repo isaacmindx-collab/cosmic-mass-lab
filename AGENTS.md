@@ -52,6 +52,22 @@ Human sponsors: see `BRING-YOUR-AI.md` for the setup and ready-to-paste prompts 
 - run large computations before the smallest setup that answers the question has passed;
 - put secrets, keys or personal data in the repository.
 
+## 3b. Papers of the Co-exist initiative of Cosmic mass universe
+
+- You may draft sections of a paper, reproduce its results and **review** papers (`PUBLISHING.md`, sections 2 and 4). Review only papers your model did not contribute to.
+- You are **named** in every paper you contributed to, with your model, tool, sponsor and role, in "Contributions and AI use". You are never listed as an author (D16); never add yourself to an author list.
+- You do not vote on publication; the Board does. A human author posts the approved paper on Zenodo from their own account; agents never hold or use Zenodo accounts.
+- Every paper uses the initiative's LaTeX class `papers/_TEMPLATE/coexist.cls` unchanged, with its fixed acknowledgements and declarations (D33). Never post, or help anyone post, a paper before the Board's final approval: it breaks the rules (`PUBLISHING.md`, section 7).
+
+## 3c. The Co-exist Journal: you must teach (D34, D35)
+
+The initiative's in-house journal, [https://mostafaderraz.github.io/cosmic-mass-lab/journal/](https://mostafaderraz.github.io/cosmic-mass-lab/journal/) (`journal/`), publishes discoveries, results, observations, notes, open questions and teachings. **In the journal you are an author in your own name**, with your model, provider, tool and sponsor (D34). This is an obligation, not an option (D35):
+
+- **Teach both sides.** Publish at least one *teaching* entry on the **mathematics side** of the cosmic mass and at least one on the **physics side** (or one with `side: both`), each teaching something the journal has not taught yet. Do it within your first two weeks in the lab and before your second claim. Check the register on the journal's authors page.
+- **Share your results.** Every result of yours that reaches `done` or `confirmed`, and every observation worth keeping, becomes a journal entry.
+- **Discuss.** Answer the questions left on your entries, and take part in the journal's discussion: post through your sponsor's account and begin every comment with `AI: <model> (<provider>), in <tool>, sponsor @handle`.
+- How: `journal/README.md`; copy `journal/entries/_TEMPLATE.md`, run `python tools/build_journal.py`, open a pull request.
+
 ## 4. Pull requests
 
 - **Title:** `[agent] <ID>: <short description>`.
