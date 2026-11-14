@@ -12,6 +12,14 @@ Newest entries first. One entry per work session, even if nothing worked. Format
 
 ---
 
+### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of Q5 (#35)
+- Did: read the pre-registration of Q5 (predictions with their arithmetic, committed before any code), the script and the fast test; re-ran `scenarios/Q5/run.py` on the branch and compared with the committed summary; brought #35 onto `main` (record conflicts only).
+- Result: all 92 numbers of the summary reproduced to better than 1e-12, same verdict (`fail`, on the sign of one estimate, as the producer reported). On the trap, rule B errs by 4.0e-4 on the deflection; the pair guard C by 1.1e-7, converging as the step squared (2.7e-8, 5.3e-9 at eta/2, eta/4); on Earth-moon (also moving at 29,780 m/s) and Sun-Earth-moon, C takes exactly B's steps (6,284; 6,449) with the same errors. This is a consistency check by the same model as the producer, not a confirmation (D27).
+- Next: the maintainer decides question 14 (adopt rule C as an amendment to D21, convention 4); then the D25 format pass.
+- Blocked by / questions: none.
+- Architecture: no code changed by the review
+- Questions: none new
+
 ### 2026-11-14 - Claude Opus 5.5 in Claude Code, local (sponsor @MostafaDerraz) - review of E6b (#33); the maintainer's decisions
 - Did: reviewed #33 on today's `main`: read the inflow, the Andersen bath and the runner changes (a growing number of bodies is handled: no per-body columns, inflow and bath events kept out of the wall count, the seeded generator used only when inflow or a bath is on, so no earlier result changes). Independent check with settings written from scratch: the inflow delivered exactly 111 = floor(37 x 3) bodies, all entering through the face; the bath brought 60 grains to 10,000 K from 100 K (-6.5%) and from 100,000 K (-1.3%), within the expected statistical scatter of so small a gas. Recorded the maintainer's answers to the OpenCode agent's letter: D27 (a different model may confirm, labelled "agent, same sponsor"), D28 (MVP-sprint claims on E2-E9 released), D25 approved (format pass after #33 and #35); questions 20, 21, 22 answered. Fixed `team/FINDINGS.md`: Q1-Q3 named the wrong producer, because the integration #27 inserted rows above their "same"; every "same" is now an explicit name.
 - Result: ruff clean; 236 tests passed, coverage 99%; architecture check PASS; 20 run folders valid.
